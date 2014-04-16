@@ -8,7 +8,6 @@ HRESULT BoneHierarchyLoader::CreateFrame(LPCSTR Name, LPD3DXFRAME *ppNewFrame)
 {
 	frameCount++;
 	Bone *newBone = new Bone;
-	memset(newBone, 0, sizeof(Bone));
 
 	//Copy name
 	if(Name != NULL)
@@ -65,7 +64,6 @@ HRESULT BoneHierarchyLoader::CreateMeshContainer(LPCSTR Name,
 	meshCount++;
 	//Just return a temporary mesh for now...
 	BoneMesh* boneMesh = new BoneMesh;
-	memset( boneMesh, 0, sizeof(BoneMesh));
 
 	// Get Mesh Data
 	boneMesh->OriginalMesh = pMeshData->pMesh;

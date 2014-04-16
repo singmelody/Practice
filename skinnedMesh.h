@@ -7,6 +7,14 @@
 struct Bone: public D3DXFRAME
 {
 	D3DXMATRIX CombinedTransformationMatrix;
+
+	Bone()
+	{
+		Name = NULL;
+		pMeshContainer = NULL;
+		pFrameSibling = NULL;
+		pFrameFirstChild = NULL;
+	}
 };
 
 struct BoneMesh: public D3DXMESHCONTAINER
@@ -20,6 +28,26 @@ struct BoneMesh: public D3DXMESHCONTAINER
 	D3DXMATRIX** boneMatrixPtrs;
 	D3DXMATRIX* boneOffsetMatrices;
 	D3DXMATRIX* currentBoneMatrices;
+
+	BoneMesh()
+	{
+		OriginalMesh = NULL;
+		NumAttributeGroups = NULL;
+		attributeTable = NULL;
+		boneMatrixPtrs = NULL;
+		boneOffsetMatrices = NULL;
+		currentBoneMatrices = NULL;
+
+		// base
+		Name = NULL;
+		pMaterials = NULL;
+		pEffects = NULL;
+		NumMaterials = NULL;
+		pAdjacency = NULL;
+		pSkinInfo = NULL;
+	}
+
+
 };
 
 class BoneHierarchyLoader: public ID3DXAllocateHierarchy
