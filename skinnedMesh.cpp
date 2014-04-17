@@ -27,7 +27,7 @@ SkinnedMesh::SkinnedMesh()
 
 SkinnedMesh::~SkinnedMesh()
 {
-	BoneHierarchyLoader boneHierarchy;
+	BoneHierarchyLoaderSoft boneHierarchy;
 	boneHierarchy.DestroyFrame(m_pRootBone);
 
 	SAFE_RELEASE( m_pSphereMesh );
@@ -35,7 +35,7 @@ SkinnedMesh::~SkinnedMesh()
 
 void SkinnedMesh::Load(WCHAR* fileName)
 {
-	BoneHierarchyLoader boneHierarchy;
+	BoneHierarchyLoaderSoft boneHierarchy;
     HRESULT hr;
 
 	WCHAR str[MAX_PATH];
