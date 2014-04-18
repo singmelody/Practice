@@ -276,7 +276,7 @@ HRESULT BoneHierarchyLoaderHAL::CreateMeshContainer(LPCSTR Name,
 
 		pSkinInfo->ConvertToIndexedBlendedMesh( pMeshData->pMesh,
 												D3DXMESH_MANAGED | D3DXMESH_WRITEONLY, 
-												30,
+												35,
 												NULL,
 												NULL,
 												NULL,

@@ -27,7 +27,6 @@ ID3DXSprite*                g_pSprite = NULL;       // Sprite for batching draw 
 bool                        g_bShowHelp = true;     // If true, it renders the UI control text
 bool						g_bShowSkeloton = false;
 CModelViewerCamera          g_Camera;               // A model viewing camera
-ID3DXEffect*                g_pEffect = NULL;       // D3DX effect interface
 ID3DXMesh*                  g_pMesh = NULL;         // Mesh object
 SkinnedMesh*				g_SkinnedMesh = NULL;
 CDXUTDialogResourceManager  g_DialogResourceManager; // manager for shared resources of dialogs
@@ -608,7 +607,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         {
             V( g_pEffect->BeginPass( iPass ) );
 
-			g_SkinnedMesh->Render(NULL);
+			g_SkinnedMesh->RenderSoft(NULL);
 
             V( g_pEffect->EndPass() );
         }
@@ -634,7 +633,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 			g_pEffect->Begin(NULL, NULL);
 			g_pEffect->BeginPass(0);
 
-			g_SkinnedMesh->Render(NULL);
+			g_SkinnedMesh->RenderSoft(NULL);
 
 			g_pEffect->EndPass();
 			g_pEffect->End();

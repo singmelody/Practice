@@ -157,7 +157,7 @@ void SkinnedMesh::SetupBoneMatrixPointers(Bone *bone)
 
 }
 
-void SkinnedMesh::Render(Bone *bone)
+void SkinnedMesh::RenderSoft(Bone *bone)
 {
 	if(bone == NULL)
 		bone = (Bone *)m_pRootBone;
@@ -189,7 +189,7 @@ void SkinnedMesh::Render(Bone *bone)
 		
 
 			// Render core
-			for (int i = 0; i < boneMesh->NumAttributeGroups; ++i)
+			for (size_t i = 0; i < boneMesh->NumAttributeGroups; ++i)
 			{
 				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
 				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
@@ -200,8 +200,61 @@ void SkinnedMesh::Render(Bone *bone)
 	}
 
 	if(bone->pFrameSibling)
-		Render((Bone*)bone->pFrameSibling);
+		RenderSoft((Bone*)bone->pFrameSibling);
 
 	if(bone->pFrameFirstChild)
-		Render((Bone*)bone->pFrameFirstChild);
+		RenderSoft((Bone*)bone->pFrameFirstChild);
+}
+
+void SkinnedMesh::RenderHAL(Bone* bone)
+{
+	if(bone == NULL)
+		bone = (Bone *)m_pRootBone;
+
+	if (bone->pMeshContainer != NULL)
+	{ 
+		BoneMesh* boneMesh = (BoneMesh*)bone->pMeshContainer;
+
+		if(boneMesh->pSkinInfo != NULL)
+		{
+			int numBones = boneMesh->pSkinInfo->GetNumBones();
+
+			for (int i = 0; i < numBones; ++i)
+			{
+				D3DXMatrixMultiply( &boneMesh->currentBoneMatrices[i],
+					&boneMesh->boneOffsetMatrices[i],
+					boneMesh->boneMatrixPtrs[i]);
+			}
+
+			g_pEffect->SetMatrixArray( 
+				"MatrixPalette", boneMesh->currentBoneMatrices, numBones);
+
+
+			// Render core
+			for (size_t i = 0; i < boneMesh->NumAttributeGroups; ++i)
+			{
+				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
+
+				g_pEffect->SetTexture( "texDiffuse", 
+										boneMesh->textures[mtrlIndex]);
+
+				D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinHAL");
+				g_pEffect->SetTechnique(hTech);
+
+				g_pEffect->Begin( NULL, NULL);
+				g_pEffect->BeginPass(0);
+
+				boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
+
+				g_pEffect->EndPass();
+				g_pEffect->End();
+			}
+		}
+	}
+
+	if(bone->pFrameSibling)
+		RenderHAL((Bone*)bone->pFrameSibling);
+
+	if(bone->pFrameFirstChild)
+		RenderHAL((Bone*)bone->pFrameFirstChild);
 }

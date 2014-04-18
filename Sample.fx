@@ -24,7 +24,8 @@ float    g_fTime;                   // App's time in seconds
 float4x4 g_mWorld;                  // World matrix for object
 float4x4 g_mVP;    // World * View * Projection matrix
 
-
+float4x4 MatrixPalette[35]; 
+int numBoneInfluences = 2;
 
 //--------------------------------------------------------------------------------------
 // Texture samplers
@@ -60,9 +61,9 @@ VS_OUTPUT RenderSceneVS( float4 vPos : POSITION,
                          uniform bool bTexture,
                          uniform bool bAnimate )
 {
-    VS_OUTPUT Output;
+    VS_OUTPUT Output = (VS_OUTPUT)0;
+
     float3 vNormalWorldSpace;
-  
     float4 vAnimatedPos = vPos;
     
     // Animation the vertex based on time and the vertex's object space position
@@ -80,8 +81,6 @@ VS_OUTPUT RenderSceneVS( float4 vPos : POSITION,
     float3 vTotalLightDiffuse = float3(0,0,0);
     for(int i=0; i<nNumLights; i++ )
 	{
-		//Output.shade = max(dot(vNormalWorldSpace, normalize(g_LightDir[i] - worldPos)), 0.2f);
-
 		vTotalLightDiffuse += g_LightDiffuse[i] * max(0.1f,dot(vNormalWorldSpace, (g_LightDir[i] - worldPos)));
 	}
         
@@ -97,6 +96,48 @@ VS_OUTPUT RenderSceneVS( float4 vPos : POSITION,
     return Output;    
 }
 
+VS_OUTPUT RenderSkinHALVS( float4 vPos : POSITION, 
+                         float3 vNormal : NORMAL,
+                         float2 vTexCoord0 : TEXCOORD0,
+						 float4 weights : BLENDWEIGHT0,
+						 int4	boneIndices : BLENDINDICES0,
+                         uniform int nNumLights,
+                         uniform bool bTexture,
+                         uniform bool bAnimate )
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0;
+
+	float3 vNormalWorldSpace;
+    float4 vAnimatedPos = vPos;
+    
+    // Animation the vertex based on time and the vertex's object space position
+    if( bAnimate )
+		vAnimatedPos += float4(vNormal, 0) * (sin(g_fTime+5.5)+0.5)*5;
+    
+    // Transform the position from object space to homogeneous projection space
+    float4 worldPos = mul(vAnimatedPos, g_mWorld);
+	Output.Position = mul( worldPos, g_mVP);
+    
+    // Transform the normal from object space to world space    
+    vNormalWorldSpace = normalize(mul(vNormal, (float3x3)g_mWorld)); // normal (world space)
+
+	int n = numBoneInfluences - 1;
+	float lastWeight = 0.0f;
+	//Blend vertex position & normal
+	for(int i = 0; i < n; ++i)
+	{
+		lastWeight += IN.weights[i];
+	}
+
+
+	// Just copy the texture coordinate through
+    if( bTexture ) 
+        Output.TextureUV = vTexCoord0; 
+    else
+        Output.TextureUV = 0; 
+    
+    return Output;   		
+}
 
 //--------------------------------------------------------------------------------------
 // Pixel shader output structure
@@ -182,3 +223,15 @@ technique Shadow
 		PixelShader  = compile ps_2_0 RenderShadowPS(false);
 	}
 }
+
+// HAL Skinning
+technique SkinHAL
+{
+	pass P0
+	{
+		VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
+		PixelShader  = compile ps_2_0 RenderScenePS(false);
+	}
+}
+
+// TODO Add Soft Skinning technique 

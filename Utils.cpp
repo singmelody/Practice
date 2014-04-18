@@ -11,3 +11,5 @@ wchar_t *GetWC(const char *c)
 
 	return wc;
 }
+
+ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface
