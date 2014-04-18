@@ -106,29 +106,41 @@ VS_OUTPUT RenderSkinHALVS( float4 vPos : POSITION,
                          uniform bool bAnimate )
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-
-	float3 vNormalWorldSpace;
-    float4 vAnimatedPos = vPos;
-    
-    // Animation the vertex based on time and the vertex's object space position
-    if( bAnimate )
-		vAnimatedPos += float4(vNormal, 0) * (sin(g_fTime+5.5)+0.5)*5;
     
     // Transform the position from object space to homogeneous projection space
-    float4 worldPos = mul(vAnimatedPos, g_mWorld);
-	Output.Position = mul( worldPos, g_mVP);
-    
-    // Transform the normal from object space to world space    
-    vNormalWorldSpace = normalize(mul(vNormal, (float3x3)g_mWorld)); // normal (world space)
-
-	int n = numBoneInfluences - 1;
+    float4 localPos = float4( 0.0f, 0.0f, 0.0f, 0.0f);
+	float3 normal = float3( 0.0f, 0.0f, 0.0f);
 	float lastWeight = 0.0f;
+
+	vNormal  = normalize(vNormal);
+	int n = numBoneInfluences - 1;
 	//Blend vertex position & normal
 	for(int i = 0; i < n; ++i)
 	{
-		lastWeight += IN.weights[i];
+		lastWeight += weights[i];
+		localPos += weights[i] * mul( vPos, MatrixPalette[boneIndices[i]]);
+		normal += weights[i] * mul( vNormal, MatrixPalette[boneIndices[i]]);
 	}
+	lastWeight = 1.0f - lastWeight;
 
+	localPos += lastWeight * mul( vPos, MatrixPalette[boneIndices[n]]);
+	normal += lastWeight * mul( vNormal, MatrixPalette[boneIndices[n]]);
+	localPos.w = 1.0f;
+	
+	float4 worldPos = mul( localPos, g_mWorld);
+	Output.Position = mul( worldPos, g_mVP);
+    
+    // Transform the normal from object space to world space    
+	normal = normalize(normal);
+    float3 worldNormal = normalize(mul(normal, (float3x3)g_mWorld)); // normal (world space)
+
+	// Compute simple directional lighting equation
+    float3 vTotalLightDiffuse = float3(0,0,0);
+    for(int i=0; i<nNumLights; i++ )
+		vTotalLightDiffuse += g_LightDiffuse[i] * max(0.1f,dot(worldNormal, (g_LightDir[i] - worldPos)));
+        
+    Output.Diffuse.rgb = g_MaterialDiffuseColor * vTotalLightDiffuse + g_MaterialAmbientColor * g_LightAmbient;   
+    Output.Diffuse.a = 1.0f; 
 
 	// Just copy the texture coordinate through
     if( bTexture ) 
@@ -230,7 +242,7 @@ technique SkinHAL
 	pass P0
 	{
 		VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
-		PixelShader  = compile ps_2_0 RenderScenePS(false);
+		PixelShader  = compile ps_2_0 RenderScenePS(true);
 	}
 }
 

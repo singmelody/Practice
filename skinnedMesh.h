@@ -3,6 +3,7 @@
 
 #include <d3dx9.h>
 #include <vector>
+#include "BoneHierarchyLoader.h"
 
 struct Bone: public D3DXFRAME
 {
@@ -67,5 +68,5 @@ private:
 	D3DXFRAME *m_pRootBone;
 	LPD3DXMESH m_pSphereMesh;
 
-
+	BoneHierarchyLoaderHAL m_boneHierarchy;
 };

@@ -3,7 +3,6 @@
 #include "skinnedMesh.h"
 #include <Windows.h>
 #include "Utils.h"
-#include "BoneHierarchyLoader.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //									SKINNED MESH												//
@@ -27,22 +26,20 @@ SkinnedMesh::SkinnedMesh()
 
 SkinnedMesh::~SkinnedMesh()
 {
-	BoneHierarchyLoaderSoft boneHierarchy;
-	boneHierarchy.DestroyFrame(m_pRootBone);
+	m_boneHierarchy.DestroyFrame(m_pRootBone);
 
 	SAFE_RELEASE( m_pSphereMesh );
 }
 
 void SkinnedMesh::Load(WCHAR* fileName)
 {
-	BoneHierarchyLoaderSoft boneHierarchy;
     HRESULT hr;
 
 	WCHAR str[MAX_PATH];
 	V( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, fileName ) );
 
 	//Load a bone hierarchy from a file
-	D3DXLoadMeshHierarchyFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), &boneHierarchy,
+	D3DXLoadMeshHierarchyFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), &m_boneHierarchy,
 		NULL, &m_pRootBone, NULL);
 
 	SetupBoneMatrixPointers((Bone*)m_pRootBone);
@@ -194,6 +191,7 @@ void SkinnedMesh::RenderSoft(Bone *bone)
 				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
 				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
 				DXUTGetD3D9Device()->SetTexture( 0, boneMesh->textures[i]);
+
 				boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
 			}
 		}
@@ -235,12 +233,13 @@ void SkinnedMesh::RenderHAL(Bone* bone)
 			{
 				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
 
-				g_pEffect->SetTexture( "texDiffuse", 
-										boneMesh->textures[mtrlIndex]);
+				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
+				DXUTGetD3D9Device()->SetTexture( 0, boneMesh->textures[mtrlIndex]);
+
+				g_pEffect->SetTexture( "g_MeshTexture",  boneMesh->textures[mtrlIndex]);
 
 				D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinHAL");
 				g_pEffect->SetTechnique(hTech);
-
 				g_pEffect->Begin( NULL, NULL);
 				g_pEffect->BeginPass(0);
 

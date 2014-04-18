@@ -600,54 +600,61 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         }
 
 
-        // Apply the technique contained in the effect 
-        V( g_pEffect->Begin( &cPasses, 0 ) );
+//         // Apply the SoftSkin technique contained in the effect 
+// 		{
+// 
+// 			V( g_pEffect->Begin( &cPasses, 0 ) );
+// 
+// 			for( iPass = 0; iPass < cPasses; iPass++ )
+// 			{
+// 				V( g_pEffect->BeginPass( iPass ) );
+// 
+// 				g_SkinnedMesh->RenderSoft(NULL);
+// 
+// 				V( g_pEffect->EndPass() );
+// 			}
+// 			V( g_pEffect->End() );
+// 		}
 
-        for( iPass = 0; iPass < cPasses; iPass++ )
-        {
-            V( g_pEffect->BeginPass( iPass ) );
+		// Apply the HALSkin technique contained in the effect
+		g_SkinnedMesh->RenderHAL(NULL);
 
-			g_SkinnedMesh->RenderSoft(NULL);
-
-            V( g_pEffect->EndPass() );
-        }
-        V( g_pEffect->End() );
 
 		// Render Shadow
-		{
-			D3DXMATRIX identity, shadow;
-			D3DXMatrixIdentity(&identity);
-
-			//Set ground plane + light position
-			D3DXPLANE ground(0.0f, -1.0f, 0.0f, 0.0f);
-			D3DXVECTOR4 lightPos(20.0f, -75.0f, 120.0f, 0.0f);
-
-			//Create the shadow matrix
-			D3DXMatrixShadow(&shadow, &lightPos, &ground);
-
-			g_pEffect->SetMatrix("g_mWorld", &shadow);
-			mViewProjection = mView * mProj;
-
-			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
-			g_pEffect->SetTechnique(hTech);
-			g_pEffect->Begin(NULL, NULL);
-			g_pEffect->BeginPass(0);
-
-			g_SkinnedMesh->RenderSoft(NULL);
-
-			g_pEffect->EndPass();
-			g_pEffect->End();
-		}
+// 		{
+// 			D3DXMATRIX identity, shadow;
+// 			D3DXMatrixIdentity(&identity);
+// 
+// 			//Set ground plane + light position
+// 			D3DXPLANE ground(0.0f, -1.0f, 0.0f, 0.0f);
+// 			D3DXVECTOR4 lightPos(20.0f, -75.0f, 120.0f, 0.0f);
+// 
+// 			//Create the shadow matrix
+// 			D3DXMatrixShadow(&shadow, &lightPos, &ground);
+// 
+// 			g_pEffect->SetMatrix("g_mWorld", &shadow);
+// 			mViewProjection = mView * mProj;
+// 
+// 			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
+// 			g_pEffect->SetTechnique(hTech);
+// 			g_pEffect->Begin(NULL, NULL);
+// 			g_pEffect->BeginPass(0);
+// 
+// 			g_SkinnedMesh->RenderSoft(NULL);
+// 
+// 			g_pEffect->EndPass();
+// 			g_pEffect->End();
+// 		}
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
 		pd3dDevice->SetTransform(D3DTS_PROJECTION, g_Camera.GetProjMatrix());
 
-		if(g_bShowSkeloton)
-		{
-			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
-			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
-		}
+// 		if(g_bShowSkeloton)
+// 		{
+// 			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
+// 			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
+// 		}
 
         g_HUD.OnRender( fElapsedTime );
         g_SampleUI.OnRender( fElapsedTime );
