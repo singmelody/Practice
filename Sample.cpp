@@ -533,7 +533,7 @@ void RenderShadow()
 	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
 	g_pEffect->SetTechnique(hTech);
 
-	g_SkinnedMesh->RenderHAL(NULL);
+	g_SkinnedMesh->RenderHAL(NULL,"Shadow","Shadow");
 }
 
 
@@ -628,14 +628,12 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 
 		// Apply the HALSkin technique contained in the effect
-		D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinHAL");
-		g_pEffect->SetTechnique(hTech);
-		g_SkinnedMesh->RenderHAL(NULL);
+		g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", );
 
 
 		// Render Shadow
  		{
-			RenderShadow();
+//			RenderShadow();
  		}
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);

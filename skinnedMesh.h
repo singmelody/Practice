@@ -57,8 +57,8 @@ public:
 	SkinnedMesh();
 	~SkinnedMesh();
 	void Load(WCHAR* fileName);
-	void RenderSoft(Bone *bone);
-	void RenderHAL(Bone* bone);
+	void RenderSoft(Bone *bone, const char* animTech, const char* staticTech);
+	void RenderHAL(Bone* bone,const char* animTech, const char* staticTech);
 	void RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world);
 
 private:		
