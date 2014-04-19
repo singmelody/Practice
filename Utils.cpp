@@ -13,3 +13,4 @@ wchar_t *GetWC(const char *c)
 }
 
 ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface
+SkinnedMesh*	g_SkinnedMesh = NULL;

@@ -184,7 +184,6 @@ void SkinnedMesh::RenderSoft(Bone *bone)
 			boneMesh->MeshData.pMesh->UnlockVertexBuffer();
 			boneMesh->OriginalMesh->UnlockVertexBuffer();
 		
-
 			// Render core
 			for (size_t i = 0; i < boneMesh->NumAttributeGroups; ++i)
 			{
@@ -192,7 +191,22 @@ void SkinnedMesh::RenderSoft(Bone *bone)
 				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
 				DXUTGetD3D9Device()->SetTexture( 0, boneMesh->textures[i]);
 
-				boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
+				g_pEffect->SetTexture( "g_MeshTexture",  boneMesh->textures[mtrlIndex]);
+
+				UINT iPass, cPasses;
+				g_pEffect->Begin( &cPasses, NULL);
+
+				for (iPass = 0; iPass < cPasses; ++iPass)
+				{
+					g_pEffect->BeginPass(iPass);
+
+					boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
+
+					g_pEffect->EndPass();
+
+				}
+
+				g_pEffect->End();
 			}
 		}
 	}
@@ -238,8 +252,6 @@ void SkinnedMesh::RenderHAL(Bone* bone)
 
 				g_pEffect->SetTexture( "g_MeshTexture",  boneMesh->textures[mtrlIndex]);
 
-				D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinHAL");
-				g_pEffect->SetTechnique(hTech);
 				g_pEffect->Begin( NULL, NULL);
 				g_pEffect->BeginPass(0);
 

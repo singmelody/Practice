@@ -28,7 +28,6 @@ bool                        g_bShowHelp = true;     // If true, it renders the U
 bool						g_bShowSkeloton = false;
 CModelViewerCamera          g_Camera;               // A model viewing camera
 ID3DXMesh*                  g_pMesh = NULL;         // Mesh object
-SkinnedMesh*				g_SkinnedMesh = NULL;
 CDXUTDialogResourceManager  g_DialogResourceManager; // manager for shared resources of dialogs
 CD3DSettingsDlg             g_SettingsDlg;          // Device settings dialog
 CDXUTDialog                 g_HUD;                  // manages the 3D UI
@@ -495,7 +494,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
     g_Camera.FrameMove( fElapsedTime );
 }
 
-// just for wrapper render pipleline
+// just for wrapper render mesh
 void RenderMesh()
 {
 	int numMaterials = (int)m_materials.size();
@@ -513,6 +512,28 @@ void RenderMesh()
 		// Render Mesh
 		g_pMesh->DrawSubset(i);
 	}
+}
+
+
+// just for wrapper render shadow
+void RenderShadow()
+{
+	D3DXMATRIX identity, shadow;
+	D3DXMatrixIdentity(&identity);
+
+	//Set ground plane + light position
+	D3DXPLANE ground(0.0f, -1.0f, 0.0f, 0.0f);
+	D3DXVECTOR4 lightPos(20.0f, -75.0f, 120.0f, 0.0f);
+
+	//Create the shadow matrix
+	D3DXMatrixShadow(&shadow, &lightPos, &ground);
+
+	g_pEffect->SetMatrix("g_mWorld", &shadow);
+
+	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
+	g_pEffect->SetTechnique(hTech);
+
+	g_SkinnedMesh->RenderHAL(NULL);
 }
 
 
@@ -600,61 +621,32 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         }
 
 
-//         // Apply the SoftSkin technique contained in the effect 
-// 		{
-// 
-// 			V( g_pEffect->Begin( &cPasses, 0 ) );
-// 
-// 			for( iPass = 0; iPass < cPasses; iPass++ )
-// 			{
-// 				V( g_pEffect->BeginPass( iPass ) );
-// 
-// 				g_SkinnedMesh->RenderSoft(NULL);
-// 
-// 				V( g_pEffect->EndPass() );
-// 			}
-// 			V( g_pEffect->End() );
-// 		}
+		// Apply the SoftSkin technique contained in the effect 
+// 		D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinSoft");
+// 		g_pEffect->SetTechnique(hTech);
+// 		g_SkinnedMesh->RenderSoft(NULL);
+
 
 		// Apply the HALSkin technique contained in the effect
+		D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinHAL");
+		g_pEffect->SetTechnique(hTech);
 		g_SkinnedMesh->RenderHAL(NULL);
 
 
 		// Render Shadow
-// 		{
-// 			D3DXMATRIX identity, shadow;
-// 			D3DXMatrixIdentity(&identity);
-// 
-// 			//Set ground plane + light position
-// 			D3DXPLANE ground(0.0f, -1.0f, 0.0f, 0.0f);
-// 			D3DXVECTOR4 lightPos(20.0f, -75.0f, 120.0f, 0.0f);
-// 
-// 			//Create the shadow matrix
-// 			D3DXMatrixShadow(&shadow, &lightPos, &ground);
-// 
-// 			g_pEffect->SetMatrix("g_mWorld", &shadow);
-// 			mViewProjection = mView * mProj;
-// 
-// 			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
-// 			g_pEffect->SetTechnique(hTech);
-// 			g_pEffect->Begin(NULL, NULL);
-// 			g_pEffect->BeginPass(0);
-// 
-// 			g_SkinnedMesh->RenderSoft(NULL);
-// 
-// 			g_pEffect->EndPass();
-// 			g_pEffect->End();
-// 		}
+ 		{
+			RenderShadow();
+ 		}
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
 		pd3dDevice->SetTransform(D3DTS_PROJECTION, g_Camera.GetProjMatrix());
 
-// 		if(g_bShowSkeloton)
-// 		{
-// 			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
-// 			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
-// 		}
+		if(g_bShowSkeloton)
+		{
+			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
+			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
+		}
 
         g_HUD.OnRender( fElapsedTime );
         g_SampleUI.OnRender( fElapsedTime );

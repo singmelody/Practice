@@ -69,4 +69,6 @@ private:
 	LPD3DXMESH m_pSphereMesh;
 
 	BoneHierarchyLoaderHAL m_boneHierarchy;
+//	BoneHierarchyLoaderSoft m_boneHierarchy;
+
 };

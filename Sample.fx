@@ -231,7 +231,7 @@ technique Shadow
 	{        
 		Lighting = false;
 
-        VertexShader = compile vs_2_0 RenderSceneVS( 1, false, false );
+        VertexShader = compile vs_2_0 RenderSkinHALVS( 1, false, false );
 		PixelShader  = compile ps_2_0 RenderShadowPS(false);
 	}
 }
@@ -246,4 +246,12 @@ technique SkinHAL
 	}
 }
 
-// TODO Add Soft Skinning technique 
+// Soft Skinning
+technique SkinSoft
+{
+	pass P0
+	{
+		VertexShader = compile vs_2_0 RenderSceneVS( 1, true, false );
+		PixelShader  = compile ps_2_0 RenderScenePS(true);
+	}
+}
