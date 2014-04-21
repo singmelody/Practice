@@ -224,8 +224,70 @@ technique RenderSceneNoTexture
     }
 }
 
+//--------------------------------------------------------------------------------------
+// Renders scene to render target
+//--------------------------------------------------------------------------------------
+technique RenderSceneWithTexture1LightHAL
+{
+    pass P0
+    {          
+        VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
+        PixelShader  = compile ps_2_0 RenderScenePS( true ); // trivial pixel shader (could use FF instead if desired)
+    }
+}
+
+technique RenderSceneWithTexture2LightHAL
+{
+    pass P0
+    {          
+        VertexShader = compile vs_2_0 RenderSkinHALVS( 2, true, false );
+        PixelShader  = compile ps_2_0 RenderScenePS( true ); // trivial pixel shader (could use FF instead if desired)
+    }
+}
+
+technique RenderSceneWithTexture3LightHAL
+{
+    pass P0
+    {          
+        VertexShader = compile vs_2_0 RenderSkinHALVS( 3, true, false );
+        PixelShader  = compile ps_2_0 RenderScenePS( true ); // trivial pixel shader (could use FF instead if desired)
+    }
+}
+
+technique RenderSceneNoTextureHAL
+{
+    pass P0
+    {          
+        VertexShader = compile vs_2_0 RenderSkinHALVS( 1, false, false );
+        PixelShader  = compile ps_2_0 RenderScenePS( false ); // trivial pixel shader (could use FF instead if desired)
+    }
+}
+
 //Shadow Technique
-technique Shadow
+technique ShadowSoft
+{
+	pass P0
+	{        
+		Lighting = false;
+
+        VertexShader = compile vs_2_0 RenderSceneVS( 1, false, false );
+		PixelShader  = compile ps_2_0 RenderShadowPS(false);
+	}
+}
+
+// Soft Skinning
+technique SkinSoft
+{
+	pass P0
+	{
+		VertexShader = compile vs_2_0 RenderSceneVS( 1, true, false );
+		PixelShader  = compile ps_2_0 RenderScenePS(true);
+	}
+}
+
+
+//Shadow Technique
+technique ShadowHAL
 {
 	pass P0
 	{        
@@ -242,16 +304,6 @@ technique SkinHAL
 	pass P0
 	{
 		VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
-		PixelShader  = compile ps_2_0 RenderScenePS(true);
-	}
-}
-
-// Soft Skinning
-technique SkinSoft
-{
-	pass P0
-	{
-		VertexShader = compile vs_2_0 RenderSceneVS( 1, true, false );
 		PixelShader  = compile ps_2_0 RenderScenePS(true);
 	}
 }

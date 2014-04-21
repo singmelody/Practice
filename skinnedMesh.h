@@ -5,6 +5,8 @@
 #include <vector>
 #include "BoneHierarchyLoader.h"
 
+#define SOFT 1
+
 struct Bone: public D3DXFRAME
 {
 	D3DXMATRIX CombinedTransformationMatrix;
@@ -57,10 +59,11 @@ public:
 	SkinnedMesh();
 	~SkinnedMesh();
 	void Load(WCHAR* fileName);
-	void RenderSoft(Bone *bone, const char* animTech, const char* staticTech);
-	void RenderHAL(Bone* bone,const char* animTech, const char* staticTech);
+	void RenderSoft(Bone *bone, const char* animTech, const char* staticTech, bool shadow = false);
+	void RenderHAL(Bone* bone,const char* animTech, const char* staticTech, bool shadow = false);
 	void RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world);
 
+	void SetShadowMatrix(D3DXMATRIX& matrix) { m_shadow = matrix; }
 private:		
 	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 	void SetupBoneMatrixPointers(Bone *bone);
@@ -68,7 +71,11 @@ private:
 	D3DXFRAME *m_pRootBone;
 	LPD3DXMESH m_pSphereMesh;
 
+#ifdef SOFT
+	BoneHierarchyLoaderSoft m_boneHierarchy;
+#else 
 	BoneHierarchyLoaderHAL m_boneHierarchy;
-//	BoneHierarchyLoaderSoft m_boneHierarchy;
+#endif
 
+	D3DXMATRIX m_shadow;
 };

@@ -528,12 +528,13 @@ void RenderShadow()
 	//Create the shadow matrix
 	D3DXMatrixShadow(&shadow, &lightPos, &ground);
 
-	g_pEffect->SetMatrix("g_mWorld", &shadow);
+	g_SkinnedMesh->SetShadowMatrix(shadow);
 
-	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Shadow");
-	g_pEffect->SetTechnique(hTech);
-
-	g_SkinnedMesh->RenderHAL(NULL,"Shadow","Shadow");
+#if SOFT
+	g_SkinnedMesh->RenderSoft(NULL,"ShadowSoft","ShadowSoft", true);
+#else
+	g_SkinnedMesh->RenderHAL(NULL,"ShadowHAL","ShadowSoft", true);
+#endif
 }
 
 
@@ -610,30 +611,29 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
         // Render the scene with this technique 
         // as defined in the .fx file
+
+		std::string techName;
         switch( g_nNumActiveLights )
         {
             case 1:
-                V( g_pEffect->SetTechnique( "RenderSceneWithTexture1Light" ) ); break;
+				techName = "RenderSceneWithTexture1Light"; break;
             case 2:
-                V( g_pEffect->SetTechnique( "RenderSceneWithTexture2Light" ) ); break;
+				techName = "RenderSceneWithTexture2Light"; break;
             case 3:
-                V( g_pEffect->SetTechnique( "RenderSceneWithTexture3Light" ) ); break;
+				techName = "RenderSceneWithTexture3Light"; break;
         }
 
-
+#ifdef SOFT
 		// Apply the SoftSkin technique contained in the effect 
-// 		D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinSoft");
-// 		g_pEffect->SetTechnique(hTech);
-// 		g_SkinnedMesh->RenderSoft(NULL);
-
-
+		g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
+#else
 		// Apply the HALSkin technique contained in the effect
-		g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", );
-
+		g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+#endif
 
 		// Render Shadow
  		{
-//			RenderShadow();
+			RenderShadow();
  		}
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);

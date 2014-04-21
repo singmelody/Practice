@@ -158,7 +158,7 @@ void SkinnedMesh::SetupBoneMatrixPointers(Bone *bone)
 
 }
 
-void SkinnedMesh::RenderSoft(Bone *bone, const char* animTech, const char* staticTech)
+void SkinnedMesh::RenderSoft(Bone *bone, const char* animTech, const char* staticTech, bool shadow)
 {
 	if(bone == NULL)
 		bone = (Bone *)m_pRootBone;
@@ -197,6 +197,20 @@ void SkinnedMesh::RenderSoft(Bone *bone, const char* animTech, const char* stati
 
 				g_pEffect->SetTexture( "g_MeshTexture",  boneMesh->textures[mtrlIndex]);
 
+				D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(animTech);
+				g_pEffect->SetTechnique(hTech);
+
+				if(!shadow)
+				{
+					D3DXMATRIX identity;
+					D3DXMatrixIdentity(&identity);
+					g_pEffect->SetMatrix( "g_mWorld", &identity);
+				}
+				else
+				{
+					g_pEffect->SetMatrix( "g_mWorld", &m_shadow);
+				}
+
 				UINT iPass, cPasses;
 				g_pEffect->Begin( &cPasses, NULL);
 
@@ -213,71 +227,20 @@ void SkinnedMesh::RenderSoft(Bone *bone, const char* animTech, const char* stati
 				g_pEffect->End();
 			}
 		}
-	}
-
-	if(bone->pFrameSibling)
-		RenderSoft((Bone*)bone->pFrameSibling, animTech, staticTech);
-
-	if(bone->pFrameFirstChild)
-		RenderSoft((Bone*)bone->pFrameFirstChild, animTech, staticTech);
-}
-
-void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* staticTech)
-{
-	if(bone == NULL)
-		bone = (Bone *)m_pRootBone;
-
-	if (bone->pMeshContainer != NULL)
-	{ 
-		BoneMesh* boneMesh = (BoneMesh*)bone->pMeshContainer;
-
-		if(boneMesh->pSkinInfo != NULL)
-		{
-			int numBones = boneMesh->pSkinInfo->GetNumBones();
-
-			for (int i = 0; i < numBones; ++i)
-			{
-				D3DXMatrixMultiply( &boneMesh->currentBoneMatrices[i],
-					&boneMesh->boneOffsetMatrices[i],
-					boneMesh->boneMatrixPtrs[i]);
-			}
-
-			g_pEffect->SetMatrixArray( 
-				"MatrixPalette", boneMesh->currentBoneMatrices, numBones);
-
-			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SkinHAL");
-			g_pEffect->SetTechnique(hTech);
-
-			// set world
-			D3DXMATRIX identity;
-			D3DXMatrixIdentity(&identity);
-
-			g_pEffect->SetMatrix( "g_mWorld", &identity);
-
-			// Render core
-			for (size_t i = 0; i < boneMesh->NumAttributeGroups; ++i)
-			{
-				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
-
-				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
-				DXUTGetD3D9Device()->SetTexture( 0, boneMesh->textures[mtrlIndex]);
-
-				g_pEffect->SetTexture( "g_MeshTexture",  boneMesh->textures[mtrlIndex]);
-
-				g_pEffect->Begin( NULL, NULL);
-				g_pEffect->BeginPass(0);
-
-				boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
-
-				g_pEffect->EndPass();
-				g_pEffect->End();
-			}
-		}
 		else
 		{
-			g_pEffect->SetMatrix( "g_mWorld", &bone->CombinedTransformationMatrix);
+			if(!shadow)
+			{
+				g_pEffect->SetMatrix( "g_mWorld", &bone->CombinedTransformationMatrix);
+			}
+			else
+			{
+				D3DXMATRIX result;
+				D3DXMatrixMultiply( &result, &bone->CombinedTransformationMatrix, &m_shadow);
+				g_pEffect->SetMatrix( "g_mWorld", &result);
+			}
 
-			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("RenderSceneWithTexture1Light");
+			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(staticTech);
 			g_pEffect->SetTechnique(hTech);
 
 			//Render the mesh
@@ -300,8 +263,106 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 	}
 
 	if(bone->pFrameSibling)
-		RenderHAL((Bone*)bone->pFrameSibling, animTech, staticTech);
+		RenderSoft((Bone*)bone->pFrameSibling, animTech, staticTech, shadow);
 
 	if(bone->pFrameFirstChild)
-		RenderHAL((Bone*)bone->pFrameFirstChild, animTech, staticTech);
+		RenderSoft((Bone*)bone->pFrameFirstChild, animTech, staticTech, shadow);
+}
+
+void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* staticTech, bool shadow)
+{
+	if(bone == NULL)
+		bone = (Bone *)m_pRootBone;
+
+	if (bone->pMeshContainer != NULL)
+	{ 
+		BoneMesh* boneMesh = (BoneMesh*)bone->pMeshContainer;
+
+		if(boneMesh->pSkinInfo != NULL)
+		{
+			int numBones = boneMesh->pSkinInfo->GetNumBones();
+
+			for (int i = 0; i < numBones; ++i)
+			{
+				D3DXMatrixMultiply( &boneMesh->currentBoneMatrices[i],
+					&boneMesh->boneOffsetMatrices[i],
+					boneMesh->boneMatrixPtrs[i]);
+			}
+
+			g_pEffect->SetMatrixArray( 
+				"MatrixPalette", boneMesh->currentBoneMatrices, numBones);
+
+			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(animTech);
+			g_pEffect->SetTechnique(hTech);
+
+			if(!shadow)
+			{
+				D3DXMATRIX identity;
+				D3DXMatrixIdentity(&identity);
+				g_pEffect->SetMatrix( "g_mWorld", &identity);
+			}
+			else
+			{
+				g_pEffect->SetMatrix( "g_mWorld", &m_shadow);
+			}
+
+			// Render core
+			for (size_t i = 0; i < boneMesh->NumAttributeGroups; ++i)
+			{
+				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
+
+				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
+				DXUTGetD3D9Device()->SetTexture( 0, boneMesh->textures[mtrlIndex]);
+
+				g_pEffect->SetTexture( "g_MeshTexture",  boneMesh->textures[mtrlIndex]);
+
+				g_pEffect->Begin( NULL, NULL);
+				g_pEffect->BeginPass(0);
+
+				boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
+
+				g_pEffect->EndPass();
+				g_pEffect->End();
+			}
+		}
+		else
+		{
+			if(!shadow)
+			{
+				g_pEffect->SetMatrix( "g_mWorld", &bone->CombinedTransformationMatrix);
+			}
+			else
+			{
+				D3DXMATRIX result;
+				D3DXMatrixMultiply( &result, &bone->CombinedTransformationMatrix, &m_shadow);
+				g_pEffect->SetMatrix( "g_mWorld", &result);
+			}
+
+			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(staticTech);
+			g_pEffect->SetTechnique(hTech);
+
+			//Render the mesh
+			int numMaterials = (int)boneMesh->materials.size();
+
+			for (int i = 0; i < numMaterials; ++i)
+			{
+				DXUTGetD3D9Device()->SetMaterial(&boneMesh->materials[i]);
+				g_pEffect->SetTexture( "g_MeshTexture", boneMesh->textures[i]);
+
+				g_pEffect->Begin( NULL, NULL);
+				g_pEffect->BeginPass(0);
+
+				boneMesh->MeshData.pMesh->DrawSubset(i);
+
+				g_pEffect->EndPass();
+				g_pEffect->End();
+			}
+		}
+	}
+
+	if(bone->pFrameSibling)
+		RenderHAL((Bone*)bone->pFrameSibling, animTech, staticTech, shadow);
+
+	if(bone->pFrameFirstChild)
+		RenderHAL((Bone*)bone->pFrameFirstChild, animTech, staticTech, shadow);
 }
