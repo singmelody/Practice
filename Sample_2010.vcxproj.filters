@@ -78,6 +78,7 @@
     <ClCompile Include="Utils.h" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
+    <ClCompile Include="animation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -93,6 +94,7 @@
     </ResourceCompile>
     <ClInclude Include="skinnedMesh.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
+    <ClInclude Include="animation.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

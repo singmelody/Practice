@@ -379,10 +379,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="animation.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="skinnedMesh.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Utils.h" />
+    <ClInclude Include="animation.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="skinnedMesh.h" />
     <None Include="DXUT\Optional\directx.ico" />

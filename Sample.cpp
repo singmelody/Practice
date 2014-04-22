@@ -307,6 +307,10 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     D3DXMatrixRotationX( &m, D3DX_PI / 2.0f );
     g_mCenterWorld *= m;
 
+	// Create Sprite
+	D3DXCreateLine( pd3dDevice, &g_Line);
+	g_Anim = new Animation();
+
     V_RETURN( CDXUTDirectionWidget::StaticOnD3D9CreateDevice( pd3dDevice ) );
     for( int i = 0; i < MAX_LIGHTS; i++ )
         g_LightControl[i].SetRadius( g_RadiusObject );
@@ -644,6 +648,9 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		{
 			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
 			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
+
+			g_Anim->Update(fElapsedTime);
+			g_Anim->Draw();
 		}
 
         g_HUD.OnRender( fElapsedTime );
@@ -859,8 +866,9 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     SAFE_RELEASE( g_pEffect );
     SAFE_RELEASE( g_pFont );
     SAFE_RELEASE( g_pMesh );
+	SAFE_RELEASE( g_Line );
 	SAFE_DELETE( g_SkinnedMesh );
-
+	SAFE_DELETE( g_Anim );
 
 	//Clear textures and materials
 	for(size_t i=0;i<m_textures.size();i++)
