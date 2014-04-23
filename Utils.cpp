@@ -16,4 +16,5 @@ ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface
 SkinnedMesh*	g_SkinnedMesh = NULL;
 ID3DXLine*		g_Line = NULL;
 Animation*		g_Anim = NULL;
+int				g_activeAnimation = 0;
 

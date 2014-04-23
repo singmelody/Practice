@@ -64,12 +64,21 @@ public:
 	void RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world);
 
 	void SetShadowMatrix(D3DXMATRIX& matrix) { m_shadow = matrix; }
+
+	void SetPose(D3DXMATRIX world, float time);
+	void SetAnimation(const std::string& name);
+	void GetAnimations();
+
+	const std::vector<std::string>& GetAnimationNames();
+
 private:		
 	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 	void SetupBoneMatrixPointers(Bone *bone);
 
 	D3DXFRAME *m_pRootBone;
 	LPD3DXMESH m_pSphereMesh;
+	ID3DXAnimationController* m_controller;
+	std::vector<std::string> m_animations;
 
 #ifdef SOFT
 	BoneHierarchyLoaderSoft m_boneHierarchy;

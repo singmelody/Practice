@@ -26,6 +26,7 @@ ID3DXFont*                  g_pFont = NULL;         // Font for drawing text
 ID3DXSprite*                g_pSprite = NULL;       // Sprite for batching draw text calls
 bool                        g_bShowHelp = true;     // If true, it renders the UI control text
 bool						g_bShowSkeloton = false;
+bool						g_bAnimtion = false;
 CModelViewerCamera          g_Camera;               // A model viewing camera
 ID3DXMesh*                  g_pMesh = NULL;         // Mesh object
 CDXUTDialogResourceManager  g_DialogResourceManager; // manager for shared resources of dialogs
@@ -45,7 +46,6 @@ int                         g_nActiveLight;
 std::vector<IDirect3DTexture9*> m_textures;
 std::vector<D3DMATERIAL9> m_materials;
 D3DMATERIAL9 white;
-
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -627,6 +627,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 				techName = "RenderSceneWithTexture3Light"; break;
         }
 
+		g_SkinnedMesh->SetPose( mWorld, fElapsedTime * 0.5f);
+
 #ifdef SOFT
 		// Apply the SoftSkin technique contained in the effect 
 		g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
@@ -757,6 +759,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bo
 //--------------------------------------------------------------------------------------
 void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUserContext )
 {
+
     if( bKeyDown )
     {
         switch( nChar )
@@ -765,6 +768,15 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
                 g_bShowHelp = !g_bShowHelp; break;
 			case VK_SPACE:
 				g_bShowSkeloton = !g_bShowSkeloton; break;
+			case VK_RETURN:
+				{
+					//Sleep(300);
+
+					g_activeAnimation = (g_activeAnimation + 1) % g_SkinnedMesh->GetAnimationNames().size();
+					g_SkinnedMesh->SetAnimation( g_SkinnedMesh->GetAnimationNames()[g_activeAnimation] );
+
+					break;
+				}
         }
     }
 }

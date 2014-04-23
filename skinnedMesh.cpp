@@ -22,6 +22,7 @@ SkinnedMesh::SkinnedMesh()
 {
 	m_pRootBone = NULL;
 	m_pSphereMesh = NULL;
+	m_controller = NULL;
 }
 
 SkinnedMesh::~SkinnedMesh()
@@ -29,6 +30,7 @@ SkinnedMesh::~SkinnedMesh()
 	m_boneHierarchy.DestroyFrame(m_pRootBone);
 
 	SAFE_RELEASE( m_pSphereMesh );
+	SAFE_RELEASE( m_controller );
 }
 
 void SkinnedMesh::Load(WCHAR* fileName)
@@ -40,7 +42,7 @@ void SkinnedMesh::Load(WCHAR* fileName)
 
 	//Load a bone hierarchy from a file
 	D3DXLoadMeshHierarchyFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), &m_boneHierarchy,
-		NULL, &m_pRootBone, NULL);
+		NULL, &m_pRootBone, &m_controller);
 
 	SetupBoneMatrixPointers((Bone*)m_pRootBone);
 
@@ -51,6 +53,13 @@ void SkinnedMesh::Load(WCHAR* fileName)
 
 	//Create Sphere
 	D3DXCreateSphere(DXUTGetD3D9Device(), 0.02f, 10, 10, &m_pSphereMesh, NULL);
+
+	GetAnimations();
+}
+
+const std::vector<std::string>& SkinnedMesh::GetAnimationNames()
+{
+	return m_animations;
 }
 
 
@@ -365,4 +374,48 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 
 	if(bone->pFrameFirstChild)
 		RenderHAL((Bone*)bone->pFrameFirstChild, animTech, staticTech, shadow);
+}
+
+
+void SkinnedMesh::GetAnimations()
+{
+	
+	ID3DXAnimationSet* anim = NULL;
+	for (int i = 0; i < m_controller->GetMaxNumAnimationSets(); ++i)
+	{
+		anim = NULL;
+		m_controller->GetAnimationSet( i, &anim);
+		if( anim != NULL)
+		{
+			m_animations.push_back(anim->GetName());
+			anim->Release();
+		}
+	}
+}
+
+void SkinnedMesh::SetPose(D3DXMATRIX world, float time)
+{
+	m_controller->AdvanceTime( time, NULL);
+	UpdateMatrices( (Bone*)m_pRootBone, &world);
+}
+
+void SkinnedMesh::SetAnimation(const std::string& name)
+{
+	ID3DXAnimationSet* anim = NULL;
+
+	int numAnims = (int)m_controller->GetMaxNumAnimationSets();
+
+	for (int i = 0; i < numAnims; ++i)
+	{
+		anim = NULL;
+		m_controller->GetAnimationSet( i, &anim);
+
+		if( anim != NULL )
+		{
+			if( strcmp(name.c_str(), anim->GetName()) == 0 )
+				m_controller->SetTrackAnimationSet( 0, anim);
+
+			anim->Release();
+		}
+	}
 }
