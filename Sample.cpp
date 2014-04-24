@@ -271,7 +271,47 @@ void RandomizeAnimations()
 		ID3DXAnimationSet *anim = NULL;
 		g_animControllers[i]->GetAnimationSet(rand()%numAnimations, &anim);
 		g_animControllers[i]->SetTrackAnimationSet(0, anim);
-		anim->Release();
+		SAFE_RELEASE(anim);
+	}
+}
+
+void RandomBlendAnimations()
+{
+	// Reset the animation controller's time
+	for (int i = 0; i < CONTROLLER_NUM; ++i)
+	{
+		g_animControllers[i]->ResetTime();
+
+		// Get two random animation
+		int numSet = g_animControllers[i]->GetMaxNumAnimationSets();
+		ID3DXAnimationSet* anim1;
+		ID3DXAnimationSet* anim2;
+		g_animControllers[i]->GetAnimationSet(rand()%numSet, &anim1);
+		g_animControllers[i]->GetAnimationSet(rand()%numSet, &anim2);
+
+		// Assgin set to track
+		g_animControllers[i]->SetTrackAnimationSet( 0, anim1);
+		g_animControllers[i]->SetTrackAnimationSet( 1, anim2);
+
+		// random weight
+		float randomWeight = rand()%1000/1000.0f;
+		g_animControllers[i]->SetTrackWeight( 0, randomWeight);
+		g_animControllers[i]->SetTrackWeight( 1, 1.0f - randomWeight);
+
+		// random speed
+		g_animControllers[i]->SetTrackSpeed( 0, rand()% 1000 / 500.0f);
+		g_animControllers[i]->SetTrackSpeed( 1, rand()% 1000 / 500.0f);
+
+		// track properties
+		g_animControllers[i]->SetTrackPriority( 0, D3DXPRIORITY_HIGH);
+		g_animControllers[i]->SetTrackPriority( 1, D3DXPRIORITY_HIGH);
+
+		// enable tracks
+		g_animControllers[i]->SetTrackEnable( 0, true);
+		g_animControllers[i]->SetTrackEnable( 1, true);
+
+		SAFE_RELEASE(anim1);
+		SAFE_RELEASE(anim2);
 	}
 }
 //--------------------------------------------------------------------------------------
@@ -309,14 +349,15 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	for (int i = 0; i < CONTROLLER_NUM; ++i)
 	{
 		D3DXMATRIX m;
-		D3DXMatrixTranslation(&m, -1.5f + i * 1.0f, 0.0f, 0.0f);
+		D3DXMatrixTranslation(&m, 0.0f, 0.0f, 0.0f);
 		g_postions.push_back(m);
 		g_animControllers.push_back( g_SkinnedMesh->GetController() );
 	}
 
 	srand(GetTickCount());
 
-	RandomizeAnimations();
+//	RandomizeAnimations();
+	RandomBlendAnimations();
 
     D3DXVECTOR3 vCenter = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
@@ -778,7 +819,7 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			case VK_RETURN:
 				{
 					Sleep(300);
-					RandomizeAnimations();
+					RandomBlendAnimations();
 					break;
 				}
         }

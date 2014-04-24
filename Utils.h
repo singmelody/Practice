@@ -7,7 +7,7 @@
 wchar_t *GetWC(const char *c);
 
 #define PATH_TO_TEXTURES "meshes\\"
-#define  CONTROLLER_NUM 4
+#define  CONTROLLER_NUM 1
 
 extern ID3DXEffect* g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*	g_SkinnedMesh;
