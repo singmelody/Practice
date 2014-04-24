@@ -15,6 +15,7 @@
 #include "skinnedMesh.h"
 #include <vector>
 #include "Utils.h"
+#include <string>
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -84,6 +85,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext );
 void InitApp();
 HRESULT LoadMesh( IDirect3DDevice9* pd3dDevice, WCHAR* strFileName, ID3DXMesh** ppMesh );
 void RenderText( double fTime );
+void TrackStatus();
 
 
 //--------------------------------------------------------------------------------------
@@ -706,10 +708,53 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         g_HUD.OnRender( fElapsedTime );
         g_SampleUI.OnRender( fElapsedTime );
 
-        RenderText( fTime );
+        //RenderText( fTime );
+		TrackStatus();
 
         V( pd3dDevice->EndScene() );
     }
+}
+
+std::string IntToString(int i)
+{
+	char num[10];
+	_itoa(i, num, 10);
+	return num;
+}
+
+void TrackStatus()
+{
+	//Print the status of all the Tracks
+	g_Line->SetWidth(100.0f);
+	g_Line->Begin();
+	D3DXVECTOR2 p[] = {D3DXVECTOR2(0, 550), D3DXVECTOR2(800, 550)};
+	g_Line->Draw(p, 2, 0x88FFFFFF);
+	g_Line->End();
+
+	int numTracks = g_animControllers[0]->GetMaxNumTracks();
+	for(int i=0; i<numTracks; i++)
+	{
+		D3DXTRACK_DESC desc;
+		ID3DXAnimationSet* anim = NULL;
+		g_animControllers[0]->GetTrackDesc(i, &desc);
+		g_animControllers[0]->GetTrackAnimationSet(i, &anim);
+
+		std::string name = anim->GetName();
+		while(name.size() < 10)name.push_back(' ');
+
+		std::string s = std::string("Track #") + IntToString(i + 1) + name;
+		s += std::string("Weight = ") + IntToString((int)(desc.Weight * 100)) + "%";
+		s += std::string(", Position = ") + IntToString((int)(desc.Position * 1000)) + " ms";
+		s += std::string(", Speed = ") + IntToString((int)(desc.Speed * 100)) + "%";
+
+		RECT r = {10, 30 + i * 20, 0, 0};
+		const wchar_t* conv = GetWC(s.c_str());
+		g_pFont->DrawText(NULL, conv, -1, &r, DT_LEFT | DT_TOP | DT_NOCLIP, 0xAA00FF00);
+		delete[] conv;
+	}
+
+	RECT rc = {10, 10, 0, 0};
+	g_pFont->DrawText(NULL, L"Press Return to randomize animations", -1, &rc, DT_LEFT | DT_TOP | DT_NOCLIP, 0x66000000);
 }
 
 
