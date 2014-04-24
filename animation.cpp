@@ -67,3 +67,8 @@ Animation::Animation()
 
 }
 
+Animation::~Animation()
+{
+	SAFE_RELEASE(m_animationSet);
+}
+

@@ -28,7 +28,6 @@ bool                        g_bShowHelp = true;     // If true, it renders the U
 bool						g_bShowSkeloton = false;
 bool						g_bAnimtion = false;
 CModelViewerCamera          g_Camera;               // A model viewing camera
-ID3DXMesh*                  g_pMesh = NULL;         // Mesh object
 CDXUTDialogResourceManager  g_DialogResourceManager; // manager for shared resources of dialogs
 CD3DSettingsDlg             g_SettingsDlg;          // Device settings dialog
 CDXUTDialog                 g_HUD;                  // manages the 3D UI
@@ -301,7 +300,6 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	white.Power = 1.0f;
 
     // Load the mesh
-    V_RETURN( LoadMesh( pd3dDevice, L"meshes\\soldier.X", &g_pMesh ) );
 
 	// Load the skeleton
 	g_SkinnedMesh = new SkinnedMesh();
@@ -320,12 +318,7 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 
 	RandomizeAnimations();
 
-    D3DXVECTOR3* pData;
-    D3DXVECTOR3 vCenter;
-    V( g_pMesh->LockVertexBuffer( 0, ( LPVOID* )&pData ) );
-    V( D3DXComputeBoundingSphere( pData, g_pMesh->GetNumVertices(),
-                                  D3DXGetFVFVertexSize( g_pMesh->GetFVF() ), &vCenter, &g_RadiusObject ) );
-    V( g_pMesh->UnlockVertexBuffer() );
+    D3DXVECTOR3 vCenter = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
     D3DXMatrixTranslation( &g_mCenterWorld, -vCenter.x, -vCenter.y, -vCenter.z );
     D3DXMATRIXA16 m;
@@ -396,80 +389,82 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 // mesh for the graphics card's vertex cache, which improves performance by organizing 
 // the internal triangle list for less cache misses.
 //--------------------------------------------------------------------------------------
-HRESULT LoadMesh( IDirect3DDevice9* pd3dDevice, WCHAR* strFileName, ID3DXMesh** ppMesh )
-{
-    ID3DXMesh* pMesh = NULL;
-    WCHAR str[MAX_PATH];
-    HRESULT hr;
-
-	//Load new mesh
-	ID3DXBuffer * materialBfr = NULL;
-	DWORD materialCount = NULL;
-
-    V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, strFileName ) );
-    V_RETURN( D3DXLoadMeshFromX( str, D3DXMESH_MANAGED, pd3dDevice, NULL, &materialBfr, NULL, &materialCount, &pMesh ) );
-
-	D3DXMATERIAL *mtrls = (D3DXMATERIAL*)materialBfr->GetBufferPointer();
-	for(int i=0;i<(int)materialCount;i++)
-	{
-		m_materials.push_back(mtrls[i].MatD3D);
-
-		//Load textures for each material
-		if(mtrls[i].pTextureFilename != NULL)
-		{			
-			char textureFileName[90];
-			strcpy(textureFileName, PATH_TO_TEXTURES);
-			strcat(textureFileName, mtrls[i].pTextureFilename);
-			const wchar_t* conv = GetWC(textureFileName);
-			V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv) );
-			delete conv;
-
-			IDirect3DTexture9 * newTexture = NULL;
-
-			V_RETURN( D3DXCreateTextureFromFileEx( pd3dDevice, str, D3DX_DEFAULT, D3DX_DEFAULT,
-				D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
-				D3DX_DEFAULT, D3DX_DEFAULT, 0,
-				NULL, NULL, &newTexture ) );
-			m_textures.push_back(newTexture);
-		}
-		else
-		{
-			m_textures.push_back(NULL);
-		}
-	}
-
-    DWORD* rgdwAdjacency = NULL;
-
-    // Make sure there are normals which are required for lighting
-	DWORD vertexFormat = pMesh->GetFVF();
-    if( !( vertexFormat & D3DFVF_NORMAL ) )
-    {
-        ID3DXMesh* pTempMesh;
-        V( pMesh->CloneMeshFVF( pMesh->GetOptions(),
-                                pMesh->GetFVF() | D3DFVF_NORMAL,
-                                pd3dDevice, &pTempMesh ) );
-        V( D3DXComputeNormals( pTempMesh, NULL ) );
-
-        SAFE_RELEASE( pMesh );
-        pMesh = pTempMesh;
-    }
-
-    // Optimize the mesh for this graphics card's vertex cache 
-    // so when rendering the mesh's triangle list the vertices will 
-    // cache hit more often so it won't have to re-execute the vertex shader 
-    // on those vertices so it will improve perf.     
-    rgdwAdjacency = new DWORD[pMesh->GetNumFaces() * 3];
-    if( rgdwAdjacency == NULL )
-        return E_OUTOFMEMORY;
-
-    V( pMesh->GenerateAdjacency( 1e-6f, rgdwAdjacency ) );
-    V( pMesh->OptimizeInplace( D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE, rgdwAdjacency, NULL, NULL, NULL ) );
-    delete []rgdwAdjacency;
-
-    *ppMesh = pMesh;
-
-    return S_OK;
-}
+// HRESULT LoadMesh( IDirect3DDevice9* pd3dDevice, WCHAR* strFileName, ID3DXMesh** ppMesh )
+// {
+//     ID3DXMesh* pMesh = NULL;
+//     WCHAR str[MAX_PATH];
+//     HRESULT hr;
+// 
+// 	//Load new mesh
+// 	ID3DXBuffer * materialBfr = NULL;
+// 	DWORD materialCount = NULL;
+// 
+//     V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, strFileName ) );
+//     V_RETURN( D3DXLoadMeshFromX( str, D3DXMESH_MANAGED, pd3dDevice, NULL, &materialBfr, NULL, &materialCount, &pMesh ) );
+// 
+// 	D3DXMATERIAL *mtrls = (D3DXMATERIAL*)materialBfr->GetBufferPointer();
+// 	for(int i=0;i<(int)materialCount;i++)
+// 	{
+// 		m_materials.push_back(mtrls[i].MatD3D);
+// 
+// 		//Load textures for each material
+// 		if(mtrls[i].pTextureFilename != NULL)
+// 		{			
+// 			char textureFileName[90];
+// 			strcpy(textureFileName, PATH_TO_TEXTURES);
+// 			strcat(textureFileName, mtrls[i].pTextureFilename);
+// 			const wchar_t* conv = GetWC(textureFileName);
+// 			V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv) );
+// 			delete conv;
+// 
+// 			IDirect3DTexture9 * newTexture = NULL;
+// 
+// 			V_RETURN( D3DXCreateTextureFromFileEx( pd3dDevice, str, D3DX_DEFAULT, D3DX_DEFAULT,
+// 				D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
+// 				D3DX_DEFAULT, D3DX_DEFAULT, 0,
+// 				NULL, NULL, &newTexture ) );
+// 			m_textures.push_back(newTexture);
+// 		}
+// 		else
+// 		{
+// 			m_textures.push_back(NULL);
+// 		}
+// 	}
+// 
+//     DWORD* rgdwAdjacency = NULL;
+// 
+//     // Make sure there are normals which are required for lighting
+// 	DWORD vertexFormat = pMesh->GetFVF();
+//     if( !( vertexFormat & D3DFVF_NORMAL ) )
+//     {
+//         ID3DXMesh* pTempMesh;
+//         V( pMesh->CloneMeshFVF( pMesh->GetOptions(),
+//                                 pMesh->GetFVF() | D3DFVF_NORMAL,
+//                                 pd3dDevice, &pTempMesh ) );
+//         V( D3DXComputeNormals( pTempMesh, NULL ) );
+// 
+//         SAFE_RELEASE( pMesh );
+//         pMesh = pTempMesh;
+//     }
+// 
+//     // Optimize the mesh for this graphics card's vertex cache 
+//     // so when rendering the mesh's triangle list the vertices will 
+//     // cache hit more often so it won't have to re-execute the vertex shader 
+//     // on those vertices so it will improve perf.     
+//     rgdwAdjacency = new DWORD[pMesh->GetNumFaces() * 3];
+//     if( rgdwAdjacency == NULL )
+//         return E_OUTOFMEMORY;
+// 
+//     V( pMesh->GenerateAdjacency( 1e-6f, rgdwAdjacency ) );
+//     V( pMesh->OptimizeInplace( D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE, rgdwAdjacency, NULL, NULL, NULL ) );
+//     delete []rgdwAdjacency;
+// 
+//     *ppMesh = pMesh;
+// 
+// 	pMesh->Release();
+// 
+//     return S_OK;
+// }
 
 
 //--------------------------------------------------------------------------------------
@@ -523,26 +518,6 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 {
     // Update the camera's position based on user input 
     g_Camera.FrameMove( fElapsedTime );
-}
-
-// just for wrapper render mesh
-void RenderMesh()
-{
-	int numMaterials = (int)m_materials.size();
-	for(int i=0;i<numMaterials;i++)
-	{
-		//Set material
-		if(m_textures[i] != NULL)
-			DXUTGetD3D9Device()->SetMaterial(&white);
-		else
-			DXUTGetD3D9Device()->SetMaterial(&m_materials[i]);
-
-		// Set Texture
-		DXUTGetD3D9Device()->SetTexture( 0, m_textures[i]);
-
-		// Render Mesh
-		g_pMesh->DrawSubset(i);
-	}
 }
 
 
@@ -906,7 +881,6 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
     CDXUTDirectionWidget::StaticOnD3D9DestroyDevice();
     SAFE_RELEASE( g_pEffect );
     SAFE_RELEASE( g_pFont );
-    SAFE_RELEASE( g_pMesh );
 	SAFE_RELEASE( g_Line );
 	SAFE_DELETE( g_SkinnedMesh );
 	SAFE_DELETE( g_Anim );
@@ -919,12 +893,13 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	//Clear textures and materials
 	for(size_t i=0;i<m_textures.size();i++)
 	{
-		if(m_textures[i] != NULL)
-			m_textures[i]->Release();
+		SAFE_RELEASE( m_textures[i] );
 	}
 
+	g_animControllers.clear();
+	g_postions.clear();
 	m_textures.clear();	
-	m_materials.clear();	
+	m_materials.clear();
 }
 
 

@@ -7,6 +7,7 @@ class Animation
 {
 public:
 	Animation();
+	~Animation();
 
 	void Update(float time);
 

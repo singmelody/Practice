@@ -387,7 +387,7 @@ void SkinnedMesh::GetAnimations()
 		if( anim != NULL)
 		{
 			m_animations.push_back(anim->GetName());
-			anim->Release();
+			SAFE_RELEASE(anim);
 		}
 	}
 }
