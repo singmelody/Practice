@@ -37,6 +37,7 @@ bool                        g_bEnablePreshader;     // if TRUE, then D3DXSHADER_
 D3DXMATRIXA16               g_mCenterWorld;
 float						g_Angle = 0.0f;
 float						g_RadiusObject = 0.0f;
+std::vector<D3DXMATRIX>		g_postions;
 
 #define MAX_LIGHTS 3
 CDXUTDirectionWidget g_LightControl[MAX_LIGHTS];
@@ -46,6 +47,7 @@ int                         g_nActiveLight;
 std::vector<IDirect3DTexture9*> m_textures;
 std::vector<D3DMATERIAL9> m_materials;
 D3DMATERIAL9 white;
+std::vector<ID3DXAnimationController*> g_animControllers;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -260,7 +262,19 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
     return true;
 }
 
+void RandomizeAnimations()
+{
+	int numAnimControllers = (int)g_animControllers.size();
 
+	for(int i=0; i<numAnimControllers; i++)
+	{
+		int numAnimations = g_animControllers[i]->GetMaxNumAnimationSets();
+		ID3DXAnimationSet *anim = NULL;
+		g_animControllers[i]->GetAnimationSet(rand()%numAnimations, &anim);
+		g_animControllers[i]->SetTrackAnimationSet(0, anim);
+		anim->Release();
+	}
+}
 //--------------------------------------------------------------------------------------
 // This callback function will be called immediately after the Direct3D device has been 
 // created, which will happen during application initialization and windowed/full screen 
@@ -292,6 +306,19 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	// Load the skeleton
 	g_SkinnedMesh = new SkinnedMesh();
 	g_SkinnedMesh->Load(L"meshes\\soldier.X");
+
+	// init multi animation position
+	for (int i = 0; i < CONTROLLER_NUM; ++i)
+	{
+		D3DXMATRIX m;
+		D3DXMatrixTranslation(&m, -1.5f + i * 1.0f, 0.0f, 0.0f);
+		g_postions.push_back(m);
+		g_animControllers.push_back( g_SkinnedMesh->GetController() );
+	}
+
+	srand(GetTickCount());
+
+	RandomizeAnimations();
 
     D3DXVECTOR3* pData;
     D3DXVECTOR3 vCenter;
@@ -627,15 +654,20 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 				techName = "RenderSceneWithTexture3Light"; break;
         }
 
-		g_SkinnedMesh->SetPose( mWorld, fElapsedTime * 0.5f);
-
+		for (int i = 0; i < CONTROLLER_NUM; ++i)
+		{
+			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, NULL);
+			g_SkinnedMesh->SetPose( g_postions[i], fElapsedTime);
 #ifdef SOFT
-		// Apply the SoftSkin technique contained in the effect 
-		g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
+			// Apply the SoftSkin technique contained in the effect 
+			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
 #else
-		// Apply the HALSkin technique contained in the effect
-		g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+			// Apply the HALSkin technique contained in the effect
+			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
 #endif
+
+		}
+
 
 		// Render Shadow
  		{
@@ -770,11 +802,8 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 				g_bShowSkeloton = !g_bShowSkeloton; break;
 			case VK_RETURN:
 				{
-					//Sleep(300);
-
-					g_activeAnimation = (g_activeAnimation + 1) % g_SkinnedMesh->GetAnimationNames().size();
-					g_SkinnedMesh->SetAnimation( g_SkinnedMesh->GetAnimationNames()[g_activeAnimation] );
-
+					Sleep(300);
+					RandomizeAnimations();
 					break;
 				}
         }
@@ -881,6 +910,11 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_Line );
 	SAFE_DELETE( g_SkinnedMesh );
 	SAFE_DELETE( g_Anim );
+
+	for (int i = 0; i < g_animControllers.size(); ++i)
+	{
+		SAFE_RELEASE( g_animControllers[i] );
+	}
 
 	//Clear textures and materials
 	for(size_t i=0;i<m_textures.size();i++)

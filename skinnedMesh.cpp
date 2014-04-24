@@ -379,7 +379,6 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 
 void SkinnedMesh::GetAnimations()
 {
-	
 	ID3DXAnimationSet* anim = NULL;
 	for (int i = 0; i < m_controller->GetMaxNumAnimationSets(); ++i)
 	{
@@ -395,7 +394,6 @@ void SkinnedMesh::GetAnimations()
 
 void SkinnedMesh::SetPose(D3DXMATRIX world, float time)
 {
-	m_controller->AdvanceTime( time, NULL);
 	UpdateMatrices( (Bone*)m_pRootBone, &world);
 }
 
@@ -418,4 +416,22 @@ void SkinnedMesh::SetAnimation(const std::string& name)
 			anim->Release();
 		}
 	}
+}
+
+ID3DXAnimationController* SkinnedMesh::GetController()
+{
+	ID3DXAnimationController* newAnimController = NULL;
+
+	if ( m_controller != NULL )
+	{
+		m_controller->CloneAnimationController(
+			m_controller->GetMaxNumAnimationOutputs(),
+			m_controller->GetMaxNumAnimationSets(),
+			m_controller->GetMaxNumTracks(),
+			m_controller->GetMaxNumEvents(),
+			&newAnimController
+			);
+	}
+
+	return newAnimController;
 }

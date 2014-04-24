@@ -5,7 +5,7 @@
 #include <vector>
 #include "BoneHierarchyLoader.h"
 
-#define SOFT 1
+//#define SOFT 1
 
 struct Bone: public D3DXFRAME
 {
@@ -70,7 +70,7 @@ public:
 	void GetAnimations();
 
 	const std::vector<std::string>& GetAnimationNames();
-
+	ID3DXAnimationController* GetController();
 private:		
 	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 	void SetupBoneMatrixPointers(Bone *bone);
