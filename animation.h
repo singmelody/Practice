@@ -14,5 +14,6 @@ public:
 	void Draw();
 private:
 	ID3DXKeyframedAnimationSet* m_animationSet;
+	ID3DXCompressedAnimationSet* m_compressedAnimationSet;
 	float m_time;
 };

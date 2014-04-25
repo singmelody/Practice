@@ -6,9 +6,14 @@ void Animation::Update(float time)
 {
 	m_time += time;
 
-	if ( m_time > m_animationSet->GetPeriod() )
+// 	if ( m_time > m_animationSet->GetPeriod() )
+// 	{
+// 		m_time -= (float)m_animationSet->GetPeriod();
+// 	}
+
+	if ( m_time > m_compressedAnimationSet->GetPeriod() )
 	{
-		m_time -= (float)m_animationSet->GetPeriod();
+		m_time -= (float)m_compressedAnimationSet->GetPeriod();
 	}
 }
 
@@ -20,7 +25,8 @@ void Animation::Draw()
 	//Get current frame data
 	D3DXVECTOR3 pos, sca;
 	D3DXQUATERNION rot;
-	m_animationSet->GetSRT(m_time, 0, &sca, &rot, &pos);
+//	m_animationSet->GetSRT(m_time, 0, &sca, &rot, &pos);
+	m_compressedAnimationSet->GetSRT(m_time, 0, &sca, &rot, &pos);
 
 	//Set current size
 	float size = sca.x * 20.0f;
@@ -65,10 +71,25 @@ Animation::Animation()
 	m_animationSet->RegisterAnimationSRTKeys(
 		"Animation1", 2, 0, 3, sca, NULL, pos, 0);
 
+	// get compressed data
+	ID3DXBuffer* compressedData = NULL;
+	m_animationSet->Compress( D3DXCOMPRESS_DEFAULT, 0.5f, NULL, &compressedData);
+
+	// create compressed animation set
+	D3DXCreateCompressedAnimationSet( m_animationSet->GetName(),
+									  m_animationSet->GetSourceTicksPerSecond(),
+									  m_animationSet->GetPlaybackType(),
+									  compressedData,
+									  0, NULL, 
+									  &m_compressedAnimationSet);
+
+	SAFE_RELEASE(compressedData);
+
 }
 
 Animation::~Animation()
 {
 	SAFE_RELEASE(m_animationSet);
+	SAFE_RELEASE(m_compressedAnimationSet);
 }
 

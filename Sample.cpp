@@ -45,9 +45,9 @@ float                       g_fLightScale;
 int                         g_nNumActiveLights;
 int                         g_nActiveLight;
 std::vector<IDirect3DTexture9*> m_textures;
-std::vector<D3DMATERIAL9> m_materials;
-D3DMATERIAL9 white;
+D3DMATERIAL9				white;
 std::vector<ID3DXAnimationController*> g_animControllers;
+float						g_showTime = 0.0f;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -86,7 +86,20 @@ void InitApp();
 HRESULT LoadMesh( IDirect3DDevice9* pd3dDevice, WCHAR* strFileName, ID3DXMesh** ppMesh );
 void RenderText( double fTime );
 void TrackStatus();
+void ShowCallBackUI(double fTime);
 
+
+class CallbackHandler : public ID3DXAnimationCallbackHandler
+{
+public:
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
+	{
+		g_showTime = 0.25f;
+		return D3D_OK;
+	}	
+};
+
+CallbackHandler g_callbackHandler;
 
 //--------------------------------------------------------------------------------------
 // Entry point to the program. Initializes everything and goes into a message processing 
@@ -316,6 +329,55 @@ void RandomBlendAnimations()
 		SAFE_RELEASE(anim2);
 	}
 }
+
+void RandomCompressedCallbackAnimations()
+{
+
+	//Get the "Aim" Animation set
+	ID3DXKeyframedAnimationSet* animSet = NULL;
+	g_animControllers[0]->GetAnimationSet(1, (ID3DXAnimationSet**)&animSet);
+
+	//Compress the animation set
+	ID3DXBuffer* compressedData = NULL;
+	animSet->Compress(D3DXCOMPRESS_DEFAULT, 0.5f, NULL, &compressedData);
+
+	//Create one callback key
+	const UINT numCallbacks = 1;
+	D3DXKEY_CALLBACK keys[numCallbacks];
+
+	// GetSourceTicksPerSecond() returns the number
+	// animation key frame ticks that occur per second.
+	// Callback keyframe times are tick based.
+	double ticks = animSet->GetSourceTicksPerSecond();
+
+	// Set the first callback key to trigger a callback
+	// half way through the animation sequence.
+	keys[0].Time = float(animSet->GetPeriod()/2.0f*ticks);
+	keys[0].pCallbackData = (void*)&g_SkinnedMesh;
+
+	// Create the ID3DXCompressedAnimationSet interface
+	// with the callback keys.
+	ID3DXCompressedAnimationSet* compressedAnimSet = NULL;
+	D3DXCreateCompressedAnimationSet(animSet->GetName(), 
+		animSet->GetSourceTicksPerSecond(),
+		animSet->GetPlaybackType(), compressedData,
+		numCallbacks, keys, &compressedAnimSet);
+
+	//Delete the old keyframed animation set.
+	g_animControllers[0]->UnregisterAnimationSet(animSet);
+
+	// and then add the new compressed animation set.
+	g_animControllers[0]->RegisterAnimationSet(compressedAnimSet);
+
+	// Hook up the animation set to the first track.
+	g_animControllers[0]->SetTrackAnimationSet(0, compressedAnimSet);
+
+	SAFE_RELEASE(animSet);
+	SAFE_RELEASE(compressedData);
+	SAFE_RELEASE(compressedAnimSet);
+}
+
+
 //--------------------------------------------------------------------------------------
 // This callback function will be called immediately after the Direct3D device has been 
 // created, which will happen during application initialization and windowed/full screen 
@@ -359,7 +421,8 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	srand(GetTickCount());
 
 //	RandomizeAnimations();
-	RandomBlendAnimations();
+//	RandomBlendAnimations();
+	RandomCompressedCallbackAnimations();
 
     D3DXVECTOR3 vCenter = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
@@ -674,7 +737,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 		for (int i = 0; i < CONTROLLER_NUM; ++i)
 		{
-			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, NULL);
+			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
 			g_SkinnedMesh->SetPose( g_postions[i], fElapsedTime);
 #ifdef SOFT
 			// Apply the SoftSkin technique contained in the effect 
@@ -708,8 +771,9 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
         g_HUD.OnRender( fElapsedTime );
         g_SampleUI.OnRender( fElapsedTime );
 
-        //RenderText( fTime );
-		TrackStatus();
+        RenderText( fTime );
+//		TrackStatus();
+		ShowCallBackUI( fElapsedTime );
 
         V( pd3dDevice->EndScene() );
     }
@@ -731,7 +795,7 @@ void TrackStatus()
 	g_Line->Draw(p, 2, 0x88FFFFFF);
 	g_Line->End();
 
-	int numTracks = g_animControllers[0]->GetMaxNumTracks();
+ 	int numTracks = g_animControllers[0]->GetMaxNumTracks();
 	for(int i=0; i<numTracks; i++)
 	{
 		D3DXTRACK_DESC desc;
@@ -747,14 +811,27 @@ void TrackStatus()
 		s += std::string(", Position = ") + IntToString((int)(desc.Position * 1000)) + " ms";
 		s += std::string(", Speed = ") + IntToString((int)(desc.Speed * 100)) + "%";
 
-		RECT r = {10, 30 + i * 20, 0, 0};
+		RECT r = {10, 350 + i * 20, 0, 0};
 		const wchar_t* conv = GetWC(s.c_str());
 		g_pFont->DrawText(NULL, conv, -1, &r, DT_LEFT | DT_TOP | DT_NOCLIP, 0xAA00FF00);
 		delete[] conv;
 	}
 
-	RECT rc = {10, 10, 0, 0};
+	RECT rc = {10, 330, 0, 0};
 	g_pFont->DrawText(NULL, L"Press Return to randomize animations", -1, &rc, DT_LEFT | DT_TOP | DT_NOCLIP, 0x66000000);
+}
+
+void ShowCallBackUI(double deltaTime)
+{
+	if(g_showTime > 0.0f)
+	{
+		RECT rc = {0, 0, 640, 480};
+		g_pFont->DrawText(NULL, L"BANG!", -1, &rc, DT_CENTER | DT_VCENTER | DT_NOCLIP, 0xFF000000);
+		SetRect(&rc, -5, -5, 635, 475);
+		g_pFont->DrawText(NULL, L"BANG!", -1, &rc, DT_CENTER | DT_VCENTER | DT_NOCLIP, 0xFFFFFF00);
+
+		g_showTime -= deltaTime;
+	}
 }
 
 
@@ -985,7 +1062,6 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	g_animControllers.clear();
 	g_postions.clear();
 	m_textures.clear();	
-	m_materials.clear();
 }
 
 
