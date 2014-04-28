@@ -16,6 +16,7 @@
 #include <vector>
 #include "Utils.h"
 #include <string>
+#include "PhysicsMgr.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -48,6 +49,7 @@ std::vector<IDirect3DTexture9*> m_textures;
 D3DMATERIAL9				white;
 std::vector<ID3DXAnimationController*> g_animControllers;
 float						g_showTime = 0.0f;
+PhysicsManager*				g_physicsEngine;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -487,6 +489,10 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     V_RETURN( g_pEffect->SetValue( "g_MaterialAmbientColor", &colorMtrlAmbient, sizeof( D3DXCOLOR ) ) );
     V_RETURN( g_pEffect->SetValue( "g_MaterialDiffuseColor", &colorMtrlDiffuse, sizeof( D3DXCOLOR ) ) );
 
+	// create physcis
+	g_physicsEngine = new PhysicsManager();
+	g_physicsEngine->Init();
+
     return S_OK;
 }
 
@@ -740,7 +746,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
 			g_SkinnedMesh->SetPose( g_postions[i], fElapsedTime);
 #ifdef SOFT
-			// Apply the SoftSkin technique contained in the effect 
+			// Apply the SoftSkin technique contained in the effect  
 			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
 #else
 			// Apply the HALSkin technique contained in the effect
@@ -1047,6 +1053,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_Line );
 	SAFE_DELETE( g_SkinnedMesh );
 	SAFE_DELETE( g_Anim );
+	SAFE_DELETE( g_physicsEngine );
 
 	for (int i = 0; i < g_animControllers.size(); ++i)
 	{
