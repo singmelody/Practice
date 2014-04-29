@@ -383,6 +383,7 @@
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PhysicsMgr.cpp" />
+    <ClCompile Include="RagDoll.cpp" />
     <ClCompile Include="skinnedMesh.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Utils.h" />
@@ -390,6 +391,7 @@
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="PhysicsMgr.h" />
+    <ClInclude Include="RagDoll.h" />
     <ClInclude Include="skinnedMesh.h" />
     <None Include="DXUT\Optional\directx.ico" />
     <ClInclude Include="DXUT\Core\DXUT.h" />

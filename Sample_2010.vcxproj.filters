@@ -8,9 +8,21 @@
     <Filter Include="DXUT">
       <UniqueIdentifier>{a43c5c25-0e86-4a20-b64a-883785ff74fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
+    <Filter Include="Physics">
+      <UniqueIdentifier>{182f8282-0591-4e10-8405-35138c5a4a8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{e9cc0387-4081-4511-90d1-2914a031b166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{95af701b-7262-41c4-a49e-7023ed360823}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
       <UniqueIdentifier>{2c3d4c8c-5d1a-459a-a05a-a4e4b608a44e}</UniqueIdentifier>
       <Extensions>fx;fxh;hlsl</Extensions>
+    </Filter>
+    <Filter Include="Ragdoll">
+      <UniqueIdentifier>{e62a486b-9fd9-4151-9fb5-a8eb325ef726}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,17 +86,34 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
-    <ClCompile Include="skinnedMesh.cpp" />
-    <ClCompile Include="Utils.h" />
-    <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="BoneHierarchyLoader.cpp" />
-    <ClCompile Include="animation.cpp" />
-    <ClCompile Include="PhysicsMgr.cpp" />
-    <ClCompile Include="OBB.cpp" />
+    <ClCompile Include="PhysicsMgr.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="OBB.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.h">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="BoneHierarchyLoader.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="skinnedMesh.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="animation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="RagDoll.cpp">
+      <Filter>Ragdoll</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
-      <Filter>Shaders</Filter>
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -94,11 +123,24 @@
     <ResourceCompile Include="Sample.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-    <ClInclude Include="skinnedMesh.h" />
-    <ClInclude Include="BoneHierarchyLoader.h" />
-    <ClInclude Include="animation.h" />
-    <ClInclude Include="PhysicsMgr.h" />
-    <ClInclude Include="OBB.h" />
+    <ClInclude Include="PhysicsMgr.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="OBB.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="animation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="BoneHierarchyLoader.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="skinnedMesh.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="RagDoll.h">
+      <Filter>Ragdoll</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

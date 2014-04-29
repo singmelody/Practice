@@ -2,7 +2,6 @@
 #include "Utils.h"
 #include <string>
 
-
 wchar_t *GetWC(const char *c)
 {
 	const size_t cSize = strlen(c)+1;
@@ -16,5 +15,5 @@ ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface
 SkinnedMesh*	g_SkinnedMesh = NULL;
 ID3DXLine*		g_Line = NULL;
 Animation*		g_Anim = NULL;
+PhysicsManager*	g_physicsEngine = NULL;
 int				g_activeAnimation = 0;
-

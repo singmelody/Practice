@@ -4,12 +4,13 @@
 #include <d3dx9.h>
 #include <vector>
 #include "BoneHierarchyLoader.h"
-
+#include "OBB.h"
 //#define SOFT 1
 
 struct Bone: public D3DXFRAME
 {
 	D3DXMATRIX CombinedTransformationMatrix;
+	OBB *m_Obb;
 
 	Bone()
 	{
@@ -17,6 +18,7 @@ struct Bone: public D3DXFRAME
 		pMeshContainer = NULL;
 		pFrameSibling = NULL;
 		pFrameFirstChild = NULL;
+		m_Obb = NULL;
 	}
 };
 
@@ -57,7 +59,7 @@ class SkinnedMesh
 {
 public:
 	SkinnedMesh();
-	~SkinnedMesh();
+	virtual ~SkinnedMesh();
 	void Load(WCHAR* fileName);
 	void RenderSoft(Bone *bone, const char* animTech, const char* staticTech, bool shadow = false);
 	void RenderHAL(Bone* bone,const char* animTech, const char* staticTech, bool shadow = false);
@@ -65,17 +67,20 @@ public:
 
 	void SetShadowMatrix(D3DXMATRIX& matrix) { m_shadow = matrix; }
 
-	void SetPose(D3DXMATRIX world, float time);
+	void SetPose(D3DXMATRIX world);
 	void SetAnimation(const std::string& name);
 	void GetAnimations();
 
 	const std::vector<std::string>& GetAnimationNames();
 	ID3DXAnimationController* GetController();
+
+protected:
+	D3DXFRAME *m_pRootBone;
+
 private:		
 	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 	void SetupBoneMatrixPointers(Bone *bone);
 
-	D3DXFRAME *m_pRootBone;
 	LPD3DXMESH m_pSphereMesh;
 	ID3DXAnimationController* m_controller;
 	std::vector<std::string> m_animations;

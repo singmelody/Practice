@@ -49,7 +49,6 @@ std::vector<IDirect3DTexture9*> m_textures;
 D3DMATERIAL9				white;
 std::vector<ID3DXAnimationController*> g_animControllers;
 float						g_showTime = 0.0f;
-PhysicsManager*				g_physicsEngine;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -390,7 +389,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	//_CrtSetBreakAlloc(3103);
+	//_CrtSetBreakAlloc(1506);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
@@ -689,7 +688,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
     {
 		// Setup the camera's view parameters
 		g_Angle += fElapsedTime;
-		D3DXVECTOR3 vecEye( cos(g_Angle) * 20.0f, 5.0f, sin(g_Angle) * -20.0f );
+		D3DXVECTOR3 vecEye( cos(g_Angle) * 3.0f, 3.0f, sin(g_Angle) * -3.0f );
 		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
@@ -743,7 +742,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		for (int i = 0; i < CONTROLLER_NUM; ++i)
 		{
 			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
-			g_SkinnedMesh->SetPose( g_postions[i], fElapsedTime);
+			g_SkinnedMesh->SetPose( g_postions[i]);
 #ifdef SOFT
 			// Apply the SoftSkin technique contained in the effect  
 			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());

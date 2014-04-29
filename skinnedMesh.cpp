@@ -112,7 +112,8 @@ void SkinnedMesh::RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world)
 		D3DXVECTOR3 thisBone = D3DXVECTOR3(w1(3, 0), w1(3, 1), w1(3, 2));
 		D3DXVECTOR3 ParentBone = D3DXVECTOR3(w2(3, 0), w2(3, 1), w2(3, 2));
 
-		if(D3DXVec3Length(&(thisBone - ParentBone)) < 2.0f)
+		float length = D3DXVec3Length(&(thisBone - ParentBone));
+		if( length < 2.0f)
 		{
 			DXUTGetD3D9Device()->SetTransform(D3DTS_WORLD, &world);
 			VERTEX vert[] = {VERTEX(ParentBone, 0xffff0000), VERTEX(thisBone, 0xff00ff00)};
@@ -392,7 +393,7 @@ void SkinnedMesh::GetAnimations()
 	}
 }
 
-void SkinnedMesh::SetPose(D3DXMATRIX world, float time)
+void SkinnedMesh::SetPose(D3DXMATRIX world)
 {
 	UpdateMatrices( (Bone*)m_pRootBone, &world);
 }

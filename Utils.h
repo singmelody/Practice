@@ -11,11 +11,14 @@ wchar_t *GetWC(const char *c);
 #define HALF_PI		(0.5f * D3DX_PI)
 #define FORTH_PI	(0.25f * D3DX_PI)
 
+class PhysicsManager;
+
 extern ID3DXEffect*		g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*		g_SkinnedMesh;
 extern ID3DXLine*		g_Line;
 extern Animation*		g_Anim;
 extern int				g_activeAnimation;
+extern PhysicsManager*	g_physicsEngine;
 
 enum PHYS_CONTRAINTS
 {
