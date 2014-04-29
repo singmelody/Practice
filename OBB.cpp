@@ -41,5 +41,6 @@ void OBB::Render()
 void OBB::Release()
 {
 	SAFE_RELEASE(m_pMesh);
-	SAFE_DELETE(m_Body);
+
+	// Rigid Body ‘› ±”…mgr Õ∑≈
 }

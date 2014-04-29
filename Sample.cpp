@@ -390,7 +390,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-
+	//_CrtSetBreakAlloc(1244);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
@@ -1053,6 +1053,8 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_Line );
 	SAFE_DELETE( g_SkinnedMesh );
 	SAFE_DELETE( g_Anim );
+
+	g_physicsEngine->Release();
 	SAFE_DELETE( g_physicsEngine );
 
 	for (int i = 0; i < g_animControllers.size(); ++i)

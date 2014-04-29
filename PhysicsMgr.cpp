@@ -37,8 +37,7 @@ void PhysicsManager::Init()
 	srand(GetTickCount());
 
 	// New default Collision configuration
-	btDefaultCollisionConfiguration* cc;
-	cc = new btDefaultCollisionConfiguration();
+	m_config = new btDefaultCollisionConfiguration();
 
 	// New default Constraint solver
 	btConstraintSolver* sl;
@@ -54,20 +53,57 @@ void PhysicsManager::Init()
 
 	// new dispatcher
 	btCollisionDispatcher* dp;
-	dp = new btCollisionDispatcher(cc);
+	dp = new btCollisionDispatcher(m_config);
 
 	// finally create a dynamics 
-	m_dynamicsWorld = new btDiscreteDynamicsWorld( dp, bp, sl, cc);
+	m_dynamicsWorld = new btDiscreteDynamicsWorld( dp, bp, sl, m_config);
 
 	// Create floor plane
-	m_floor = new btRigidBody( 0.0f, new btDefaultMotionState(), new btStaticPlaneShape(btVector3(0,1,0), -0.5f));
-	m_dynamicsWorld->addRigidBody(m_floor);
+ 	m_floor = new btRigidBody( 0.0f, new btDefaultMotionState(), new btStaticPlaneShape(btVector3(0,1,0), -0.5f));
+ 	m_dynamicsWorld->addRigidBody(m_floor);
 
 	Reset();
 }
 
 void PhysicsManager::Release()
 {
+	for (int i = 0; i < m_boxes.size(); ++i)
+	{
+		m_boxes[i]->Release();
+		SAFE_DELETE(m_boxes[i]);
+	}
+
+	m_boxes.clear();
+
+	btCollisionObjectArray& array =  m_dynamicsWorld->getCollisionObjectArray();
+	int Nums = m_dynamicsWorld->getNumCollisionObjects();
+	for (int i = Nums - 1; i >= 0; --i)
+	{
+		btCollisionObject* obj = array[i];
+		btRigidBody* b = btRigidBody::upcast(obj);
+
+		btMotionState *state = b->getMotionState();
+		SAFE_DELETE(state);
+
+		btCollisionShape* shape = b->getCollisionShape();
+		SAFE_DELETE(shape);
+
+		m_dynamicsWorld->removeCollisionObject(obj);
+		SAFE_DELETE(obj);
+	}
+	
+
+	btDispatcher* dp = m_dynamicsWorld->getDispatcher();
+	SAFE_DELETE(dp);
+
+	btBroadphaseInterface* bp = m_dynamicsWorld->getBroadphase();
+	SAFE_DELETE(bp);
+
+	btConstraintSolver* sl = m_dynamicsWorld->getConstraintSolver();
+	SAFE_DELETE(sl);
+
+	SAFE_DELETE(m_config);
+
 	SAFE_DELETE(m_dynamicsWorld);
 }
 

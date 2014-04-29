@@ -31,6 +31,7 @@ public:
 private:
 	std::vector<OBB*>	m_boxes;
 	btDynamicsWorld*	m_dynamicsWorld;
+	btDefaultCollisionConfiguration* m_config;
 	btRigidBody*		m_floor;
 
 	float				m_time;
