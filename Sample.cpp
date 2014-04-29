@@ -390,7 +390,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	//_CrtSetBreakAlloc(1244);
+	//_CrtSetBreakAlloc(3103);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
@@ -952,6 +952,21 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 				{
 					Sleep(300);
 					RandomBlendAnimations();
+					break;
+				}
+			case VK_NUMPAD1:
+				{
+					g_physicsEngine->ResetJoint(HINGE);
+					break;
+				}
+			case VK_NUMPAD2:
+				{
+					g_physicsEngine->ResetJoint(TWISTCONE);
+					break;
+				}
+			case VK_NUMPAD3:
+				{
+					g_physicsEngine->ResetJoint(BALLPOINT);
 					break;
 				}
         }
