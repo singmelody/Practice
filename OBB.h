@@ -9,7 +9,7 @@ public:
 	~OBB(void);
 
 	void Release();
-	void Render();
+	void Render(const char* tech);
 
 public:
 	btRigidBody* m_Body;

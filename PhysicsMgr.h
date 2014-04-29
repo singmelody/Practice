@@ -21,7 +21,7 @@ public:
 	void Init();
 	void Release();
 	void Update(float deltaTime);
-	void Render();
+	void Render(const char* tech);
 	void Reset();
 	OBB* CreateOBB(D3DXVECTOR3 pos, D3DXVECTOR3 size);
 

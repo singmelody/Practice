@@ -1,5 +1,7 @@
 #include "DXUT.h"
 #include "OBB.h"
+#include "PhysicsMgr.h"
+#include "Utils.h"
 
 
 OBB::OBB(D3DXVECTOR3 pos, D3DXVECTOR3 size, bool dynamic)
@@ -33,9 +35,23 @@ OBB::~OBB(void)
 	Release();
 }
 
-void OBB::Render()
+void OBB::Render(const char* tech)
 {
+	btMotionState* ms = m_Body->getMotionState();
+	if(!ms)
+		return;
 
+	g_pEffect->SetMatrix("g_mWorld", &BT2DX_MATRIX(*ms));
+
+	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(tech);
+	g_pEffect->SetTechnique(hTech);
+	g_pEffect->Begin( NULL, NULL);
+	g_pEffect->BeginPass(0);
+
+	m_pMesh->DrawSubset(0);
+
+	g_pEffect->EndPass();
+	g_pEffect->End();
 }
 
 void OBB::Release()

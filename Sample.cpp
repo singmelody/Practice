@@ -681,7 +681,6 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
     D3DXMATRIXA16 mView;
     D3DXMATRIXA16 mProj;
 
-
     // Clear the render target and the zbuffer 
     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DXCOLOR( 0.0f, 0.25f, 0.25f, 0.55f ), 1.0f, 0 ) );
 
@@ -690,7 +689,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
     {
 		// Setup the camera's view parameters
 		g_Angle += fElapsedTime;
-		D3DXVECTOR3 vecEye( cos(g_Angle) * 2.0f, 2.0f, sin(g_Angle) * 2.0f );
+		D3DXVECTOR3 vecEye( cos(g_Angle) * 20.0f, 5.0f, sin(g_Angle) * -20.0f );
 		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
@@ -755,6 +754,10 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 		}
 
+		// Physics
+		g_physicsEngine->Update(fElapsedTime);
+		g_physicsEngine->Render(techName.c_str());
+
 
 		// Render Shadow
  		{
@@ -773,6 +776,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 			g_Anim->Update(fElapsedTime);
 			g_Anim->Draw();
 		}
+
 
         g_HUD.OnRender( fElapsedTime );
         g_SampleUI.OnRender( fElapsedTime );

@@ -59,7 +59,7 @@ void PhysicsManager::Init()
 	m_dynamicsWorld = new btDiscreteDynamicsWorld( dp, bp, sl, m_config);
 
 	// Create floor plane
- 	m_floor = new btRigidBody( 0.0f, new btDefaultMotionState(), new btStaticPlaneShape(btVector3(0,1,0), -0.5f));
+ 	m_floor = new btRigidBody( 0.0f, new btDefaultMotionState(), new btStaticPlaneShape(btVector3(0,1.0f,0), -0.5f));
  	m_dynamicsWorld->addRigidBody(m_floor);
 
 	Reset();
@@ -164,10 +164,10 @@ void PhysicsManager::Update(float deltaTime)
 	}
 }
 
-void PhysicsManager::Render()
+void PhysicsManager::Render(const char* tech)
 {
 	for(int i = 0; i < (int)m_boxes.size(); ++i)
 	{
-		m_boxes[i]->Render();
+		m_boxes[i]->Render(tech);
 	}
 }
