@@ -15,9 +15,14 @@ public:
 	void Update(float deltaTime);
 	void Render(const char* tech);
 
+	D3DXVECTOR3 SetPivot(D3DXVECTOR3& pivot);
+	D3DXVECTOR3 GetPivot(D3DXVECTOR3& pivot);
+	D3DXQUATERNION GetRotation(D3DXQUATERNION orgBoneRot);
+
 public:
 	btRigidBody* m_Body;
 	D3DXVECTOR3 m_size;
+	D3DXQUATERNION m_orgRot;
 
 private:
 	ID3DXMesh* m_pMesh;

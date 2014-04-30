@@ -8,6 +8,7 @@ RagDoll::RagDoll(WCHAR* fileName, D3DXMATRIX& world)
 {
 	Load(fileName);
 	SetPose(world);
+	InitBones((Bone*)m_pRootBone);
 	
 	Bone* Head_End = (Bone*)D3DXFrameFind(m_pRootBone, "Head_End");
 	Bone* Head = (Bone*)D3DXFrameFind(m_pRootBone, "Head");
@@ -78,6 +79,14 @@ RagDoll::RagDoll(WCHAR* fileName, D3DXMATRIX& world)
 
 	CreateTwistCone(U_R_Arm, o08, o03, D3DX_PI * 0.6f, D3DXVECTOR3(0.0f, D3DX_PI * 0.75f, D3DX_PI * 0.0f), D3DXVECTOR3(D3DX_PI, 0.0f, 0.0f));
 	CreateHinge(L_R_Arm, o03, o04, 2.0f, 0.0f, D3DXVECTOR3(0.0f, 0.0f, -D3DX_PI * 0.5f), D3DXVECTOR3(0.0f, 0.0f, -D3DX_PI * 0.5f));
+
+	//Assign Pelvis bone to Spine OBB
+	Pelvis->m_Obb = o08;
+	D3DXVECTOR3 PelvisPos(Pelvis->CombinedTransformationMatrix(3, 0), 
+		Pelvis->CombinedTransformationMatrix(3, 1), 
+		Pelvis->CombinedTransformationMatrix(3, 2));
+
+	Pelvis->m_pivot = o08->SetPivot(PelvisPos);	
 }
 
 
@@ -87,7 +96,17 @@ RagDoll::~RagDoll(void)
 
 void RagDoll::InitBones(Bone* bone)
 {
+	if(bone == NULL)
+		return;
 
+	D3DXVECTOR3 sca, pos;
+	D3DXQUATERNION rot;
+	D3DXMatrixDecompose(&sca, &rot, &pos, &bone->CombinedTransformationMatrix);
+	D3DXQuaternionNormalize(&rot, &rot);
+	bone->m_originalRot = rot;
+
+	InitBones((Bone*)bone->pFrameSibling);
+	InitBones((Bone*)bone->pFrameFirstChild);
 }
 
 void RagDoll::Release()
@@ -140,17 +159,55 @@ void RagDoll::Update(float deltaTime)
 	}
 }
 
-void RagDoll::Render(const char* tech)
+void RagDoll::Render(const char* tech, bool showObb = false)
 {
-	for(int i=0; i<(int)m_boxes.size(); i++)
+	if(showObb)
 	{
-		m_boxes[i]->Render(tech);
+		for(int i=0; i<(int)m_boxes.size(); i++)
+		{
+			m_boxes[i]->Render(tech);
+		}
 	}
+
+
+	//Update Ragdoll from physical representation
+	UpdateSkeleton((Bone*)m_pRootBone);
+
+	//Render the ragdoll
+#ifdef SOFT
+	SkinnedMesh::RenderHAL(NULL, "SkinSoft", tech);
+#else
+	SkinnedMesh::RenderHAL(NULL, "SkinHAL", tech);
+#endif
 }
 
 void RagDoll::UpdateSkeleton(Bone* bone)
 {
+	if(bone == NULL)
+		return;
 
+	if(bone->m_Obb != NULL)
+	{
+		//Calculate new position for the bone
+		D3DXMATRIX pos;
+		D3DXVECTOR3 pivot = bone->m_Obb->GetPivot(bone->m_pivot);		
+		D3DXMatrixTranslation(&pos, pivot.x, pivot.y, pivot.z);
+
+		//Calculate new orientation for the bone
+		D3DXMATRIX rot;
+		D3DXMatrixRotationQuaternion(&rot, &bone->m_Obb->GetRotation(bone->m_originalRot));
+
+		//Combine to create new transformation matrix
+		bone->CombinedTransformationMatrix = rot * pos;
+
+		//Update children bones with our new transformation matrix
+		if(bone->pFrameFirstChild != NULL)
+			UpdateMatrices((Bone*)bone->pFrameFirstChild, &bone->CombinedTransformationMatrix);			
+	}
+
+	//Traverse the rest of the bone hierarchy
+	UpdateSkeleton((Bone*)bone->pFrameSibling);
+	UpdateSkeleton((Bone*)bone->pFrameFirstChild);
 }
 
 OBB* RagDoll::CreateBoneBox(Bone* parent, Bone* bone, D3DXVECTOR3 size, D3DXQUATERNION rot)
@@ -158,34 +215,27 @@ OBB* RagDoll::CreateBoneBox(Bone* parent, Bone* bone, D3DXVECTOR3 size, D3DXQUAT
 	if(bone == NULL || parent == NULL)
 		return NULL;
 
-	//Get Bone Starting point
-	D3DXMATRIX &parentMat = parent->CombinedTransformationMatrix;
-	D3DXVECTOR3 parentPos(parentMat(3, 0), parentMat(3, 1), parentMat(3, 2));
 
-	//Get Bone End point
+	D3DXMATRIX &parentMat = parent->CombinedTransformationMatrix;
 	D3DXMATRIX &boneMat = bone->CombinedTransformationMatrix;
+	D3DXVECTOR3 parentPos(parentMat(3, 0), parentMat(3, 1), parentMat(3, 2));
 	D3DXVECTOR3 bonePos(boneMat(3, 0), boneMat(3, 1), boneMat(3, 2));
 
-	//Extract the rotation from the bone
 	D3DXQUATERNION q;
 	D3DXVECTOR3 p, s;
 	D3DXMatrixDecompose(&s, &q, &p, &parentMat);
-
-	//Offset rotation (in some cases only)
 	q *= rot;
 	D3DXQuaternionNormalize(&q, &q);
 
-	//Calculate the middle point
 	p = (parentPos + bonePos) * 0.5f;
 
-	//Create new OBB
 	OBB *obb = new OBB(p, size, q, true);
 
-	//Add the OBB to the physics engine
 	g_physicsEngine->GetWorld()->addRigidBody(obb->m_Body);
 	m_boxes.push_back(obb);
 
 	parent->m_Obb = obb;
+	parent->m_pivot = obb->SetPivot(parentPos);
 
 	return obb;
 }
@@ -205,15 +255,33 @@ void RagDoll::CreateHinge(Bone* parent, OBB* A, OBB* B, float upperLimit, float 
 	btTransform aTrans, bTrans;
 	a->getMotionState()->getWorldTransform(aTrans);
 	b->getMotionState()->getWorldTransform(bTrans);
-	D3DXMATRIX worldA = BT2DX_MATRIX(aTrans);
-	D3DXMATRIX worldB = BT2DX_MATRIX(bTrans);
+	btVector3 aPos = aTrans.getOrigin();
+	btVector3 bPos = bTrans.getOrigin();
+	btQuaternion aRot = aTrans.getRotation();
+	btQuaternion bRot = bTrans.getRotation();
 
-	D3DXVECTOR3 offA, offB;
+	D3DXQUATERNION qa(aRot.x(), aRot.y(), aRot.z(), aRot.w());
+	D3DXQUATERNION qb(bRot.x(), bRot.y(), bRot.z(), bRot.w());
+
+	D3DXMATRIX matPosA, matPosB, matRotA, matRotB, worldA, worldB;
+	D3DXMatrixTranslation(&matPosA, aPos.x(), aPos.y(), aPos.z());
+	D3DXMatrixTranslation(&matPosB, bPos.x(), bPos.y(), bPos.z());
+	D3DXMatrixRotationQuaternion(&matRotA, &qa);
+	D3DXMatrixRotationQuaternion(&matRotB, &qb);
+	D3DXMatrixMultiply(&worldA, &matRotA, &matPosA);
+	D3DXMatrixMultiply(&worldB, &matRotB, &matPosB);
+
+	D3DXVECTOR3 offA(0.0f, A->m_size.y * -0.5f, 0.0f);
+	D3DXVECTOR3 offB(0.0f, B->m_size.y * 0.5f, 0.0f);
+
 	D3DXMatrixInverse(&worldA, NULL, &worldA);
 	D3DXMatrixInverse(&worldB, NULL, &worldB);
 
 	D3DXVec3TransformCoord(&offA, &hingePosDX, &worldA);
 	D3DXVec3TransformCoord(&offB, &hingePosDX, &worldB);
+
+	//	btVector3 offsetA(aPos.x() - hingePos.x(), aPos.y() - hingePos.y(), aPos.z() - hingePos.z());
+	//	btVector3 offsetB(bPos.x() - hingePos.x(), bPos.y() - hingePos.y(), bPos.z() - hingePos.z());
 
 	btVector3 offsetA(offA.x, offA.y, offA.z);
 	btVector3 offsetB(offB.x, offB.y, offB.z);
@@ -235,33 +303,44 @@ void RagDoll::CreateTwistCone(Bone* parent, OBB* A, OBB* B, float limit, D3DXVEC
 	if(parent == NULL || A == NULL || B == NULL)
 		return;
 
-	//Extract the constraint position
 	D3DXMATRIX &parentMat = parent->CombinedTransformationMatrix;
 	btVector3 hingePos(parentMat(3, 0), parentMat(3, 1), parentMat(3, 2));
-	D3DXVECTOR3 hingePosDX(parentMat(3, 0), parentMat(3, 1), parentMat(3, 2));
+	D3DXVECTOR3 hingePosDX = D3DXVECTOR3(parentMat(3, 0), parentMat(3, 1), parentMat(3, 2));
 
-	//Get references to the two rigid bodies we want to connect
 	btRigidBody *a = A->m_Body;
 	btRigidBody *b = B->m_Body;
 
-	//Get world matrix from the two rigid bodies
 	btTransform aTrans, bTrans;
 	a->getMotionState()->getWorldTransform(aTrans);
 	b->getMotionState()->getWorldTransform(bTrans);
-	D3DXMATRIX worldA = BT2DX_MATRIX(aTrans);
-	D3DXMATRIX worldB = BT2DX_MATRIX(bTrans);
+	btVector3 aPos = aTrans.getOrigin();
+	btVector3 bPos = bTrans.getOrigin();
+	btQuaternion aRot = aTrans.getRotation();
+	btQuaternion bRot = bTrans.getRotation();
 
-	//Calculate Pivot point for both rigid bodies
+	D3DXQUATERNION qa(aRot.x(), aRot.y(), aRot.z(), aRot.w());
+	D3DXQUATERNION qb(bRot.x(), bRot.y(), bRot.z(), bRot.w());
+
+	D3DXMATRIX matPosA, matPosB, matRotA, matRotB, worldA, worldB;
+	D3DXMatrixTranslation(&matPosA, aPos.x(), aPos.y(), aPos.z());
+	D3DXMatrixTranslation(&matPosB, bPos.x(), bPos.y(), bPos.z());
+	D3DXMatrixRotationQuaternion(&matRotA, &qa);
+	D3DXMatrixRotationQuaternion(&matRotB, &qb);
+	D3DXMatrixMultiply(&worldA, &matRotA, &matPosA);
+	D3DXMatrixMultiply(&worldB, &matRotB, &matPosB);
+
+	D3DXVECTOR3 offA(0.0f, A->m_size.y * -0.5f, 0.0f);
+	D3DXVECTOR3 offB(0.0f, B->m_size.y * 0.5f, 0.0f);
+
 	D3DXMatrixInverse(&worldA, NULL, &worldA);
 	D3DXMatrixInverse(&worldB, NULL, &worldB);
 
-	D3DXVECTOR3 offA, offB;
 	D3DXVec3TransformCoord(&offA, &hingePosDX, &worldA);
 	D3DXVec3TransformCoord(&offB, &hingePosDX, &worldB);
+
 	btVector3 offsetA(offA.x, offA.y, offA.z);
 	btVector3 offsetB(offB.x, offB.y, offB.z);
 
-	//Set constraint axis
 	aTrans.setIdentity();
 	bTrans.setIdentity();
 	aTrans.setOrigin(offsetA);
@@ -269,12 +348,7 @@ void RagDoll::CreateTwistCone(Bone* parent, OBB* A, OBB* B, float limit, D3DXVEC
 	aTrans.getBasis().setEulerZYX(hingeAxisA.x, hingeAxisA.y, hingeAxisA.z);
 	bTrans.getBasis().setEulerZYX(hingeAxisB.x, hingeAxisB.y, hingeAxisB.z);
 
-	//Create new twist cone constraint
 	btConeTwistConstraint *twistC = new btConeTwistConstraint(*a, *b, aTrans, bTrans);
-
-	//Set Constraint limits
-	twistC->setLimit(limit, limit, 0.05f);
-
-	//Add constraint to the physics engine
+	twistC->setLimit(limit, limit, 0.05f);	
 	g_physicsEngine->GetWorld()->addConstraint(twistC, true);
 }

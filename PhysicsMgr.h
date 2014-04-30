@@ -23,7 +23,7 @@ public:
 	void Init();
 	void Release();
 	void Update(float deltaTime);
-	void Render(const char* tech);
+	void Render(const char* tech,bool showOBB);
 
 	void ResetBase();
 	void ResetBox();
@@ -37,12 +37,12 @@ public:
 
 	btDynamicsWorld* GetWorld(){return m_dynamicsWorld;}
 private:
-	std::vector<OBB*>	m_boxes;
-	btDynamicsWorld*	m_dynamicsWorld;
+	std::vector<OBB*>		m_boxes;
+	btDynamicsWorld*		m_dynamicsWorld;
 	btDefaultCollisionConfiguration* m_config;
-	btRigidBody*		m_floor;
+	btRigidBody*			m_floor;
 
-	float				m_time;
+	float					m_time;
 
-	RagDoll*			m_ragDoll;
+	RagDoll*				m_ragDoll;
 };

@@ -156,12 +156,17 @@ void PhysicsManager::ResetRagDoll()
 	m_floor = new btRigidBody(0.0f, new btDefaultMotionState(), new btStaticPlaneShape(btVector3(0,1,0), 0.0));
 	m_dynamicsWorld->addRigidBody(m_floor);
 
-	D3DXMATRIX world;
-	D3DXMatrixRotationZ(&world, ((rand()%1000) / 1000.0f) * 0.4f);
+	srand(GetTickCount());
+
+	D3DXMATRIX p, r, world;
+	D3DXMatrixTranslation(&p, -0.5f + 0.5f * 0, 0.0f, 0.0f);
+	D3DXMatrixRotationZ(&r, (float)((rand()%1000) * 0.001) * 0.4f - 0.2f);
+	world = r * p;
+	//D3DXMatrixIdentity(&world);
 
 	HRESULT hr;
 	WCHAR str[MAX_PATH];
-	V( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, L"meshes\\soldier_ragdoll.X" ) );
+	V( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, L"meshes\\soldier.X" ) );
 	m_ragDoll = new RagDoll(str, world);
 }
 
@@ -196,19 +201,17 @@ PhysicsManager::~PhysicsManager()
 
 void PhysicsManager::Update(float deltaTime)
 {
+	m_ragDoll->Update(deltaTime);
+
 	if(m_dynamicsWorld != NULL)
 	{
 		m_dynamicsWorld->stepSimulation(deltaTime);
 	}
 }
 
-void PhysicsManager::Render(const char* tech)
+void PhysicsManager::Render(const char* tech, bool showOBB = false)
 {
-// 	for(int i = 0; i < (int)m_boxes.size(); ++i)
-// 	{
-// 		m_boxes[i]->Render(tech);
-// 	}
-	m_ragDoll->Render(tech);
+	m_ragDoll->Render(tech,showOBB);
 } 
 
 void PhysicsManager::ResetBase()

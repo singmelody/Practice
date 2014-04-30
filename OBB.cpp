@@ -25,6 +25,7 @@ void OBB::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXQUATERNION& rot, bool dyna
 
 	//Create Motion State
 	D3DXQuaternionNormalize(&rot, &rot);
+	m_orgRot = rot;
 	btQuaternion q(rot.x, rot.y, rot.z, rot.w);
 	btVector3 p(pos.x, pos.y, pos.z);
 	btTransform startTrans(q, p);
@@ -79,6 +80,44 @@ void OBB::Update(float deltaTime)
 	if (m_Body->wantsSleeping())
 	{
 		m_Body->updateDeactivation(deltaTime);
-		m_Body->setActivationState(2);
 	}
+}
+
+D3DXVECTOR3 OBB::SetPivot(D3DXVECTOR3& pivot)
+{
+	btMotionState *ms = m_Body->getMotionState();
+	if(ms == NULL)return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	D3DXMATRIX world = BT2DX_MATRIX(*ms);
+	D3DXVECTOR3 newPivot;
+	D3DXMatrixInverse(&world, NULL, &world);
+	D3DXVec3TransformCoord(&newPivot, &pivot, &world);
+
+	return newPivot;
+}
+
+D3DXVECTOR3 OBB::GetPivot(D3DXVECTOR3& pivot)
+{
+	btMotionState *ms = m_Body->getMotionState();
+	if(ms == NULL)return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	D3DXMATRIX world = BT2DX_MATRIX(*ms);
+	D3DXVECTOR3 newPivot;
+	D3DXVec3TransformCoord(&newPivot, &pivot, &world);
+
+	return newPivot;
+}
+
+D3DXQUATERNION OBB::GetRotation(D3DXQUATERNION orgBoneRot)
+{
+	btMotionState *ms = m_Body->getMotionState();
+	btTransform t;
+	ms->getWorldTransform(t);
+	D3DXQUATERNION rot = BT2DX_QUATERNION(t.getRotation());
+
+	D3DXQUATERNION invOrgRot;
+	D3DXQuaternionInverse(&invOrgRot, &m_orgRot);
+	D3DXQUATERNION diff = invOrgRot * rot;
+
+	return orgBoneRot * diff;
 }

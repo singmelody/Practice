@@ -49,6 +49,7 @@ std::vector<IDirect3DTexture9*> m_textures;
 D3DMATERIAL9				white;
 std::vector<ID3DXAnimationController*> g_animControllers;
 float						g_showTime = 0.0f;
+bool						g_ShowOBB = false;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -421,9 +422,9 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 
 	srand(GetTickCount());
 
-//	RandomizeAnimations();
+	RandomizeAnimations();
 //	RandomBlendAnimations();
-	RandomCompressedCallbackAnimations();
+//	RandomCompressedCallbackAnimations();
 
     D3DXVECTOR3 vCenter = D3DXVECTOR3(0.0f,0.0f,0.0f);
 
@@ -755,7 +756,9 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 		// Physics
 		g_physicsEngine->Update(fElapsedTime);
-		g_physicsEngine->Render(techName.c_str());
+
+		
+		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
 
 
 		// Render Shadow
@@ -966,6 +969,11 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			case VK_NUMPAD3:
 				{
 					g_physicsEngine->ResetJoint(BALLPOINT);
+					break;
+				}
+			case VK_NUMPAD4:
+				{
+					g_ShowOBB  = !g_ShowOBB;
 					break;
 				}
         }

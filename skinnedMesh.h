@@ -10,7 +10,14 @@
 struct Bone: public D3DXFRAME
 {
 	D3DXMATRIX CombinedTransformationMatrix;
+	// ptr to an Obb
 	OBB *m_Obb;
+
+	// bone's pivot point (offset from obb center)
+	D3DXVECTOR3 m_pivot;
+
+	// Original orientation of this bone
+	D3DXQUATERNION m_originalRot;
 
 	Bone()
 	{
@@ -76,9 +83,9 @@ public:
 
 protected:
 	D3DXFRAME *m_pRootBone;
+	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 
 private:		
-	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 	void SetupBoneMatrixPointers(Bone *bone);
 
 	LPD3DXMESH m_pSphereMesh;
