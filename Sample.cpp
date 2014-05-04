@@ -499,6 +499,10 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_Morph = new Morph();
 	g_Morph->Init();
 
+	// create multi morph
+	g_MultiMorph = new MultiMorph();
+	g_MultiMorph->Init();
+
     return S_OK;
 }
 
@@ -773,8 +777,10 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 		// set texture
 		g_pEffect->SetTexture("g_MeshTexture", NULL);
-		g_Morph->Render(techName.c_str());
+//		g_Morph->Render(techName.c_str());
 
+		g_MultiMorph->Update(fElapsedTime);
+		g_MultiMorph->Render(techName.c_str());
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
 // 		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
@@ -1129,6 +1135,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	}
 
 	SAFE_DELETE(g_Morph);
+	SAFE_DELETE(g_MultiMorph);
 
 	g_animControllers.clear();
 	g_postions.clear();

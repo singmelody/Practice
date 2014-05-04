@@ -23,3 +23,4 @@ Animation*		g_Anim = NULL;
 PhysicsManager*	g_physicsEngine = NULL;
 int				g_activeAnimation = 0;
 Morph*			g_Morph = NULL;
+MultiMorph*		g_MultiMorph = NULL;

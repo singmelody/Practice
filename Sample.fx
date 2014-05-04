@@ -50,9 +50,67 @@ struct VS_OUTPUT
 	float4 Diffuse    : COLOR0;     // vertex diffuse color (note that COLOR0 is clamped from 0..1) 
 };
 
+//--------------------------------------------------------------------------------------
+// This section computes standard transform and lighting
+//--------------------------------------------------------------------------------------
+//Morph Weights
+float4 weights;
+
+//Vertex Input
+struct VS_INPUT
+{ 
+     float4 basePos     : POSITION0;
+     float3 baseNorm    : NORMAL0;
+     float2 baseUV      : TEXCOORD0;
+
+     float4 targetPos1  : POSITION1;
+     float3 targetNorm1 : NORMAL1;
+
+     float4 targetPos2  : POSITION2;
+     float3 targetNorm2 : NORMAL2;
+
+     float4 targetPos3  : POSITION3;
+     float3 targetNorm3 : NORMAL3;
+
+     float4 targetPos4  : POSITION4;
+     float3 targetNorm4 : NORMAL4;
+};
+
+VS_OUTPUT RenderMultiMorphVS(VS_INPUT IN)
+{
+	VS_OUTPUT OUT = (VS_OUTPUT)0;
+
+	float4 pos = IN.basePos;
+	float3 norm = IN.baseNorm;
+
+	// Blend Position
+	pos += (IN.targetPos1 - IN.basePos) * weights.r;
+	pos += (IN.targetPos2 - IN.basePos) * weights.g;
+	pos += (IN.targetPos3 - IN.basePos) * weights.b;
+	pos += (IN.targetPos4 - IN.basePos) * weights.a;
+
+	//Blend Normal	
+    norm += (IN.targetNorm1 - IN.baseNorm) * weights.r;
+    norm += (IN.targetNorm2 - IN.baseNorm) * weights.g;
+    norm += (IN.targetNorm3 - IN.baseNorm) * weights.b;
+    norm += (IN.targetNorm4 - IN.baseNorm) * weights.a;
+
+	//getting the position of the vertex in the world
+    float4 posWorld = mul(pos, g_mWorld);
+    float4 normal = normalize(mul(norm, g_mWorld)); 
+	 
+    //getting to position to object space
+    OUT.Position = mul(posWorld, g_mVP);
+	 
+    OUT.Diffuse = max(dot(normal, normalize(g_LightDir[0] - posWorld)), 0.2f);
+    
+    OUT.TextureUV = IN.baseUV;
+    
+    return OUT;
+}
 
 //--------------------------------------------------------------------------------------
-// This shader computes standard transform and lighting
+// This section computes standard transform and lighting
 //--------------------------------------------------------------------------------------
 VS_OUTPUT RenderSceneVS( float4 vPos : POSITION, 
                          float3 vNormal : NORMAL,
@@ -304,6 +362,16 @@ technique SkinHAL
 	pass P0
 	{
 		VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
+		PixelShader  = compile ps_2_0 RenderScenePS(true);
+	}
+}
+
+// MultiMorph
+technique MultiMorph
+{
+	pass P0
+	{
+		VertexShader = compile vs_2_0 RenderMultiMorphVS();
 		PixelShader  = compile ps_2_0 RenderScenePS(true);
 	}
 }
