@@ -36,7 +36,7 @@ void Morph::Init()
 	m_Target01->CloneMeshFVF( D3DXMESH_MANAGED, m_Target01->GetFVF(), DXUTGetD3D9Device(), &m_face);
 }
 
-void Morph::Update(float deltaTime)
+void Morph::Update()
 {
 	BYTE* target01,* target02, *face;
 

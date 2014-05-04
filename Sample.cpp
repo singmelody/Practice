@@ -18,6 +18,7 @@
 #include <string>
 #include "PhysicsMgr.h"
 #include "Morph.h"
+#include <stdlib.h>
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -693,11 +694,12 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
 		// Setup the camera's view parameters
-		g_Angle += fElapsedTime;
-		D3DXVECTOR3 vecEye( cos(g_Angle) * 1.0f, 1.0f, sin(g_Angle) * -1.0f);
+//		g_Angle += fElapsedTime;
+//		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
+		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
 		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
-		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
+//		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
 		// set view projection prop
 		mProj = *g_Camera.GetProjMatrix();
@@ -768,6 +770,9 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// set world prop
 		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();
 		V( g_pEffect->SetMatrix( "g_mWorld", &mWorld ) );
+
+		// set texture
+		g_pEffect->SetTexture("g_MeshTexture", NULL);
 		g_Morph->Render(techName.c_str());
 
 		// Physics
@@ -776,9 +781,9 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 
 		// Render Shadow
- 		{
-			RenderShadow();
- 		}
+		{
+//			RenderShadow();
+		}
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
@@ -987,6 +992,22 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			case VK_NUMPAD4:
 				{
 					g_ShowOBB  = !g_ShowOBB;
+					break;
+				}
+			case VK_NUMPAD5:
+				{
+					float m_blend = g_Morph->GetBlend();
+					float blend = min(m_blend + 0.5 * 0.5f, 2.0f);
+					g_Morph->SetBlend(blend);
+					g_Morph->Update();
+					break;
+				}
+			case VK_NUMPAD6:
+				{
+					float m_blend = g_Morph->GetBlend();
+					float blend = max(m_blend - 0.5 * 0.5f, -1.0f);
+					g_Morph->SetBlend(blend);
+					g_Morph->Update();
 					break;
 				}
         }
