@@ -3,8 +3,9 @@
 #include "DXUT.h"
 #include "skinnedMesh.h"
 #include "animation.h"
+#include <string>
 
-wchar_t *GetWC(const char *c);
+std::wstring GetWC(const char *c);
 
 #define PATH_TO_TEXTURES "meshes\\"
 #define  CONTROLLER_NUM 1
@@ -12,6 +13,7 @@ wchar_t *GetWC(const char *c);
 #define FORTH_PI	(0.25f * D3DX_PI)
 
 class PhysicsManager;
+class Morph;
 
 extern ID3DXEffect*		g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*		g_SkinnedMesh;
@@ -19,6 +21,7 @@ extern ID3DXLine*		g_Line;
 extern Animation*		g_Anim;
 extern int				g_activeAnimation;
 extern PhysicsManager*	g_physicsEngine;
+extern Morph*			g_Morph;
 
 enum PHYS_CONTRAINTS
 {

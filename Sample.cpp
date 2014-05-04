@@ -17,6 +17,7 @@
 #include "Utils.h"
 #include <string>
 #include "PhysicsMgr.h"
+#include "Morph.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -493,6 +494,10 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_physicsEngine = new PhysicsManager();
 	g_physicsEngine->Init();
 
+	// create morph anim
+	g_Morph = new Morph();
+	g_Morph->Init();
+
     return S_OK;
 }
 
@@ -689,8 +694,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
     {
 		// Setup the camera's view parameters
 		g_Angle += fElapsedTime;
-		D3DXVECTOR3 vecEye( cos(g_Angle) * 3.0f, 3.0f, sin(g_Angle) * -3.0f );
-		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
+		D3DXVECTOR3 vecEye( cos(g_Angle) * 1.0f, 1.0f, sin(g_Angle) * -1.0f);
+		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -740,25 +745,34 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 				techName = "RenderSceneWithTexture3Light"; break;
         }
 
-		for (int i = 0; i < CONTROLLER_NUM; ++i)
-		{
-			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
-			g_SkinnedMesh->SetPose( g_postions[i]);
-#ifdef SOFT
-			// Apply the SoftSkin technique contained in the effect  
-			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
-#else
-			// Apply the HALSkin technique contained in the effect
-			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
-#endif
+// 		for (int i = 0; i < CONTROLLER_NUM; ++i)
+// 		{
+// 			g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
+// 			g_SkinnedMesh->SetPose( g_postions[i]);
+// #ifdef SOFT
+// 			// Apply the SoftSkin technique contained in the effect  
+// 			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
+// #else
+// 			// Apply the HALSkin technique contained in the effect
+// 			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+// #endif
+// 
+// 		}
 
-		}
+		// set view projection prop
+		mProj = *g_Camera.GetProjMatrix();
+		mView = *g_Camera.GetViewMatrix();
+		mViewProjection = mView * mProj;
+		V( g_pEffect->SetMatrix( "g_mVP", &mViewProjection ) );
+
+		// set world prop
+		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();
+		V( g_pEffect->SetMatrix( "g_mWorld", &mWorld ) );
+		g_Morph->Render(techName.c_str());
 
 		// Physics
-		g_physicsEngine->Update(fElapsedTime);
-
-		
-		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
+// 		g_physicsEngine->Update(fElapsedTime);
+// 		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
 
 
 		// Render Shadow
@@ -824,9 +838,8 @@ void TrackStatus()
 		s += std::string(", Speed = ") + IntToString((int)(desc.Speed * 100)) + "%";
 
 		RECT r = {10, 350 + i * 20, 0, 0};
-		const wchar_t* conv = GetWC(s.c_str());
-		g_pFont->DrawText(NULL, conv, -1, &r, DT_LEFT | DT_TOP | DT_NOCLIP, 0xAA00FF00);
-		delete[] conv;
+		std::wstring conv = GetWC(s.c_str());
+		g_pFont->DrawText(NULL, conv.c_str(), -1, &r, DT_LEFT | DT_TOP | DT_NOCLIP, 0xAA00FF00);
 	}
 
 	RECT rc = {10, 330, 0, 0};
@@ -1093,6 +1106,8 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	{
 		SAFE_RELEASE( m_textures[i] );
 	}
+
+	SAFE_DELETE(g_Morph);
 
 	g_animControllers.clear();
 	g_postions.clear();

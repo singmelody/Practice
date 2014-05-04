@@ -381,6 +381,8 @@
   <ItemGroup>
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
+    <ClCompile Include="eye.cpp" />
+    <ClCompile Include="Morph.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PhysicsMgr.cpp" />
     <ClCompile Include="RagDoll.cpp" />
@@ -389,6 +391,8 @@
     <ClCompile Include="Utils.h" />
     <ClInclude Include="animation.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
+    <ClInclude Include="eye.h" />
+    <ClInclude Include="Morph.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="PhysicsMgr.h" />
     <ClInclude Include="RagDoll.h" />

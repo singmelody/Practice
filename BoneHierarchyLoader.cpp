@@ -84,12 +84,11 @@ HRESULT BoneHierarchyLoaderSoft::CreateMeshContainer(LPCSTR Name,
 			char textureFileName[90];
 			strcpy(textureFileName, PATH_TO_TEXTURES);
 			strcat(textureFileName, mtrl.pTextureFilename);
-			const wchar_t* conv = GetWC(textureFileName);
+			std::wstring conv = GetWC(textureFileName);
 
 			WCHAR str[MAX_PATH];
 			HRESULT hr;
-			V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv ) );
-			SAFE_DELETE(conv);
+			V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() ) );
 
 			D3DXCreateTextureFromFile( DXUTGetD3D9Device(), str, &itexture);
 		}
@@ -247,12 +246,11 @@ HRESULT BoneHierarchyLoaderHAL::CreateMeshContainer(LPCSTR Name,
 			char textureFileName[90];
 			strcpy(textureFileName, PATH_TO_TEXTURES);
 			strcat(textureFileName, mtrl.pTextureFilename);
-			const wchar_t* conv = GetWC(textureFileName);
+			std::wstring conv = GetWC(textureFileName);
 
 			WCHAR str[MAX_PATH];
 			HRESULT hr;
-			V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv ) );
-			SAFE_DELETE(conv);
+			V_RETURN( DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() ) );
 
 			D3DXCreateTextureFromFile( DXUTGetD3D9Device(), str, &itexture);
 		}

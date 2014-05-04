@@ -24,6 +24,9 @@
     <Filter Include="Ragdoll">
       <UniqueIdentifier>{e62a486b-9fd9-4151-9fb5-a8eb325ef726}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Facial">
+      <UniqueIdentifier>{f6470631-1884-4bd2-be1a-2c3171aa96e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -110,6 +113,12 @@
     <ClCompile Include="RagDoll.cpp">
       <Filter>Ragdoll</Filter>
     </ClCompile>
+    <ClCompile Include="eye.cpp">
+      <Filter>Facial</Filter>
+    </ClCompile>
+    <ClCompile Include="Morph.cpp">
+      <Filter>Facial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -140,6 +149,12 @@
     </ClInclude>
     <ClInclude Include="RagDoll.h">
       <Filter>Ragdoll</Filter>
+    </ClInclude>
+    <ClInclude Include="eye.h">
+      <Filter>Facial</Filter>
+    </ClInclude>
+    <ClInclude Include="Morph.h">
+      <Filter>Facial</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
