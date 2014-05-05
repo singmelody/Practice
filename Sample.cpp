@@ -18,6 +18,7 @@
 #include <string>
 #include "PhysicsMgr.h"
 #include "Morph.h"
+#include "Face.h"
 #include <stdlib.h>
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
@@ -507,6 +508,10 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_MorphSkeleton = new MorphMesh();
 	g_MorphSkeleton->Init();
 
+	// create face
+	g_Face = new Face();
+	g_Face->Init();
+
     return S_OK;
 }
 
@@ -704,8 +709,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 2.0f, 1.1f, -3.0f);
-		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
+		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -786,8 +791,11 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_MultiMorph->Update(fElapsedTime);
 // 		g_MultiMorph->Render(techName.c_str());
 
-		g_MorphSkeleton->Update(fElapsedTime);
-		g_MorphSkeleton->Render();
+// 		g_MorphSkeleton->Update(fElapsedTime);
+// 		g_MorphSkeleton->Render();
+
+		g_Face->Update(fElapsedTime);
+		g_Face->Render(techName.c_str());
 
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
@@ -1145,6 +1153,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_Morph);
 	SAFE_DELETE(g_MultiMorph);
 	SAFE_DELETE(g_MorphSkeleton);
+	SAFE_DELETE(g_Face);
 
 	g_animControllers.clear();
 	g_postions.clear();

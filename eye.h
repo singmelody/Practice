@@ -6,7 +6,7 @@ public:
 	Eye();
 	~Eye();
 	void Init(D3DXVECTOR3 position);
-	void Render(ID3DXEffect *pEffect);
+	void Render();
 	void LookAt(D3DXVECTOR3 focus);
 
 private:

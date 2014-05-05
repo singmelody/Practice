@@ -44,3 +44,4 @@ int				g_activeAnimation = 0;
 Morph*			g_Morph = NULL;
 MultiMorph*		g_MultiMorph = NULL;
 MorphMesh*		g_MorphSkeleton = NULL;
+Face*			g_Face = NULL;

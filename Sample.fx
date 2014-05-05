@@ -333,7 +333,7 @@ PS_OUTPUT RenderScenePS( VS_OUTPUT In,
 
     // Lookup mesh texture and modulate it with diffuse
     if( bTexture )
-        Output.RGBColor = tex2D(MeshTextureSampler, In.TextureUV) + In.Diffuse;
+        Output.RGBColor = tex2D(MeshTextureSampler, In.TextureUV) * In.Diffuse;
     else
         Output.RGBColor = float4(0.0f,0.0f,0.0f,0.0f);
 
