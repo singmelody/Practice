@@ -371,6 +371,7 @@ void MorphMesh::RenderHuman(Bone *bone)
 			IDirect3DIndexBuffer9* ib = NULL;
 			boneMesh->MeshData.pMesh->GetIndexBuffer(&ib);
 			DXUTGetD3D9Device()->SetIndices( ib );
+			SAFE_RELEASE(ib);
 
 			//Start Shader
 			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("MorphSkeleton");
