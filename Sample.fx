@@ -39,6 +39,30 @@ sampler_state
     MagFilter = LINEAR;
 };
 
+//Morph Weight
+float shapeShift;
+
+//Texture
+texture texHuman;
+texture texWolf;
+
+//Samplers
+sampler HumanSampler = sampler_state
+{
+   Texture = (texHuman);
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
+   MaxAnisotropy = 16;
+};
+
+sampler WolfSampler = sampler_state
+{
+   Texture = (texWolf);
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
+   MaxAnisotropy = 16;
+};
+
 
 //--------------------------------------------------------------------------------------
 // Vertex shader output structure
@@ -49,6 +73,90 @@ struct VS_OUTPUT
     float2 TextureUV  : TEXCOORD0;  // vertex texture coords
 	float4 Diffuse    : COLOR0;     // vertex diffuse color (note that COLOR0 is clamped from 0..1) 
 };
+
+//--------------------------------------------------------------------------------------
+// Pixel shader output structure
+//--------------------------------------------------------------------------------------
+struct PS_OUTPUT
+{
+    float4 RGBColor : COLOR0;  // Pixel color    
+};
+
+//--------------------------------------------------------------------------------------
+// This section computes standard transform and lighting and morph skeleton
+//--------------------------------------------------------------------------------------
+//Vertex Input
+struct VS_INPUT_MORPH
+{
+     float4 position    : POSITION0;
+     float3 normal      : NORMAL0;
+     float2 tex0        : TEXCOORD0;
+	 float4 weights     : BLENDWEIGHT0;
+     int4   boneIndices : BLENDINDICES0;
+     
+     float4 position2 : POSITION1;
+     float3 normal2   : NORMAL1;
+};
+
+VS_OUTPUT RenderMorphSkeletonVS(VS_INPUT_MORPH IN)
+{
+	VS_OUTPUT OUT = (VS_OUTPUT)0;
+
+	float4 position = IN.position + ( IN.position2 - IN.position ) * shapeShift;	// shapeShift-->[-1,0]
+	float4 p = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float3 norm = float3(0.0f, 0.0f, 0.0f);
+    float lastWeight = 0.0f;
+    int n = numBoneInfluences-1;
+    
+    IN.normal = normalize(IN.normal);
+    for(int i = 0; i < n; ++i)
+    {
+        lastWeight += IN.weights[i];
+	    p += IN.weights[i] * mul(position, MatrixPalette[IN.boneIndices[i]]);
+	    norm += IN.weights[i] * mul(IN.normal, MatrixPalette[IN.boneIndices[i]]);
+    }
+    lastWeight = 1.0f - lastWeight;
+    
+    p += lastWeight * mul(position, MatrixPalette[IN.boneIndices[n]]);
+    norm += lastWeight * mul(IN.normal, MatrixPalette[IN.boneIndices[n]]);
+
+	p.w = 1.0f;    	
+	float4 posWorld = mul(p, g_mWorld);
+    OUT.Position = mul(posWorld, g_mVP);
+    OUT.TextureUV = IN.tex0;
+    
+	//Calculate Lighting
+    norm = normalize(norm);
+    norm = mul(norm, g_mWorld);
+
+	// Compute simple directional lighting equation
+    float3 vTotalLightDiffuse = float3(0,0,0);
+    for(int i=0; i<1; i++ )
+		vTotalLightDiffuse += g_LightDiffuse[i] * max(0.1f,dot(norm, (g_LightDir[i] - posWorld)));
+        
+    OUT.Diffuse.rgb = g_MaterialDiffuseColor * vTotalLightDiffuse + g_MaterialAmbientColor * g_LightAmbient;   
+    OUT.Diffuse.a = 1.0f; 
+
+	return OUT;
+}
+
+PS_OUTPUT RenderSceneMorphPS( VS_OUTPUT IN,
+                         uniform bool bTexture ) 
+{ 
+    PS_OUTPUT Output;
+
+    //Sample human texture
+	float4 colorHuman = tex2D(HumanSampler, IN.TextureUV);
+	
+	//sample wolf texture
+	float4 colorWolf = tex2D(WolfSampler, IN.TextureUV);
+	
+	//Blend the result based on the shapeShift variable
+	Output.RGBColor = (colorHuman * (1.0f - shapeShift) + colorWolf * shapeShift) * IN.Diffuse;
+
+	return Output;
+}
+
 
 //--------------------------------------------------------------------------------------
 // This section computes standard transform and lighting
@@ -76,6 +184,11 @@ struct VS_INPUT
      float3 targetNorm4 : NORMAL4;
 };
 
+
+
+//--------------------------------------------------------------------------------------
+// This section computes standard transform and lighting and simple multi morph
+//--------------------------------------------------------------------------------------
 VS_OUTPUT RenderMultiMorphVS(VS_INPUT IN)
 {
 	VS_OUTPUT OUT = (VS_OUTPUT)0;
@@ -208,15 +321,6 @@ VS_OUTPUT RenderSkinHALVS( float4 vPos : POSITION,
     
     return Output;   		
 }
-
-//--------------------------------------------------------------------------------------
-// Pixel shader output structure
-//--------------------------------------------------------------------------------------
-struct PS_OUTPUT
-{
-    float4 RGBColor : COLOR0;  // Pixel color    
-};
-
 
 //--------------------------------------------------------------------------------------
 // This shader outputs the pixel's color by modulating the texture's
@@ -374,4 +478,16 @@ technique MultiMorph
 		VertexShader = compile vs_2_0 RenderMultiMorphVS();
 		PixelShader  = compile ps_2_0 RenderScenePS(true);
 	}
+}
+
+// Morph Anim & skeleton
+technique MorphSkeleton
+{
+    pass P0
+    {
+		Lighting = false;
+		
+        VertexShader = compile vs_2_0 RenderMorphSkeletonVS();
+        PixelShader  = compile ps_2_0 RenderSceneMorphPS(true);        
+    }
 }

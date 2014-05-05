@@ -503,6 +503,10 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_MultiMorph = new MultiMorph();
 	g_MultiMorph->Init();
 
+	// create morph & skeleton
+	g_MorphSkeleton = new MorphMesh();
+	g_MorphSkeleton->Init();
+
     return S_OK;
 }
 
@@ -700,8 +704,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 2.0f, 1.1f, -3.0f);
+		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -779,8 +783,12 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		g_pEffect->SetTexture("g_MeshTexture", NULL);
 //		g_Morph->Render(techName.c_str());
 
-		g_MultiMorph->Update(fElapsedTime);
-		g_MultiMorph->Render(techName.c_str());
+// 		g_MultiMorph->Update(fElapsedTime);
+// 		g_MultiMorph->Render(techName.c_str());
+
+		g_MorphSkeleton->Update(fElapsedTime);
+		g_MorphSkeleton->Render();
+
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
 // 		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
@@ -1136,6 +1144,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 
 	SAFE_DELETE(g_Morph);
 	SAFE_DELETE(g_MultiMorph);
+	SAFE_DELETE(g_MorphSkeleton);
 
 	g_animControllers.clear();
 	g_postions.clear();

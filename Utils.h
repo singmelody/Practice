@@ -15,6 +15,7 @@ std::wstring GetWC(const char *c);
 class PhysicsManager;
 class Morph;
 class MultiMorph;
+class MorphMesh;
 
 extern ID3DXEffect*		g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*		g_SkinnedMesh;
@@ -24,6 +25,7 @@ extern int				g_activeAnimation;
 extern PhysicsManager*	g_physicsEngine;
 extern Morph*			g_Morph;
 extern MultiMorph*		g_MultiMorph;
+extern MorphMesh*		g_MorphSkeleton;
 
 enum PHYS_CONTRAINTS
 {

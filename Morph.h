@@ -1,5 +1,6 @@
 #pragma once
 #include "DXUT.h"
+#include "skinnedMesh.h"
 
 class Morph
 {
@@ -39,4 +40,26 @@ private:
 	D3DXVECTOR4 m_oldWeights, m_newWeights;
 	float m_prc;
 };
+
+class MorphMesh : public SkinnedMesh
+{
+	friend class Application;
+public:
+	MorphMesh();
+	~MorphMesh();
+
+	void Init();
+	void Update(float deltaTime);
+	void Render();
+	void RenderHuman(Bone *bone);
+
+private:	
+	void LoadTex(const char* c, IDirect3DTexture9** mesh);
+	ID3DXAnimationController* m_animControl;
+	IDirect3DVertexDeclaration9 *m_pDecl;
+
+	IDirect3DTexture9* m_pHumanTexture;
+	IDirect3DTexture9* m_pWolfTexture;
+};
+ 
 
