@@ -1,4 +1,5 @@
 #include "DXUT.h"
+#include "SDKmisc.h"
 #include "Utils.h"
 #include <string>
 #include "Morph.h"
@@ -14,6 +15,24 @@ std::wstring GetWC(const char *c)
 	SAFE_DELETE(wc);
 
 	return wstr;
+}
+
+void LoadMesh(const char* c, ID3DXMesh** mesh)
+{
+	std::wstring conv = GetWC(c);
+
+	WCHAR str[MAX_PATH];
+	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
+	D3DXLoadMeshFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), NULL, NULL, NULL, NULL, mesh);
+}
+
+void LoadTex(const char* c, IDirect3DTexture9** tex)
+{
+	std::wstring conv = GetWC(c);
+
+	WCHAR str[MAX_PATH];
+	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
+	D3DXCreateTextureFromFile(DXUTGetD3D9Device(), str, tex);
 }
 
 ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface

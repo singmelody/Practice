@@ -31,7 +31,6 @@ public:
 	void Render(const char* tech);
 
 private:
-	void LoadMesh(const char* c, ID3DXMesh** mesh);
 	ID3DXMesh* m_baseMesh;
 	ID3DXMesh* m_targets[4];
 
@@ -54,7 +53,6 @@ public:
 	void RenderHuman(Bone *bone);
 
 private:	
-	void LoadTex(const char* c, IDirect3DTexture9** mesh);
 	ID3DXAnimationController* m_animControl;
 	IDirect3DVertexDeclaration9 *m_pDecl;
 

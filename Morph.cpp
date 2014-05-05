@@ -226,15 +226,6 @@ void MultiMorph::Render(const char* tech)
 	SAFE_RELEASE(ib);
 }
 
-void MultiMorph::LoadMesh(const char* c, ID3DXMesh** mesh)
-{
-	std::wstring conv = GetWC(c);
-
-	WCHAR str[MAX_PATH];
-	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
-	D3DXLoadMeshFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), NULL, NULL, NULL, NULL, mesh);
-}
-
 
 D3DVERTEXELEMENT9 morphSkeletonVertexDecl[] = 
 {
@@ -280,15 +271,6 @@ void MorphMesh::Init()
 	// Load Textures
 	LoadTex( "meshes\\human.jpg", &m_pHumanTexture);
 	LoadTex( "meshes\\werewolf.jpg", &m_pWolfTexture);
-}
-
-void MorphMesh::LoadTex(const char* c, IDirect3DTexture9** tex)
-{
-	std::wstring conv = GetWC(c);
-
-	WCHAR str[MAX_PATH];
-	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
-	D3DXCreateTextureFromFile(DXUTGetD3D9Device(), str, tex);
 }
 
 void MorphMesh::Update(float deltaTime)

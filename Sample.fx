@@ -102,7 +102,7 @@ VS_OUTPUT RenderMorphSkeletonVS(VS_INPUT_MORPH IN)
 {
 	VS_OUTPUT OUT = (VS_OUTPUT)0;
 
-	float4 position = IN.position + ( IN.position2 - IN.position ) * shapeShift;	// shapeShift-->[-1,0]
+	float4 position = IN.position + ( IN.position2 - IN.position ) * shapeShift;	// shapeShift-->[0,1]
 	float4 p = float4(0.0f, 0.0f, 0.0f, 1.0f);
     float3 norm = float3(0.0f, 0.0f, 0.0f);
     float lastWeight = 0.0f;

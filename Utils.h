@@ -5,7 +5,9 @@
 #include "animation.h"
 #include <string>
 
-std::wstring GetWC(const char *c);
+extern std::wstring GetWC(const char *c);
+extern void LoadMesh(const char* c, ID3DXMesh** mesh);
+extern void LoadTex(const char* c, IDirect3DTexture9** tex);
 
 #define PATH_TO_TEXTURES "meshes\\"
 #define  CONTROLLER_NUM 1
