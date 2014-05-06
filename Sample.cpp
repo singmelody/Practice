@@ -20,6 +20,7 @@
 #include "Morph.h"
 #include "Face.h"
 #include "FaceController.h"
+#include "FaceFacory.h"
 #include <stdlib.h>
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
@@ -55,6 +56,7 @@ std::vector<ID3DXAnimationController*> g_animControllers;
 float						g_showTime = 0.0f;
 bool						g_ShowOBB = false;
 std::vector<FaceController*> g_faceControllers;
+FaceFacory*					g_pFaceFactory = NULL;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -520,6 +522,12 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	// create face model
 	g_FaceModel = new FaceModel("meshes\\face.x");
 
+	// create face factory
+	g_pFaceFactory = new FaceFacory("meshes\\factory_face.x");
+
+	g_FaceModelGenerate = g_pFaceFactory->GenerateRandomFace();
+	g_FaceControllerGenerate = new FaceController(D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModelGenerate);
+
 	// Create face controllers
 	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModel));
 	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(0.3f,0.0f,0.0f), g_FaceModel));
@@ -813,12 +821,15 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_ComplexFace->Update(fElapsedTime);
 // 		g_ComplexFace->Render(techName.c_str());
 
-		// Update face controllers
-		for (int i = 0; i < g_faceControllers.size(); ++i)
-		{
-			g_faceControllers[i]->Update(fElapsedTime);
-			g_faceControllers[i]->Render(techName.c_str());
-		}
+// 		// Update face controllers
+// 		for (int i = 0; i < g_faceControllers.size(); ++i)
+// 		{
+// 			g_faceControllers[i]->Update(fElapsedTime);
+// 			g_faceControllers[i]->Render(techName.c_str());
+// 		}
+
+		g_FaceControllerGenerate->Update(fElapsedTime);
+		g_FaceControllerGenerate->Render(techName.c_str());
 
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
@@ -1055,6 +1066,16 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 					g_Morph->Update();
 					break;
 				}
+			case VK_NUMPAD7:
+				{
+					SAFE_DELETE(g_FaceModelGenerate);
+					SAFE_DELETE(g_FaceControllerGenerate);
+
+					g_FaceModelGenerate = g_pFaceFactory->GenerateRandomFace();
+					g_FaceControllerGenerate = new FaceController(D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModelGenerate);
+
+					break;
+				}
         }
     }
 }
@@ -1179,6 +1200,9 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_Face);
 	SAFE_DELETE(g_ComplexFace);
 	SAFE_DELETE(g_FaceModel);
+	SAFE_DELETE(g_FaceModelGenerate);
+	SAFE_DELETE(g_FaceControllerGenerate);
+	SAFE_DELETE(g_pFaceFactory);
 
 	for (int i = 0; i < g_faceControllers.size(); ++i)
 	{

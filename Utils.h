@@ -22,6 +22,7 @@ class MorphMesh;
 class Face;
 class ComplexFace;
 class FaceModel;
+class FaceController;
 
 extern ID3DXEffect*		g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*		g_SkinnedMesh;
@@ -34,6 +35,8 @@ extern MultiMorph*		g_MultiMorph;
 extern MorphMesh*		g_MorphSkeleton;
 extern Face*			g_Face;
 extern FaceModel*		g_FaceModel;
+extern FaceModel*		g_FaceModelGenerate;
+extern FaceController*  g_FaceControllerGenerate;
 extern ComplexFace*		g_ComplexFace;
 
 enum PHYS_CONTRAINTS

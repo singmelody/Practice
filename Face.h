@@ -49,7 +49,9 @@ private:
 class FaceModel
 {
 public:
+	FaceModel();
 	FaceModel(const char* filename);
+
 	~FaceModel();
 
 	void Render(FaceController* pController);

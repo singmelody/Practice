@@ -30,6 +30,9 @@
     <Filter Include="Morph">
       <UniqueIdentifier>{99c3b881-53c6-4931-88f7-8c355c93323f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FaceFactory">
+      <UniqueIdentifier>{71b5baa2-3feb-4825-93a1-5634afb5f632}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -126,6 +129,7 @@
       <Filter>Facial</Filter>
     </ClCompile>
     <ClCompile Include="FaceController.cpp" />
+    <ClCompile Include="FaceFacory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -167,6 +171,7 @@
       <Filter>Facial</Filter>
     </ClInclude>
     <ClInclude Include="FaceController.h" />
+    <ClInclude Include="FaceFacory.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
