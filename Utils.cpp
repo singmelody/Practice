@@ -35,6 +35,15 @@ void LoadTex(const char* c, IDirect3DTexture9** tex)
 	D3DXCreateTextureFromFile(DXUTGetD3D9Device(), str, tex);
 }
 
+extern void LoadMeshHierarchy(const char* c, const LPD3DXALLOCATEHIERARCHY& hier, D3DXFRAME** frame)
+{
+	std::wstring conv = GetWC(c);
+
+	WCHAR str[MAX_PATH];
+	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
+	D3DXLoadMeshHierarchyFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), hier, NULL, frame, NULL);
+}
+
 ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface
 SkinnedMesh*	g_SkinnedMesh = NULL;
 ID3DXLine*		g_Line = NULL;
@@ -45,3 +54,4 @@ Morph*			g_Morph = NULL;
 MultiMorph*		g_MultiMorph = NULL;
 MorphMesh*		g_MorphSkeleton = NULL;
 Face*			g_Face = NULL;
+ComplexFace*	g_ComplexFace = NULL;

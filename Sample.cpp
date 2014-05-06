@@ -512,6 +512,9 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_Face = new Face();
 	g_Face->Init();
 
+	// create complex face
+	g_ComplexFace = new ComplexFace("meshes\\face.x");
+
     return S_OK;
 }
 
@@ -794,8 +797,11 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_MorphSkeleton->Update(fElapsedTime);
 // 		g_MorphSkeleton->Render();
 
-		g_Face->Update(fElapsedTime);
-		g_Face->Render(techName.c_str());
+// 		g_Face->Update(fElapsedTime);
+// 		g_Face->Render(techName.c_str());
+
+		g_ComplexFace->Update(fElapsedTime);
+		g_ComplexFace->Render(techName.c_str());
 
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
@@ -1154,6 +1160,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_MultiMorph);
 	SAFE_DELETE(g_MorphSkeleton);
 	SAFE_DELETE(g_Face);
+	SAFE_DELETE(g_ComplexFace);
 
 	g_animControllers.clear();
 	g_postions.clear();

@@ -348,3 +348,65 @@ HRESULT BoneHierarchyLoaderHAL::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshCo
 
 	return S_OK;
 }
+
+STDMETHODIMP FaceHierarchyLoader::CreateFrame(THIS_ LPCSTR Name, LPD3DXFRAME *ppNewFrame)
+{
+	D3DXFRAME* newBone = new D3DXFRAME();
+	memset( newBone, 0, sizeof(D3DXFRAME));
+
+	// Copy Name
+	if( Name != NULL )
+	{
+		newBone->Name = new char[strlen(Name) + 1];
+		strcpy( newBone->Name, Name);
+	}
+
+	D3DXMatrixIdentity(&newBone->TransformationMatrix);
+
+	*ppNewFrame = newBone;
+
+	return S_OK;
+}
+
+
+
+STDMETHODIMP FaceHierarchyLoader::DestroyFrame(THIS_ LPD3DXFRAME pFrameToFree)
+{
+	if (pFrameToFree)
+	{
+		if(pFrameToFree->Name != NULL)
+			SAFE_DELETE_ARRAY(pFrameToFree->Name);
+
+		if(pFrameToFree->pMeshContainer != NULL)
+			DestroyMeshContainer(( ((Bone*)pFrameToFree)->pMeshContainer ));
+	}
+
+	if(pFrameToFree->pFrameSibling)
+		DestroyFrame(pFrameToFree->pFrameSibling);
+
+	if(pFrameToFree->pFrameFirstChild)
+		DestroyFrame(pFrameToFree->pFrameFirstChild);
+
+	SAFE_DELETE(pFrameToFree);
+
+
+	return S_OK;
+}
+
+STDMETHODIMP FaceHierarchyLoader::DestroyMeshContainer(THIS_ LPD3DXMESHCONTAINER pMeshContainerBase)
+{
+	ID3DXMesh* m = (ID3DXMesh*)pMeshContainerBase;
+	SAFE_RELEASE(m);
+
+	return S_OK;
+}
+
+STDMETHODIMP FaceHierarchyLoader::CreateMeshContainer(THIS_ LPCSTR Name, CONST D3DXMESHDATA *pMeshData, CONST D3DXMATERIAL *pMaterials, CONST D3DXEFFECTINSTANCE *pEffectInstances, DWORD NumMaterials, CONST DWORD *pAdjacency, LPD3DXSKININFO pSkinInfo, LPD3DXMESHCONTAINER *ppNewMeshContainer)
+{
+	// Add Reference
+	pMeshData->pMesh->AddRef();
+
+	*ppNewMeshContainer = (D3DXMESHCONTAINER*)pMeshData->pMesh;
+
+	return S_OK;
+}
