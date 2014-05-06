@@ -55,3 +55,4 @@ MultiMorph*		g_MultiMorph = NULL;
 MorphMesh*		g_MorphSkeleton = NULL;
 Face*			g_Face = NULL;
 ComplexFace*	g_ComplexFace = NULL;
+FaceModel*		g_FaceModel = NULL;

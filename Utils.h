@@ -21,6 +21,7 @@ class MultiMorph;
 class MorphMesh;
 class Face;
 class ComplexFace;
+class FaceModel;
 
 extern ID3DXEffect*		g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*		g_SkinnedMesh;
@@ -32,8 +33,8 @@ extern Morph*			g_Morph;
 extern MultiMorph*		g_MultiMorph;
 extern MorphMesh*		g_MorphSkeleton;
 extern Face*			g_Face;
+extern FaceModel*		g_FaceModel;
 extern ComplexFace*		g_ComplexFace;
-
 
 enum PHYS_CONTRAINTS
 {

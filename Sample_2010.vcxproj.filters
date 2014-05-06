@@ -125,6 +125,7 @@
     <ClCompile Include="Face.cpp">
       <Filter>Facial</Filter>
     </ClCompile>
+    <ClCompile Include="FaceController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -165,6 +166,7 @@
     <ClInclude Include="Face.h">
       <Filter>Facial</Filter>
     </ClInclude>
+    <ClInclude Include="FaceController.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

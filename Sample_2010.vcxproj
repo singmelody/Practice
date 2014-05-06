@@ -383,6 +383,7 @@
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="Eye.cpp" />
     <ClCompile Include="Face.cpp" />
+    <ClCompile Include="FaceController.cpp" />
     <ClCompile Include="Morph.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PhysicsMgr.cpp" />
@@ -394,6 +395,7 @@
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="Eye.h" />
     <ClInclude Include="Face.h" />
+    <ClInclude Include="FaceController.h" />
     <ClInclude Include="Morph.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="PhysicsMgr.h" />

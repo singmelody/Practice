@@ -2,6 +2,7 @@
 #include "Face.h"
 #include "BoneHierarchyLoader.h"
 #include "Utils.h"
+#include "FaceController.h"
 
 Face::Face(void)
 {
@@ -225,14 +226,6 @@ void ComplexFace::Render(const char* tech)
 	g_pEffect->EndPass();
 	g_pEffect->End();
 
-	//Restore vertex declaration and stream sources
-	DXUTGetD3D9Device()->SetVertexDeclaration(NULL);
-
-	for(int i=0;i<5;i++)
-	{
-		DXUTGetD3D9Device()->SetStreamSource(i, NULL, 0, 0);
-	}
-
 	//Render Eyes
 	hTech = g_pEffect->GetTechniqueByName(tech);
 	g_pEffect->SetTechnique(hTech);
@@ -245,9 +238,203 @@ void ComplexFace::Render(const char* tech)
 	g_pEffect->EndPass();
 	g_pEffect->End();
 
+	//Restore vertex declaration and stream sources
+	DXUTGetD3D9Device()->SetVertexDeclaration(NULL);
+
+	for(int i=0;i<5;i++)
+	{
+		DXUTGetD3D9Device()->SetStreamSource(i, NULL, 0, 0);
+	}
+
 }
 
 void ComplexFace::ExtractMeshes(D3DXFRAME* frame)
+{
+	if (frame == NULL)
+		return;
+
+	if(frame->pMeshContainer)
+	{
+		if(frame->Name)
+		{
+			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer;
+
+			if(!strcmp(frame->Name, "Base"))
+			{
+				m_baseMesh = mesh;
+				mesh->AddRef();
+			}
+			else if(!strcmp(frame->Name, "Blink") )
+			{
+				m_binkMesh = mesh;
+				mesh->AddRef();
+			}
+			else if(!strcmp(frame->Name, "Emotion") )
+			{
+				m_emotionMeshes.push_back(mesh);
+				mesh->AddRef();
+			}
+			else if(!strcmp(frame->Name, "Speech") )
+			{
+				m_speechMeshes.push_back(mesh);
+				mesh->AddRef();
+			}
+		}
+	}
+
+	ExtractMeshes(frame->pFrameFirstChild);
+	ExtractMeshes(frame->pFrameSibling);
+}
+
+FaceModel::FaceModel(const char* filename)
+{
+	m_baseMesh = NULL;
+	m_binkMesh = NULL;
+	m_faceTex = NULL;
+	m_pFaceVertexDecl = NULL;
+
+
+	//Face Vertex Format
+	D3DVERTEXELEMENT9 faceVertexDecl[] = 
+	{
+		//1st Stream: Base Mesh
+		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},	
+		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	
+
+		//2nd Stream
+		{1,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1},
+		{1, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   1},
+		{1, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
+
+		//3rd Stream
+		{2,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 2},
+		{2, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2},
+		{2, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2},
+
+		//4th Stream
+		{3,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 3},
+		{3, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   3},
+		{3, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3},
+
+		//5th Stream
+		{4,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 4},
+		{4, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   4},
+		{4, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 4},
+
+		D3DDECL_END()
+	};
+
+	// Create face vertex decl
+	DXUTGetD3D9Device()->CreateVertexDeclaration( faceVertexDecl, &m_pFaceVertexDecl);
+
+	// Load Face Meshes
+	FaceHierarchyLoader hierarchy;
+	D3DXFRAME*	root = NULL;
+	LoadMeshHierarchy( filename, &hierarchy, &root);
+
+	//Extract Face Meshes
+	ExtractMeshes(root);
+
+	//Destroy temporary hierarchy
+	hierarchy.DestroyFrame(root);
+
+	//Load texture
+	LoadTex( "meshes\\face.jpg", &m_faceTex);
+}
+
+FaceModel::~FaceModel()
+{
+	SAFE_RELEASE( m_baseMesh );
+	SAFE_RELEASE( m_binkMesh );
+	SAFE_RELEASE( m_faceTex );
+	SAFE_RELEASE( m_pFaceVertexDecl );
+
+	for (int i = 0; i < m_emotionMeshes.size(); ++i)
+	{
+		SAFE_RELEASE(m_emotionMeshes[i]);
+	}
+
+	for (int i = 0; i < m_speechMeshes.size(); ++i)
+	{
+		SAFE_RELEASE(m_speechMeshes[i]);
+	}
+}
+
+void FaceModel::Render(FaceController* pController)
+{
+	if( m_baseMesh == NULL || pController == NULL)
+		return;
+
+	// set active vertex decl
+	DXUTGetD3D9Device()->SetVertexDeclaration(m_pFaceVertexDecl);
+
+	// set streams
+	DWORD vSize1 = m_baseMesh->GetNumBytesPerVertex();
+	DWORD vSize = D3DXGetFVFVertexSize( m_baseMesh->GetFVF()); 
+	assert( vSize1 == vSize );
+
+	IDirect3DVertexBuffer9* baseMeshBuffer = NULL;
+	m_baseMesh->GetVertexBuffer(&baseMeshBuffer);
+	DXUTGetD3D9Device()->SetStreamSource( 0, baseMeshBuffer, 0 , vSize);
+	SAFE_RELEASE(baseMeshBuffer);
+
+	// set blink source
+	IDirect3DVertexBuffer9* blinkBuffer = NULL;
+	m_binkMesh->GetVertexBuffer(&blinkBuffer);
+	DXUTGetD3D9Device()->SetStreamSource( 1, blinkBuffer, 0, vSize);
+	SAFE_RELEASE(blinkBuffer);
+
+	// set emotion source
+	IDirect3DVertexBuffer9* emotionBuffer = NULL;
+	m_emotionMeshes[pController->m_emotionIdx]->GetVertexBuffer(&emotionBuffer);
+	DXUTGetD3D9Device()->SetStreamSource( 2, emotionBuffer, 0, vSize);
+	SAFE_RELEASE(emotionBuffer);
+
+	// set speech source
+	for (int i = 0; i < 2; ++i)
+	{
+		IDirect3DVertexBuffer9* speechBuffer = NULL;
+		m_speechMeshes[pController->m_speechIndices[i]]->GetVertexBuffer(&speechBuffer);
+		DXUTGetD3D9Device()->SetStreamSource( 3 + i, speechBuffer, 0, vSize);
+		SAFE_RELEASE(speechBuffer);
+	}
+
+	//Set Index buffer
+	IDirect3DIndexBuffer9* ib = NULL;
+	m_baseMesh->GetIndexBuffer(&ib);
+	DXUTGetD3D9Device()->SetIndices(ib);
+	SAFE_RELEASE(ib);
+
+	// Set Shader var
+	g_pEffect->SetMatrix("g_mWorld", &pController->m_headMatrix);
+	g_pEffect->SetTexture("g_MeshTexture", m_faceTex);
+	g_pEffect->SetVector("weights", &pController->m_morphWeights);
+
+	//Start Technique
+	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("MultiMorph");
+	g_pEffect->SetTechnique(hTech);
+	g_pEffect->Begin(NULL, NULL);
+	g_pEffect->BeginPass(0);
+
+	//Draw mesh
+	DXUTGetD3D9Device()->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 
+		m_baseMesh->GetNumVertices(), 0, 
+		m_baseMesh->GetNumFaces());
+
+	g_pEffect->EndPass();
+	g_pEffect->End();
+
+	//Restore vertex declaration and stream sources
+	DXUTGetD3D9Device()->SetVertexDeclaration(NULL);
+
+	for(int i=0;i<5;i++)
+	{
+		DXUTGetD3D9Device()->SetStreamSource(i, NULL, 0, 0);
+	}
+}
+
+void FaceModel::ExtractMeshes(D3DXFRAME* frame)
 {
 	if (frame == NULL)
 		return;

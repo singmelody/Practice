@@ -19,6 +19,7 @@
 #include "PhysicsMgr.h"
 #include "Morph.h"
 #include "Face.h"
+#include "FaceController.h"
 #include <stdlib.h>
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
@@ -53,6 +54,7 @@ D3DMATERIAL9				white;
 std::vector<ID3DXAnimationController*> g_animControllers;
 float						g_showTime = 0.0f;
 bool						g_ShowOBB = false;
+std::vector<FaceController*> g_faceControllers;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -515,6 +517,14 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	// create complex face
 	g_ComplexFace = new ComplexFace("meshes\\face.x");
 
+	// create face model
+	g_FaceModel = new FaceModel("meshes\\face.x");
+
+	// Create face controllers
+	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModel));
+	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(0.3f,0.0f,0.0f), g_FaceModel));
+	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(-0.3f,0.0f,0.0f), g_FaceModel));
+
     return S_OK;
 }
 
@@ -800,8 +810,15 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_Face->Update(fElapsedTime);
 // 		g_Face->Render(techName.c_str());
 
-		g_ComplexFace->Update(fElapsedTime);
-		g_ComplexFace->Render(techName.c_str());
+// 		g_ComplexFace->Update(fElapsedTime);
+// 		g_ComplexFace->Render(techName.c_str());
+
+		// Update face controllers
+		for (int i = 0; i < g_faceControllers.size(); ++i)
+		{
+			g_faceControllers[i]->Update(fElapsedTime);
+			g_faceControllers[i]->Render(techName.c_str());
+		}
 
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
@@ -1161,6 +1178,15 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_MorphSkeleton);
 	SAFE_DELETE(g_Face);
 	SAFE_DELETE(g_ComplexFace);
+	SAFE_DELETE(g_FaceModel);
+
+	for (int i = 0; i < g_faceControllers.size(); ++i)
+	{
+		FaceController* controller = g_faceControllers[i];
+		SAFE_DELETE(controller);
+	}
+
+	g_faceControllers.clear();
 
 	g_animControllers.clear();
 	g_postions.clear();

@@ -3,6 +3,8 @@
 #include "Eye.h"
 #include <vector>
 
+class FaceController;
+
 class Face
 {
 public:
@@ -42,4 +44,23 @@ private:
 	D3DXVECTOR4					 m_morphWeights;
 
 	Eye							 m_eyes[2];
+};
+
+class FaceModel
+{
+public:
+	FaceModel(const char* filename);
+	~FaceModel();
+
+	void Render(FaceController* pController);
+	void ExtractMeshes(D3DXFRAME* frame);
+
+public:
+	ID3DXMesh* m_baseMesh;
+	ID3DXMesh* m_binkMesh;
+	std::vector<ID3DXMesh*> m_emotionMeshes;
+	std::vector<ID3DXMesh*>	m_speechMeshes;
+	IDirect3DVertexDeclaration9* m_pFaceVertexDecl;
+	IDirect3DTexture9*		m_faceTex;
+
 };
