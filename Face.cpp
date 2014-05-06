@@ -234,7 +234,7 @@ void ComplexFace::Render(const char* tech)
 	}
 
 	//Render Eyes
-	hTech = g_pEffect->GetTechniqueByName("Lighting");
+	hTech = g_pEffect->GetTechniqueByName(tech);
 	g_pEffect->SetTechnique(hTech);
 	g_pEffect->Begin(NULL, NULL);
 	g_pEffect->BeginPass(0);
