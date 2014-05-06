@@ -129,6 +129,16 @@ ComplexFace::~ComplexFace()
 	SAFE_RELEASE( m_binkMesh );
 	SAFE_RELEASE( m_FaceTexture );
 	SAFE_RELEASE( m_pFaceVertexDecl );
+
+	for (int i = 0; i < m_emotionMeshes.size(); ++i)
+	{
+		SAFE_RELEASE(m_emotionMeshes[i]);
+	}
+
+	for (int i = 0; i < m_speechMeshes.size(); ++i)
+	{
+		SAFE_RELEASE(m_speechMeshes[i]);
+	}
 }
 
 void ComplexFace::Update(float deltaTime)
@@ -195,6 +205,9 @@ void ComplexFace::Render(const char* tech)
 	SAFE_RELEASE(ib);
 
 	// Set Shader var
+	D3DXMATRIX world;
+	D3DXMatrixIdentity(&world);
+	g_pEffect->SetMatrix("g_mWorld", &world);
 	g_pEffect->SetTexture("g_MeshTexture", m_FaceTexture);
 	g_pEffect->SetVector("weights", &m_morphWeights);
 
