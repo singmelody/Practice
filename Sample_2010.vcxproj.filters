@@ -39,6 +39,9 @@
     <Filter Include="Audio">
       <UniqueIdentifier>{6675f43e-3eac-47da-8ec5-e8ace23ac841}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IK">
+      <UniqueIdentifier>{530a4e4c-9bf0-4ceb-8f3c-c8cef6f09a4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -137,6 +140,7 @@
     <ClCompile Include="FaceController.cpp" />
     <ClCompile Include="FaceFacory.cpp" />
     <ClCompile Include="WavDecoder.cpp" />
+    <ClCompile Include="InverseKinematics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -180,6 +184,7 @@
     <ClInclude Include="FaceController.h" />
     <ClInclude Include="FaceFacory.h" />
     <ClInclude Include="WavDecoder.h" />
+    <ClInclude Include="InverseKinematics.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

@@ -436,3 +436,8 @@ ID3DXAnimationController* SkinnedMesh::GetController()
 
 	return newAnimController;
 }
+
+D3DXFRAME* SkinnedMesh::GetBone(const char* name)
+{
+	return D3DXFrameFind( m_pRootBone, name);
+}

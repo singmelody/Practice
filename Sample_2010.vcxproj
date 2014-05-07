@@ -385,6 +385,7 @@
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="FaceController.cpp" />
     <ClCompile Include="FaceFacory.cpp" />
+    <ClCompile Include="InverseKinematics.cpp" />
     <ClCompile Include="Morph.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PhysicsMgr.cpp" />
@@ -399,6 +400,7 @@
     <ClInclude Include="Face.h" />
     <ClInclude Include="FaceController.h" />
     <ClInclude Include="FaceFacory.h" />
+    <ClInclude Include="InverseKinematics.h" />
     <ClInclude Include="Morph.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="PhysicsMgr.h" />

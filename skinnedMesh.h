@@ -81,9 +81,11 @@ public:
 	const std::vector<std::string>& GetAnimationNames();
 	ID3DXAnimationController* GetController();
 
+	D3DXFRAME* GetBone(const char* name);
+
+	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 protected:
 	D3DXFRAME *m_pRootBone;
-	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
 
 private:		
 	void SetupBoneMatrixPointers(Bone *bone);
