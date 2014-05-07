@@ -1,7 +1,7 @@
 #include "DXUT.h"
 #include "FaceController.h"
 #include "Utils.h"
-
+#include "WavDecoder.h"
 FaceController::FaceController(D3DXVECTOR3 pos, FaceModel *pFace)
 {
 	m_faceModel = pFace;
@@ -205,8 +205,8 @@ void FaceController::UpdateSpeech(float deltaTime)
 		// set blend meshes
 		float timeBetweenVisemes = v2.m_time - v1.m_time;
 		float p = (m_speechTime - v1.m_time) / timeBetweenVisemes;
-		m_morphWeights.z = (1.0f - p) * v1.m_blendAmount;
-		m_morphWeights.w = p * v2.m_blendAmount;
+		m_morphWeights.z = (1.0f - p) * v1.m_blendWeight;
+		m_morphWeights.w = p * v2.m_blendWeight;
 
 		// update index
 		if(m_speechTime >= v2.m_time)
@@ -219,17 +219,55 @@ void FaceController::UpdateSpeech(float deltaTime)
 	}
 }
 
+void FaceController::SpeakWav(WavDecoder& wave)
+{
+	m_visemes.clear();
+
+	// calculate which visemes to use from the wave file data
+	float soundLength = wave.GetLength();
+	float mapAmp = wave.GetMaxAmplitude() * 0.3f;
+
+	for (float i = 0.0f; i < soundLength; i+=0.1f)
+	{
+		short amp = wave.GetAverageAmplitude( i, i+0.1f);
+		float p = min( amp / mapAmp, 1.0f);
+
+		if( p < 0.2f )
+		{
+			m_visemes.push_back(Viseme(0, 0.0f, i));
+		}
+		else if( p < 0.4f)
+		{
+			float prc = max( (p - 0.2f) /0.2f, 0.3f);
+			m_visemes.push_back( Viseme(3, prc, i));
+		}
+		else if( p < 0.7f)
+		{
+			float prc = max( (p - 0.4f)/0.3f, 0.3f);
+			m_visemes.push_back( Viseme( 1, prc, i));
+		}
+		else
+		{
+			float prc = max( (p-0.7f)/0.3f, 0.3f);
+			m_visemes.push_back( Viseme( 4, prc, i));
+		}
+	}
+
+	m_visemeIndex = 1;
+	m_speechTime = 0.0f;
+}
+
 Viseme::Viseme()
 {
 	m_morphTarget = 0;
-	m_blendAmount = 0.0f;
+	m_blendWeight = 0.0f;
 	m_time = 0.0f;
 }
 
 Viseme::Viseme(int target, float amount, float time)
 {
 	m_morphTarget = target;
-	m_blendAmount = amount;
+	m_blendWeight = amount;
 	m_time = time;
 }
 

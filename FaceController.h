@@ -3,6 +3,7 @@
 #include "Face.h"
 
 class Viseme;
+class WavDecoder;
 
 class FaceController
 {
@@ -17,6 +18,8 @@ public:
 	
 	void Speak(const std::vector<Viseme>& visemes);
 	void UpdateSpeech(float deltaTime);
+
+	void SpeakWav(WavDecoder& wave);
 public:
 	FaceModel* m_faceModel;
 
@@ -46,6 +49,6 @@ public:
 
 public:
 	int m_morphTarget;
-	float m_blendAmount;
+	float m_blendWeight;
 	float m_time;
 };

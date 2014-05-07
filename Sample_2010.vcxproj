@@ -392,6 +392,7 @@
     <ClCompile Include="skinnedMesh.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Utils.h" />
+    <ClCompile Include="WavDecoder.cpp" />
     <ClInclude Include="animation.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="Eye.h" />
@@ -403,6 +404,7 @@
     <ClInclude Include="PhysicsMgr.h" />
     <ClInclude Include="RagDoll.h" />
     <ClInclude Include="skinnedMesh.h" />
+    <ClInclude Include="WavDecoder.h" />
     <None Include="DXUT\Optional\directx.ico" />
     <ClInclude Include="DXUT\Core\DXUT.h" />
     <ClInclude Include="DXUT\Core\DXUTenum.h" />

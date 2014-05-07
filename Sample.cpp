@@ -22,6 +22,7 @@
 #include "FaceController.h"
 #include "FaceFacory.h"
 #include <stdlib.h>
+#include "WavDecoder.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -731,6 +732,26 @@ void Speak()
 	g_speakController->Speak(visemes);
 }
 
+void SpeakWav()
+{
+	std::wstring audioPath = GetWC("audio\\voice.wav");
+	WCHAR str[MAX_PATH];
+	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, audioPath.c_str() );
+
+	//Load Wave file
+	WavDecoder wf;
+	wf.Load(str);
+
+	//Stop old sounds
+	PlaySound(0, 0, 0);
+
+	//play voice	
+
+	PlaySound(str,NULL,SND_FILENAME|SND_ASYNC); 
+
+	g_speakController->SpeakWav(wf);
+}
+
 
 //--------------------------------------------------------------------------------------
 // This callback function will be called at the end of every frame to perform all the 
@@ -1120,6 +1141,12 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 					Speak();
 					break;
 				}
+			case VK_NUMPAD9:
+				{
+					SpeakWav();
+					break;
+				}
+
         }
     }
 }
