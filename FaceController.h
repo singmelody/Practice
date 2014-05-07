@@ -2,6 +2,8 @@
 
 #include "Face.h"
 
+class Viseme;
+
 class FaceController
 {
 	friend class face;
@@ -10,8 +12,11 @@ public:
 	~FaceController(void);
 
 	void Update(float deltaTime);
+	void SpeakUpdate(float deltaTime);
 	void Render(const char* tech);
-
+	
+	void Speak(const std::vector<Viseme>& visemes);
+	void UpdateSpeech(float deltaTime);
 public:
 	FaceModel* m_faceModel;
 
@@ -25,5 +30,22 @@ public:
 	D3DXMATRIX	m_headMatrix;
 
 	Eye m_eyes[2];
+
+	// speech viseme array
+	std::vector<Viseme> m_visemes;
+	int m_visemeIndex;
+	float m_speechTime;
 };
 
+class Viseme
+{
+public:
+	Viseme();
+	Viseme(int target, float amount, float time);
+	~Viseme();
+
+public:
+	int m_morphTarget;
+	float m_blendAmount;
+	float m_time;
+};

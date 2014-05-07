@@ -57,6 +57,7 @@ float						g_showTime = 0.0f;
 bool						g_ShowOBB = false;
 std::vector<FaceController*> g_faceControllers;
 FaceFacory*					g_pFaceFactory = NULL;
+FaceController*				g_speakController = NULL;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -533,6 +534,9 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(0.3f,0.0f,0.0f), g_FaceModel));
 	g_faceControllers.push_back(new FaceController(D3DXVECTOR3(-0.3f,0.0f,0.0f), g_FaceModel));
 
+	// create speak face controller
+	g_speakController = new FaceController( D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModel);
+
     return S_OK;
 }
 
@@ -695,6 +699,38 @@ void RenderShadow()
 #endif
 }
 
+void Speak()
+{
+	//Stop old sounds
+	PlaySound(0, 0, 0);
+
+	//play voice	
+	std::wstring audioPath = GetWC("audio\\voice.wav");
+	WCHAR str[MAX_PATH];
+	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, audioPath.c_str() );
+	PlaySound(str,NULL,SND_FILENAME|SND_ASYNC); 
+
+	//Create viseme queue
+	std::vector<Viseme> visemes;
+	visemes.push_back(Viseme(0, 0.0f,  0.0f));
+	visemes.push_back(Viseme(1, 1.0f,  0.25f));
+	visemes.push_back(Viseme(0, 0.0f,  0.5f));
+	visemes.push_back(Viseme(1, 0.75f, 0.65f));
+	visemes.push_back(Viseme(0, 0.0f,  1.0f));
+	visemes.push_back(Viseme(0, 0.0f,  1.25f));
+	visemes.push_back(Viseme(3, 1.0f,  1.35f));
+	visemes.push_back(Viseme(5, 1.0f,  1.5f));
+	visemes.push_back(Viseme(1, 1.0f,  1.58f));
+	visemes.push_back(Viseme(5, 1.0f,  1.71f));
+	visemes.push_back(Viseme(3, 0.75f, 1.83f));
+	visemes.push_back(Viseme(3, 0.5f,  1.9f));
+	visemes.push_back(Viseme(1, 1.0f,  2.1f));
+	visemes.push_back(Viseme(4, 1.0f,  2.3f));
+	visemes.push_back(Viseme(4, 0.0f,  2.5f));
+
+	g_speakController->Speak(visemes);
+}
+
 
 //--------------------------------------------------------------------------------------
 // This callback function will be called at the end of every frame to perform all the 
@@ -828,8 +864,11 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 			g_faceControllers[i]->Render(techName.c_str());
 // 		}
 
-		g_FaceControllerGenerate->Update(fElapsedTime);
-		g_FaceControllerGenerate->Render(techName.c_str());
+// 		g_FaceControllerGenerate->Update(fElapsedTime);
+// 		g_FaceControllerGenerate->Render(techName.c_str());
+
+		g_speakController->SpeakUpdate(fElapsedTime);
+		g_speakController->Render(techName.c_str());
 
 		// Physics
 // 		g_physicsEngine->Update(fElapsedTime);
@@ -1076,6 +1115,11 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 
 					break;
 				}
+			case VK_NUMPAD8:
+				{
+					Speak();
+					break;
+				}
         }
     }
 }
@@ -1203,6 +1247,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_FaceModelGenerate);
 	SAFE_DELETE(g_FaceControllerGenerate);
 	SAFE_DELETE(g_pFaceFactory);
+	SAFE_DELETE(g_speakController);
 
 	for (int i = 0; i < g_faceControllers.size(); ++i)
 	{

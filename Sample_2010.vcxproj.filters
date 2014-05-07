@@ -33,6 +33,9 @@
     <Filter Include="FaceFactory">
       <UniqueIdentifier>{71b5baa2-3feb-4825-93a1-5634afb5f632}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{1a0a2414-f171-4b59-88a5-3f94a00866c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
