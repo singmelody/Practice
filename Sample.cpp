@@ -852,6 +852,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 			if(g_ik)
 			{
 				g_ik->UpdateHeadIK();
+				g_ik->UpdateArmIK();
 			}
 #ifdef SOFT
 			// Apply the SoftSkin technique contained in the effect  
