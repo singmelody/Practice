@@ -112,7 +112,7 @@ void InverseKinematics::UpdateArmIK()
 	float x = (p.x - 320) / 640.0f;
 	float y = (p.y - 240) / 480.0f;	
 
-	D3DXVECTOR3 lookAt(x, 1.5f - y, -1.0f);
+	D3DXVECTOR3 lookAt(x, 1.5f - y, -0.25f);
 
 	// Grab a point located at (-0.5, 1.5, 0.0)
 	// The elbow joint axis (0, 0, -1) in content
@@ -152,7 +152,7 @@ void InverseKinematics::ApplyArmIK(D3DXVECTOR3 &hingeAxis, D3DXVECTOR3 &target)
 	// calcuate  current angle and wanted angle
 	float wantedJointAngle = 0.0f;
 
-	if ( start2Target  >= start2Joint + joint2End )
+	if ( distStart2Target  >= distStart2Joint + distJoint2End )
 	{
 		// straingt arm
 		wantedJointAngle = D3DXToRadian(180.0f);
@@ -164,74 +164,140 @@ void InverseKinematics::ApplyArmIK(D3DXVECTOR3 &hingeAxis, D3DXVECTOR3 &target)
 		wantedJointAngle = acosf(cosAngle);
 	}
 
-	// Normalized vectors
-	D3DXVECTOR3 nmlStart2Joint = start2Joint;
-	D3DXVECTOR3 nmlJoint2End = joint2End;
-	D3DXVec3Normalize( &nmlStart2Joint, &nmlStart2Joint);
-	D3DXVec3Normalize( &nmlJoint2End, &nmlJoint2End);
+	//Normalize vectors
+	D3DXVECTOR3 nmlStartToJoint = start2Joint;
+	D3DXVECTOR3 nmlJointToEnd = joint2End;
+	D3DXVec3Normalize(&nmlStartToJoint, &nmlStartToJoint);
+	D3DXVec3Normalize(&nmlJointToEnd, &nmlJointToEnd);
 
-	// Calculate the current joint angle
-	float currentJointAngle = acosf( D3DXVec3Dot( &(-nmlStart2Joint), &nmlJoint2End) );
+	//Calculate the current joint angle
+	float currentJointAngle = acosf(D3DXVec3Dot(&(-nmlStartToJoint), &nmlJointToEnd));
 
-	// Calculate rotation matrix
+	//Calculate rotation matrix
 	float diffJointAngle = wantedJointAngle - currentJointAngle;
 	D3DXMATRIX rotation;
-	D3DXMatrixRotationAxis( &rotation, &hingeAxis, diffJointAngle);
+	D3DXMatrixRotationAxis(&rotation, &hingeAxis, diffJointAngle);
 
-	// Apply elbow transformation
+	//Apply elbow transformation
 	m_elbowBone->TransformationMatrix = rotation * m_elbowBone->TransformationMatrix;
 
-	// Now the elbow "bending" has been done, Next you just
-	// need to rotate the shoulder using the look at ik algorithm
-
-	// Calcuate new end pos
-	// calcuate this in world pos & transform
-	// it later 2 start bone local space
-	D3DXMATRIX tempMatrix;
-	tempMatrix = m_elbowBone->CombinedTransformationMatrix;
+	// Calcuate new end position
+	// Calculate this in world position and transform it later to start bones local space
+	D3DXMATRIX tempMatrix = m_elbowBone->CombinedTransformationMatrix;
 	tempMatrix._41 = 0.0f; 
 	tempMatrix._42 = 0.0f; 
 	tempMatrix._43 = 0.0f; 
 	tempMatrix._44 = 1.0f;
 
 	D3DXVECTOR3 worldHingeAxis;
-	D3DXVECTOR3 newJoint2End;
+	D3DXVECTOR3 newJointToEnd;
+	D3DXVec3TransformCoord(&worldHingeAxis, &hingeAxis, &tempMatrix);
+	D3DXMatrixRotationAxis(&rotation, &worldHingeAxis, diffJointAngle);
+	D3DXVec3TransformCoord(&newJointToEnd, &joint2End, &rotation);
 
-	D3DXVec3TransformCoord( &worldHingeAxis, &hingeAxis, &tempMatrix);
-	D3DXMatrixRotationAxis( &rotation, &worldHingeAxis, diffJointAngle);
-	D3DXVec3TransformCoord( &newJoint2End, &joint2End, &rotation);
-
-	D3DXVECTOR3 newEndPos;
-	D3DXVec3Add( &newEndPos, &newJoint2End, &jointPos);
+	D3DXVECTOR3 newEndPosition;
+	D3DXVec3Add(&newEndPosition, &newJointToEnd, &jointPos);
 
 	// Calculate start bone rotation
-	D3DXMATRIX mtx2Local;
-	D3DXMatrixInverse( &mtx2Local, NULL, &m_shoulderBone->CombinedTransformationMatrix);
+	D3DXMATRIX mtxToLocal;
+	D3DXMatrixInverse(&mtxToLocal, NULL, &m_shoulderBone->CombinedTransformationMatrix);
 
 	D3DXVECTOR3 localNewEnd;
 	D3DXVECTOR3 localTarget;
-	D3DXVec3TransformCoord( &localNewEnd, &newEndPos, &mtx2Local);
-	D3DXVec3TransformCoord( &localTarget, &target, &mtx2Local);
-	D3DXVec3Normalize( &localNewEnd, &localNewEnd);
-	D3DXVec3Normalize( &localTarget, &localTarget);
+	D3DXVec3TransformCoord(&localNewEnd, &newEndPosition, &mtxToLocal);
+	D3DXVec3TransformCoord(&localTarget, &target, &mtxToLocal);
+	D3DXVec3Normalize(&localNewEnd, &localNewEnd);
+	D3DXVec3Normalize(&localTarget, &localTarget);
 
 	D3DXVECTOR3 localAxis;
-	D3DXVec3Cross( &localAxis, &localNewEnd, &localTarget);
+	D3DXVec3Cross(&localAxis, &localNewEnd, &localTarget);
 	if(D3DXVec3Length(&localAxis) == 0.0f)
 		return;
 
-	D3DXVec3Normalize( &localAxis, &localAxis);
-	float localAngle = acosf( D3DXVec3Dot( &localNewEnd, &localTarget));
+	D3DXVec3Normalize(&localAxis, &localAxis);
+	float localAngle = acosf(D3DXVec3Dot(&localNewEnd, &localTarget));
 
 	// Apply the rotation that makes the bone turn
-	D3DXMatrixRotationAxis( &rotation, &localAxis, localAngle);
+	D3DXMatrixRotationAxis(&rotation, &localAxis, localAngle);
 	m_shoulderBone->CombinedTransformationMatrix = rotation * m_shoulderBone->CombinedTransformationMatrix;
 	m_shoulderBone->TransformationMatrix = rotation * m_shoulderBone->TransformationMatrix;
 
-	// update matrix of child bones
-	if (m_shoulderBone->pFrameFirstChild)
-	{
-		m_skinnedMesh->UpdateMatrices( (Bone*)m_shoulderBone->pFrameFirstChild,
-										&m_shoulderBone->CombinedTransformationMatrix);
-	}
+	// Update matrices of child bones.
+	if(m_shoulderBone->pFrameFirstChild)
+		m_skinnedMesh->UpdateMatrices((Bone*)m_shoulderBone->pFrameFirstChild, 
+		&m_shoulderBone->CombinedTransformationMatrix);
+
+	
+// 
+// 	// Normalized vectors
+// 	D3DXVECTOR3 nmlStart2Joint = start2Joint;
+// 	D3DXVECTOR3 nmlJoint2End = joint2End;
+// 	D3DXVec3Normalize( &nmlStart2Joint, &nmlStart2Joint);
+// 	D3DXVec3Normalize( &nmlJoint2End, &nmlJoint2End);
+// 
+// 	// Calculate the current joint angle
+// 	float currentJointAngle = acosf( D3DXVec3Dot( &(-nmlStart2Joint), &nmlJoint2End) );
+// 
+// 	// Calculate rotation matrix
+// 	float diffJointAngle = wantedJointAngle - currentJointAngle;
+// 	D3DXMATRIX rotation;
+// 	D3DXMatrixRotationAxis( &rotation, &hingeAxis, diffJointAngle);
+// 
+// 	// Apply elbow transformation
+// 	m_elbowBone->TransformationMatrix = rotation * m_elbowBone->TransformationMatrix;
+// 
+// 	// Now the elbow "bending" has been done, Next you just
+// 	// need to rotate the shoulder using the look at ik algorithm
+// 
+// 	// Calcuate new end pos
+// 	// calcuate this in world pos & transform
+// 	// it later 2 start bone local space
+// 	D3DXMATRIX tempMatrix;
+// 	tempMatrix = m_elbowBone->CombinedTransformationMatrix;
+// 	tempMatrix._41 = 0.0f; 
+// 	tempMatrix._42 = 0.0f; 
+// 	tempMatrix._43 = 0.0f; 
+// 	tempMatrix._44 = 1.0f;
+// 
+// 	D3DXVECTOR3 worldHingeAxis;
+// 	D3DXVECTOR3 newJoint2End;
+// 
+// 	D3DXVec3TransformCoord( &worldHingeAxis, &hingeAxis, &tempMatrix);
+// 	D3DXMatrixRotationAxis( &rotation, &worldHingeAxis, diffJointAngle);
+// 	D3DXVec3TransformCoord( &newJoint2End, &joint2End, &rotation);
+// 
+// 	D3DXVECTOR3 newEndPos;
+// 	D3DXVec3Add( &newEndPos, &newJoint2End, &jointPos);
+// 
+// 	// Calculate start bone rotation
+// 	D3DXMATRIX mtx2Local;
+// 	D3DXMatrixInverse( &mtx2Local, NULL, &m_shoulderBone->CombinedTransformationMatrix);
+// 
+// 	D3DXVECTOR3 localNewEnd;
+// 	D3DXVECTOR3 localTarget;
+// 	D3DXVec3TransformCoord( &localNewEnd, &newEndPos, &mtx2Local);
+// 	D3DXVec3TransformCoord( &localTarget, &target, &mtx2Local);
+// 	D3DXVec3Normalize( &localNewEnd, &localNewEnd);
+// 	D3DXVec3Normalize( &localTarget, &localTarget);
+// 
+// 	D3DXVECTOR3 localAxis;
+// 	D3DXVec3Cross( &localAxis, &localNewEnd, &localTarget);
+// 	if(D3DXVec3Length(&localAxis) == 0.0f)
+// 		return;
+// 
+// 	D3DXVec3Normalize( &localAxis, &localAxis);
+// 	float localAngle = acosf( D3DXVec3Dot( &localNewEnd, &localTarget));
+// 
+// 	// Apply the rotation that makes the bone turn
+// 	D3DXMatrixRotationAxis( &rotation, &localAxis, localAngle);
+// 	m_shoulderBone->CombinedTransformationMatrix = rotation * m_shoulderBone->CombinedTransformationMatrix;
+// 	m_shoulderBone->TransformationMatrix = rotation * m_shoulderBone->TransformationMatrix;
+// 
+// 	// update matrix of child bones
+// 	if (m_shoulderBone->pFrameFirstChild)
+// 	{
+// 		m_skinnedMesh->UpdateMatrices( (Bone*)m_shoulderBone->pFrameFirstChild,
+// 										&m_shoulderBone->CombinedTransformationMatrix);
+// 	}
+
 }

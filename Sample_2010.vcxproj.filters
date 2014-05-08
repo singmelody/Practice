@@ -33,9 +33,6 @@
     <Filter Include="FaceFactory">
       <UniqueIdentifier>{71b5baa2-3feb-4825-93a1-5634afb5f632}</UniqueIdentifier>
     </Filter>
-    <Filter Include="NewFilter1">
-      <UniqueIdentifier>{1a0a2414-f171-4b59-88a5-3f94a00866c3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Audio">
       <UniqueIdentifier>{6675f43e-3eac-47da-8ec5-e8ace23ac841}</UniqueIdentifier>
     </Filter>
@@ -137,10 +134,18 @@
     <ClCompile Include="Face.cpp">
       <Filter>Facial</Filter>
     </ClCompile>
-    <ClCompile Include="FaceController.cpp" />
-    <ClCompile Include="FaceFacory.cpp" />
-    <ClCompile Include="WavDecoder.cpp" />
-    <ClCompile Include="InverseKinematics.cpp" />
+    <ClCompile Include="FaceController.cpp">
+      <Filter>Facial</Filter>
+    </ClCompile>
+    <ClCompile Include="FaceFacory.cpp">
+      <Filter>Facial</Filter>
+    </ClCompile>
+    <ClCompile Include="InverseKinematics.cpp">
+      <Filter>IK</Filter>
+    </ClCompile>
+    <ClCompile Include="WavDecoder.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -181,10 +186,18 @@
     <ClInclude Include="Face.h">
       <Filter>Facial</Filter>
     </ClInclude>
-    <ClInclude Include="FaceController.h" />
-    <ClInclude Include="FaceFacory.h" />
-    <ClInclude Include="WavDecoder.h" />
-    <ClInclude Include="InverseKinematics.h" />
+    <ClInclude Include="FaceController.h">
+      <Filter>Facial</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceFacory.h">
+      <Filter>Facial</Filter>
+    </ClInclude>
+    <ClInclude Include="InverseKinematics.h">
+      <Filter>IK</Filter>
+    </ClInclude>
+    <ClInclude Include="WavDecoder.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

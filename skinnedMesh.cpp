@@ -337,36 +337,36 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 		}
 		else
 		{
-			if(!shadow)
-			{
-				g_pEffect->SetMatrix( "g_mWorld", &bone->CombinedTransformationMatrix);
-			}
-			else
-			{
-				D3DXMATRIX result;
-				D3DXMatrixMultiply( &result, &bone->CombinedTransformationMatrix, &m_shadow);
-				g_pEffect->SetMatrix( "g_mWorld", &result);
-			}
-
-			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(staticTech);
-			g_pEffect->SetTechnique(hTech);
-
-			//Render the mesh
-			int numMaterials = (int)boneMesh->materials.size();
-
-			for (int i = 0; i < numMaterials; ++i)
-			{
-				DXUTGetD3D9Device()->SetMaterial(&boneMesh->materials[i]);
-				g_pEffect->SetTexture( "g_MeshTexture", boneMesh->textures[i]);
-
-				g_pEffect->Begin( NULL, NULL);
-				g_pEffect->BeginPass(0);
-
-				boneMesh->MeshData.pMesh->DrawSubset(i);
-
-				g_pEffect->EndPass();
-				g_pEffect->End();
-			}
+// 			if(!shadow)
+// 			{
+// 				g_pEffect->SetMatrix( "g_mWorld", &bone->CombinedTransformationMatrix);
+// 			}
+// 			else
+// 			{
+// 				D3DXMATRIX result;
+// 				D3DXMatrixMultiply( &result, &bone->CombinedTransformationMatrix, &m_shadow);
+// 				g_pEffect->SetMatrix( "g_mWorld", &result);
+// 			}
+// 
+// 			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(staticTech);
+// 			g_pEffect->SetTechnique(hTech);
+// 
+// 			//Render the mesh
+// 			int numMaterials = (int)boneMesh->materials.size();
+// 
+// 			for (int i = 0; i < numMaterials; ++i)
+// 			{
+// 				DXUTGetD3D9Device()->SetMaterial(&boneMesh->materials[i]);
+// 				g_pEffect->SetTexture( "g_MeshTexture", boneMesh->textures[i]);
+// 
+// 				g_pEffect->Begin( NULL, NULL);
+// 				g_pEffect->BeginPass(0);
+// 
+// 				boneMesh->MeshData.pMesh->DrawSubset(i);
+// 
+// 				g_pEffect->EndPass();
+// 				g_pEffect->End();
+// 			}
 		}
 	}
 
