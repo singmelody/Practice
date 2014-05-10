@@ -3,6 +3,7 @@
 #include "BoneHierarchyLoader.h"
 #include "Utils.h"
 #include "FaceController.h"
+#include <iostream>
 
 Face::Face(void)
 {
@@ -257,7 +258,7 @@ void ComplexFace::ExtractMeshes(D3DXFRAME* frame)
 	{
 		if(frame->Name)
 		{
-			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer;
+			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer->MeshData.pMesh;
 
 			if(!strcmp(frame->Name, "Base"))
 			{
@@ -291,9 +292,10 @@ FaceModel::FaceModel(const char* filename)
 	m_baseMesh = NULL;
 	m_binkMesh = NULL;
 	m_faceTex = NULL;
+	m_normalTex = NULL;
 	m_pFaceVertexDecl = NULL;
 
-
+	//Face Vertex Format
 	//Face Vertex Format
 	D3DVERTEXELEMENT9 faceVertexDecl[] = 
 	{
@@ -301,6 +303,8 @@ FaceModel::FaceModel(const char* filename)
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},	
 		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
 		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	
+		{0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,  0},
+		{0, 44, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
 
 		//2nd Stream
 		{1,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1},
@@ -336,11 +340,16 @@ FaceModel::FaceModel(const char* filename)
 	//Extract Face Meshes
 	ExtractMeshes(root);
 
+	// Add tagents & binormal to base mesh
+	AddTangent(&m_baseMesh);
+	//PrintMeshDeclaration(m_pBaseMesh);
+
 	//Destroy temporary hierarchy
 	hierarchy.DestroyFrame(root);
 
 	//Load texture
 	LoadTex( "meshes\\face.jpg", &m_faceTex);
+	LoadTex( "meshes\\face_normal.tga", &m_normalTex);
 }
 
 FaceModel::FaceModel()
@@ -348,6 +357,7 @@ FaceModel::FaceModel()
 	m_baseMesh = NULL;
 	m_binkMesh = NULL;
 	m_faceTex = NULL;
+	m_normalTex = NULL;
 	m_pFaceVertexDecl = NULL;
 
 
@@ -386,12 +396,14 @@ FaceModel::FaceModel()
 	DXUTGetD3D9Device()->CreateVertexDeclaration( faceVertexDecl, &m_pFaceVertexDecl);
 }
 
+
 FaceModel::~FaceModel()
 {
 	SAFE_RELEASE( m_baseMesh );
 	SAFE_RELEASE( m_binkMesh );
 	SAFE_RELEASE( m_faceTex );
 	SAFE_RELEASE( m_pFaceVertexDecl );
+	SAFE_RELEASE( m_normalTex );
 
 	for (int i = 0; i < m_emotionMeshes.size(); ++i)
 	{
@@ -413,16 +425,16 @@ void FaceModel::Render(FaceController* pController)
 	DXUTGetD3D9Device()->SetVertexDeclaration(m_pFaceVertexDecl);
 
 	// set streams
-	DWORD vSize1 = m_baseMesh->GetNumBytesPerVertex();
-	DWORD vSize = D3DXGetFVFVertexSize( m_baseMesh->GetFVF()); 
-	assert( vSize1 == vSize );
-
+	D3DVERTEXELEMENT9 decl[MAX_FVF_DECL_SIZE];
+	m_baseMesh->GetDeclaration(decl);
+	DWORD vSize1 = D3DXGetDeclVertexSize(decl, 0);
 	IDirect3DVertexBuffer9* baseMeshBuffer = NULL;
 	m_baseMesh->GetVertexBuffer(&baseMeshBuffer);
-	DXUTGetD3D9Device()->SetStreamSource( 0, baseMeshBuffer, 0 , vSize);
+	DXUTGetD3D9Device()->SetStreamSource(0, baseMeshBuffer, 0, vSize1);
 	SAFE_RELEASE(baseMeshBuffer);
 
 	// set blink source
+	DWORD vSize = D3DXGetFVFVertexSize(m_binkMesh->GetFVF());
 	IDirect3DVertexBuffer9* blinkBuffer = NULL;
 	m_binkMesh->GetVertexBuffer(&blinkBuffer);
 	DXUTGetD3D9Device()->SetStreamSource( 1, blinkBuffer, 0, vSize);
@@ -451,11 +463,12 @@ void FaceModel::Render(FaceController* pController)
 
 	// Set Shader var
 	g_pEffect->SetMatrix("g_mWorld", &pController->m_headMatrix);
-	g_pEffect->SetTexture("g_MeshTexture", m_faceTex);
+	g_pEffect->SetTexture("texDiffuse", m_faceTex);
+	g_pEffect->SetTexture("texNormalMap", m_normalTex);
 	g_pEffect->SetVector("weights", &pController->m_morphWeights);
 
 	//Start Technique
-	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("MultiMorph");
+	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("FaceMorphNormal");
 	g_pEffect->SetTechnique(hTech);
 	g_pEffect->Begin(NULL, NULL);
 	g_pEffect->BeginPass(0);
@@ -486,7 +499,7 @@ void FaceModel::ExtractMeshes(D3DXFRAME* frame)
 	{
 		if(frame->Name)
 		{
-			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer;
+			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer->MeshData.pMesh;
 
 			if(!strcmp(frame->Name, "Base"))
 			{
@@ -513,4 +526,107 @@ void FaceModel::ExtractMeshes(D3DXFRAME* frame)
 
 	ExtractMeshes(frame->pFrameFirstChild);
 	ExtractMeshes(frame->pFrameSibling);
+}
+
+void FaceModel::AddTangent(ID3DXMesh** pMesh)
+{
+	//Get vertex declaration from mesh
+	D3DVERTEXELEMENT9 decl[MAX_FVF_DECL_SIZE];
+	(*pMesh)->GetDeclaration(decl);
+
+	//Find the end index of the declaration
+	int index = 0;
+	while(decl[index].Type != D3DDECLTYPE_UNUSED)
+	{
+		index++;
+	}
+
+	//Get size of last element
+	int size = 0;
+
+	switch(decl[index - 1].Type)
+	{
+	case D3DDECLTYPE_FLOAT1:
+		size = 4;
+		break;
+
+	case D3DDECLTYPE_FLOAT2:
+		size = 8;
+		break;
+
+	case D3DDECLTYPE_FLOAT3:
+		size = 12;
+		break;
+
+	case D3DDECLTYPE_FLOAT4:
+		size = 16;
+		break;
+
+	case D3DDECLTYPE_D3DCOLOR:
+		size = 4;
+		break;
+
+	case D3DDECLTYPE_UBYTE4:
+		size = 4;
+		break;
+
+	default:
+		std::cout << "Unhandled declaration type: " << decl[index - 1].Type << "\n";
+	};
+
+	//Create Tangent Element
+	D3DVERTEXELEMENT9 tangent = 
+	{
+		0, 
+		decl[index - 1].Offset + size,
+		D3DDECLTYPE_FLOAT3, 
+		D3DDECLMETHOD_DEFAULT, 
+		D3DDECLUSAGE_TANGENT, 
+		0
+	};
+
+	//Create BiNormal Element
+	D3DVERTEXELEMENT9 binormal = 
+	{
+		0, 
+		tangent.Offset + 12, 
+		D3DDECLTYPE_FLOAT3, 
+		D3DDECLMETHOD_DEFAULT, 
+		D3DDECLUSAGE_BINORMAL, 
+		0
+	};
+
+	//End element
+	D3DVERTEXELEMENT9 endElement = D3DDECL_END();
+
+	//Add new elements to vertex declaration
+	decl[index++] = tangent;
+	decl[index++] = binormal;
+	decl[index] = endElement;
+
+	//Convert mesh to the new vertex declaration
+	ID3DXMesh* pNewMesh = NULL;
+
+	if(FAILED((*pMesh)->CloneMesh((*pMesh)->GetOptions(), 
+		decl,
+		DXUTGetD3D9Device(),
+		&pNewMesh)))
+	{
+		std::cout << "Failed to clone mesh\n";
+		return;
+	}
+
+	//Compute the tangents & binormals
+	if(FAILED(D3DXComputeTangentFrame(pNewMesh, NULL)))
+	{
+		SAFE_RELEASE( pNewMesh );
+		std::cout << "Failed to compute tangents & binormals for new mesh\n";
+		return;
+	}
+
+	//Release old mesh
+	SAFE_RELEASE( *pMesh );
+
+	//Assign new mesh to the mesh pointer
+	*pMesh = pNewMesh;
 }

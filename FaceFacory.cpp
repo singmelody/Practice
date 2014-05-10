@@ -86,7 +86,7 @@ void FaceFacory::ExtractMeshes(D3DXFRAME* frame)
 	{
 		if(frame->Name)
 		{
-			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer;
+			ID3DXMesh* mesh = (ID3DXMesh*)frame->pMeshContainer->MeshData.pMesh;
 
 			if(!strcmp(frame->Name, "Base"))
 			{

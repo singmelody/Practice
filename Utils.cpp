@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include <string>
 #include "Morph.h"
+#include <iostream>
 
 std::wstring GetWC(const char *c)
 {
@@ -42,6 +43,21 @@ extern void LoadMeshHierarchy(const char* c, const LPD3DXALLOCATEHIERARCHY& hier
 	WCHAR str[MAX_PATH];
 	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
 	D3DXLoadMeshHierarchyFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), hier, NULL, frame, NULL);
+}
+
+void PrintMeshDeclaration(ID3DXMesh* pMesh)
+{
+	D3DVERTEXELEMENT9 decl[MAX_FVF_DECL_SIZE];
+	pMesh->GetDeclaration(decl);
+
+	for(int i=0; i<MAX_FVF_DECL_SIZE; i++)
+	{
+		if(decl[i].Type != D3DDECLTYPE_UNUSED)
+		{
+			std::cout << "Offset: " << (int)decl[i].Offset << ", Type: " << (int)decl[i].Type << ", Usage: " << (int)decl[i].Usage << "\n";
+		}
+		else break;
+	}
 }
 
 ID3DXEffect*    g_pEffect = NULL;       // D3DX effect interface

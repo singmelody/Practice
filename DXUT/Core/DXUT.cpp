@@ -3374,7 +3374,7 @@ void DXUTCleanup3DEnvironment9( bool bReleaseSettings )
         // are unrelease objects.
         if( pd3dDevice )
         {
-            UINT references = pd3dDevice->Release();	// 目测是createMeshContainer 那边 destroy没有递归导致的
+            UINT references = pd3dDevice->Release();
             if( references > 0 )
             {
                 DXUTDisplayErrorMessage( DXUTERR_NONZEROREFCOUNT );

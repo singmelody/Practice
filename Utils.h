@@ -9,6 +9,7 @@ extern std::wstring GetWC(const char *c);
 extern void LoadMesh(const char* c, ID3DXMesh** mesh);
 extern void LoadMeshHierarchy(const char* c, const LPD3DXALLOCATEHIERARCHY& hier, D3DXFRAME** mesh);
 extern void LoadTex(const char* c, IDirect3DTexture9** tex);
+extern void PrintMeshDeclaration(ID3DXMesh* pMesh);
 
 #define PATH_TO_TEXTURES "meshes\\"
 #define  CONTROLLER_NUM 1

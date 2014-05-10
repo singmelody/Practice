@@ -58,11 +58,13 @@ public:
 	void ExtractMeshes(D3DXFRAME* frame);
 
 public:
+	void AddTangent(ID3DXMesh** pMesh);
+
 	ID3DXMesh* m_baseMesh;
 	ID3DXMesh* m_binkMesh;
 	std::vector<ID3DXMesh*> m_emotionMeshes;
 	std::vector<ID3DXMesh*>	m_speechMeshes;
 	IDirect3DVertexDeclaration9* m_pFaceVertexDecl;
 	IDirect3DTexture9*		m_faceTex;
-
+	IDirect3DTexture9*		m_normalTex;
 };

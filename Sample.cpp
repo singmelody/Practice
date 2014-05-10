@@ -437,12 +437,12 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	srand(GetTickCount());
 
 	// set still Anim
-// 	ID3DXAnimationSet *anim = NULL;
-// 	g_animControllers[0]->GetAnimationSet(2, &anim);
-// 	g_animControllers[0]->SetTrackAnimationSet(0, anim);
-// 	anim->Release();
+	ID3DXAnimationSet *anim = NULL;
+	g_animControllers[0]->GetAnimationSet(2, &anim);
+	g_animControllers[0]->SetTrackAnimationSet(0, anim);
+	anim->Release();
 
-	RandomizeAnimations();
+//	RandomizeAnimations();
 //	RandomBlendAnimations();
 //	RandomCompressedCallbackAnimations();
 
@@ -533,11 +533,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_ComplexFace = new ComplexFace("meshes\\face.x");
 
 	// create face model
-	g_FaceModel = new FaceModel("meshes\\face.x");
+ 	g_FaceModel = new FaceModel("meshes\\face.x");
 
 	// create face factory
 	g_pFaceFactory = new FaceFacory("meshes\\factory_face.x");
-
+ 
 	g_FaceModelGenerate = g_pFaceFactory->GenerateRandomFace();
 	g_FaceControllerGenerate = new FaceController(D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModelGenerate);
 
@@ -798,8 +798,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 1.5f, -3.0f);
-		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
+		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -849,27 +849,27 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 				techName = "RenderSceneWithTexture3Light"; break;
         }
 
-		for (int i = 0; i < CONTROLLER_NUM; ++i)
-		{
-			//g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
-			g_animControllers[i]->AdvanceTime( fElapsedTime, NULL);
-			g_SkinnedMesh->SetPose( g_postions[i]);
-
-			// update ik
-			if(g_ik)
-			{
-				g_ik->UpdateHeadIK();
-				g_ik->UpdateArmIK();
-			}
-#ifdef SOFT
-			// Apply the SoftSkin technique contained in the effect  
-			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
-#else
-			// Apply the HALSkin technique contained in the effect
-			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
-#endif
-
-		}
+// 		for (int i = 0; i < CONTROLLER_NUM; ++i)
+// 		{
+// 			//g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
+// 			g_animControllers[i]->AdvanceTime( fElapsedTime, NULL);
+// 			g_SkinnedMesh->SetPose( g_postions[i]);
+// 
+// 			// update ik
+// 			if(g_ik)
+// 			{
+// 				g_ik->UpdateHeadIK();
+// 				g_ik->UpdateArmIK();
+// 			}
+// #ifdef SOFT
+// 			// Apply the SoftSkin technique contained in the effect  
+// 			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
+// #else
+// 			// Apply the HALSkin technique contained in the effect
+// 			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+// #endif
+// 
+// 		}
 
 		// set view projection prop
 		mProj = *g_Camera.GetProjMatrix();
@@ -898,11 +898,11 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_ComplexFace->Render(techName.c_str());
 
 // 		// Update face controllers
-// 		for (int i = 0; i < g_faceControllers.size(); ++i)
-// 		{
-// 			g_faceControllers[i]->Update(fElapsedTime);
-// 			g_faceControllers[i]->Render(techName.c_str());
-// 		}
+		for (int i = 0; i < g_faceControllers.size(); ++i)
+		{
+			g_faceControllers[i]->Update(fElapsedTime);
+			g_faceControllers[i]->Render(techName.c_str());
+		}
 
 // 		g_FaceControllerGenerate->Update(fElapsedTime);
 // 		g_FaceControllerGenerate->Render(techName.c_str());

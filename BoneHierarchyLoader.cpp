@@ -395,18 +395,30 @@ STDMETHODIMP FaceHierarchyLoader::DestroyFrame(THIS_ LPD3DXFRAME pFrameToFree)
 
 STDMETHODIMP FaceHierarchyLoader::DestroyMeshContainer(THIS_ LPD3DXMESHCONTAINER pMeshContainerBase)
 {
-	ID3DXMesh* m = (ID3DXMesh*)pMeshContainerBase;
+	ID3DXMesh* m = (ID3DXMesh*)pMeshContainerBase->MeshData.pMesh;
 	SAFE_RELEASE(m);
-
+	SAFE_DELETE(pMeshContainerBase);
 	return S_OK;
 }
 
 STDMETHODIMP FaceHierarchyLoader::CreateMeshContainer(THIS_ LPCSTR Name, CONST D3DXMESHDATA *pMeshData, CONST D3DXMATERIAL *pMaterials, CONST D3DXEFFECTINSTANCE *pEffectInstances, DWORD NumMaterials, CONST DWORD *pAdjacency, LPD3DXSKININFO pSkinInfo, LPD3DXMESHCONTAINER *ppNewMeshContainer)
 {
 	// Add Reference
-	pMeshData->pMesh->AddRef();
+// 	pMeshData->pMesh->AddRef();
+// 
+// 	*ppNewMeshContainer = (D3DXMESHCONTAINER*)pMeshData->pMesh;
 
-	*ppNewMeshContainer = (D3DXMESHCONTAINER*)pMeshData->pMesh;
+	ID3DXMesh* pSrcMesh = pMeshData->pMesh;
+
+	D3DXMESHCONTAINER* pContainer = new D3DXMESHCONTAINER();
+	memset(pContainer, 0, sizeof(D3DXMESHCONTAINER));
+
+	pSrcMesh->CloneMeshFVF( pSrcMesh->GetOptions(),
+							pSrcMesh->GetFVF(),
+							DXUTGetD3D9Device(),
+							&pContainer->MeshData.pMesh);
+
+	*ppNewMeshContainer = pContainer;
 
 	return S_OK;
 }

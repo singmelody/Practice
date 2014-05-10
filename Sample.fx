@@ -63,6 +63,26 @@ sampler WolfSampler = sampler_state
    MaxAnisotropy = 16;
 };
 
+//Textures
+texture texDiffuse;
+texture texNormalMap;
+
+//Samplers
+sampler DiffuseSampler = sampler_state
+{
+   Texture = (texDiffuse);
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
+   MaxAnisotropy = 16;
+};
+
+sampler NormalSampler = sampler_state
+{
+   Texture = (texNormalMap);
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
+   MaxAnisotropy = 16;
+};
 
 //--------------------------------------------------------------------------------------
 // Vertex shader output structure
@@ -348,6 +368,96 @@ float4 RenderShadowPS(VS_OUTPUT IN,
 }
 
 //--------------------------------------------------------------------------------------
+// Morph face & normal technique
+//--------------------------------------------------------------------------------------
+//Vertex Input
+struct VS_INPUT_NORMAL
+{ 
+     float4 basePos     : POSITION0;
+     float3 baseNorm    : NORMAL0;
+     float2 baseUV      : TEXCOORD0;
+	 float3 tangent		: TANGENT0;
+     float3 binormal	: BINORMAL0;
+
+     float4 targetPos1  : POSITION1;
+     float3 targetNorm1 : NORMAL1;
+
+     float4 targetPos2  : POSITION2;
+     float3 targetNorm2 : NORMAL2;
+
+     float4 targetPos3  : POSITION3;
+     float3 targetNorm3 : NORMAL3;
+
+     float4 targetPos4  : POSITION4;
+     float3 targetNorm4 : NORMAL4;
+};
+
+struct VS_OUTPUT_NORMAL
+{
+	 float4 position	 : POSITION0;
+     float2 tex0		 : TEXCOORD0;
+     float3 lightVec	 : TEXCOORD1;
+};
+
+VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
+{
+	VS_OUTPUT_NORMAL OUT = (VS_OUTPUT_NORMAL)0;
+
+	float4 position  = IN.basePos;
+	float3 normal = IN.baseNorm;
+
+	//Blend Position	
+	position += (IN.targetPos1 - IN.basePos) * weights.r;
+	position += (IN.targetPos2 - IN.basePos) * weights.g;
+	position += (IN.targetPos3 - IN.basePos) * weights.b;
+	position += (IN.targetPos4 - IN.basePos) * weights.a;
+
+	//Blend Normal	
+	normal += (IN.targetNorm1 - IN.baseNorm) * weights.r;
+	normal += (IN.targetNorm2 - IN.baseNorm) * weights.g;
+	normal += (IN.targetNorm3 - IN.baseNorm) * weights.b;
+	normal += (IN.targetNorm4 - IN.baseNorm) * weights.a;
+
+    //getting the position of the vertex in the world
+    float4 posWorld = mul(position, g_mWorld);
+    OUT.position = mul(posWorld, g_mVP);
+    normal = normalize(mul(normal, g_mWorld));
+    
+    //getting vertex -> light vector
+    float3 light = normalize(g_LightDir[0] - posWorld);
+
+    //calculating the binormal and setting the Tangent Binormal and Normal matrix
+    float3x3 TBNMatrix = float3x3(IN.tangent, IN.binormal , normal);     
+    
+	// matrix transform from object space to tagent space
+	float3x3 toTangentSpace = transpose(TBNMatrix);
+	
+    //setting the lightVector
+    OUT.lightVec = mul( light, toTangentSpace);
+	
+    OUT.tex0 = IN.baseUV;
+    
+    return OUT;
+}
+
+//Pixel Shader
+float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
+{
+    //calculate the color and the normal
+    float4 color = tex2D(DiffuseSampler, IN.tex0);
+
+    //this is how you uncompress a normal map
+    float3 normal = 2.0f * tex2D(NormalSampler, IN.tex0).rgb - 1.0f;
+
+    //normalize the light
+    float3 light = normalize(IN.lightVec);
+
+    //set the output color
+    float diffuse = max(saturate(dot(normal, light)), 0.2f);
+    return color * diffuse;
+}
+
+//--------------------------------------------------------------------------------------
 // Renders scene to render target
 //--------------------------------------------------------------------------------------
 technique RenderSceneWithTexture1Light
@@ -480,6 +590,18 @@ technique MultiMorph
 	}
 }
 
+// Face Morph Normal Technique
+technique FaceMorphNormal
+{
+	pass P0
+	{        
+		Lighting = false;
+		
+		VertexShader = compile vs_2_0 RenderMultiMorphNormalVS();
+		PixelShader  = compile ps_2_0 RenderSceneNormalPS();
+	}
+}
+
 // Morph Anim & skeleton
 technique MorphSkeleton
 {
@@ -491,3 +613,4 @@ technique MorphSkeleton
         PixelShader  = compile ps_2_0 RenderSceneMorphPS(true);        
     }
 }
+
