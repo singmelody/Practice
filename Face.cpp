@@ -463,6 +463,11 @@ void FaceModel::Render(FaceController* pController)
 
 	// Set Shader var
 	g_pEffect->SetMatrix("g_mWorld", &pController->m_headMatrix);
+
+	D3DXMATRIX worldInv;
+	D3DXMatrixInverse( &worldInv, NULL, &pController->m_headMatrix);
+	g_pEffect->SetMatrix("g_mWorldInverse", &worldInv);
+
 	g_pEffect->SetTexture("texDiffuse", m_faceTex);
 	g_pEffect->SetTexture("texNormalMap", m_normalTex);
 	g_pEffect->SetVector("weights", &pController->m_morphWeights);

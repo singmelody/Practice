@@ -22,6 +22,7 @@ texture g_MeshTexture;              // Color texture for mesh
 
 float    g_fTime;                   // App's time in seconds
 float4x4 g_mWorld;                  // World matrix for object
+float4x4 g_mWorldInverse;           // World Inverse matrix for object
 float4x4 g_mVP;    // World * View * Projection matrix
 
 float4x4 MatrixPalette[35]; 
@@ -431,9 +432,12 @@ VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
     
 	// matrix transform from object space to tagent space
 	float3x3 toTangentSpace = transpose(TBNMatrix);
+
+	// a world inv need here
+	float3 localLight = (float3)mul( float4(light, 1.0f), g_mWorldInverse);
 	
     //setting the lightVector
-    OUT.lightVec = mul( light, toTangentSpace);
+    OUT.lightVec = mul( localLight, toTangentSpace);
 	
     OUT.tex0 = IN.baseUV;
     
