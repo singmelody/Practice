@@ -377,7 +377,6 @@ struct VS_INPUT_NORMAL
      float3 baseNorm    : NORMAL0;
      float2 baseUV      : TEXCOORD0;
 	 float3 tangent		: TANGENT0;
-     float3 binormal	: BINORMAL0;
 
      float4 targetPos1  : POSITION1;
      float3 targetNorm1 : NORMAL1;
@@ -427,7 +426,8 @@ VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
     float3 light = normalize(g_LightDir[0] - posWorld);
 
     //calculating the binormal and setting the Tangent Binormal and Normal matrix
-    float3x3 TBNMatrix = float3x3(IN.tangent, IN.binormal , normal);     
+	float3 binormal = normalize(cross( normal, IN.tangent));
+    float3x3 TBNMatrix = float3x3(IN.tangent, binormal , normal);     
     
 	// matrix transform from object space to tagent space
 	float3x3 toTangentSpace = transpose(TBNMatrix);

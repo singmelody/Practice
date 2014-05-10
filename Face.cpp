@@ -304,7 +304,6 @@ FaceModel::FaceModel(const char* filename)
 		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
 		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	
 		{0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,  0},
-		{0, 44, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
 
 		//2nd Stream
 		{1,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1},
@@ -340,7 +339,7 @@ FaceModel::FaceModel(const char* filename)
 	//Extract Face Meshes
 	ExtractMeshes(root);
 
-	// Add tagents & binormal to base mesh
+	// Add tagents to base mesh
 	AddTangent(&m_baseMesh);
 	//PrintMeshDeclaration(m_pBaseMesh);
 
@@ -368,6 +367,7 @@ FaceModel::FaceModel()
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},	
 		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
 		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	
+		{0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,  0},
 
 		//2nd Stream
 		{1,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1},
@@ -585,23 +585,11 @@ void FaceModel::AddTangent(ID3DXMesh** pMesh)
 		0
 	};
 
-	//Create BiNormal Element
-	D3DVERTEXELEMENT9 binormal = 
-	{
-		0, 
-		tangent.Offset + 12, 
-		D3DDECLTYPE_FLOAT3, 
-		D3DDECLMETHOD_DEFAULT, 
-		D3DDECLUSAGE_BINORMAL, 
-		0
-	};
-
 	//End element
 	D3DVERTEXELEMENT9 endElement = D3DDECL_END();
 
 	//Add new elements to vertex declaration
 	decl[index++] = tangent;
-	decl[index++] = binormal;
 	decl[index] = endElement;
 
 	//Convert mesh to the new vertex declaration
@@ -617,7 +605,13 @@ void FaceModel::AddTangent(ID3DXMesh** pMesh)
 	}
 
 	//Compute the tangents & binormals
-	if(FAILED(D3DXComputeTangentFrame(pNewMesh, NULL)))
+	HRESULT result;
+	if( ( result = 
+		D3DXComputeTangentFrameEx(pNewMesh, D3DDECLUSAGE_TEXCOORD, 0,   
+		D3DDECLUSAGE_TANGENT, 0, D3DX_DEFAULT, 0, 
+		D3DDECLUSAGE_NORMAL, 0, 
+		D3DXTANGENT_GENERATE_IN_PLACE,
+		NULL, 0.01f, 0.25f, 0.01f, NULL, NULL) < 0) )
 	{
 		SAFE_RELEASE( pNewMesh );
 		std::cout << "Failed to compute tangents & binormals for new mesh\n";
