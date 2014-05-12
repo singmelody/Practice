@@ -18,13 +18,13 @@ std::wstring GetWC(const char *c)
 	return wstr;
 }
 
-void LoadMesh(const char* c, ID3DXMesh** mesh)
+void LoadMesh(const char* c, ID3DXMesh** mesh, ID3DXBuffer** ppAdjacency = NULL, ID3DXBuffer** ppMaterials = NULL, DWORD* materialCount = NULL)
 {
 	std::wstring conv = GetWC(c);
 
 	WCHAR str[MAX_PATH];
 	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
-	D3DXLoadMeshFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), NULL, NULL, NULL, NULL, mesh);
+	D3DXLoadMeshFromX(str, D3DXMESH_MANAGED, DXUTGetD3D9Device(), ppAdjacency, ppMaterials, NULL, materialCount, mesh);
 }
 
 void LoadTex(const char* c, IDirect3DTexture9** tex)

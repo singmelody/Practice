@@ -380,11 +380,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="animation.cpp" />
+    <ClCompile Include="Bird.cpp" />
+    <ClCompile Include="BirdMesh.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="Eye.cpp" />
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="FaceController.cpp" />
     <ClCompile Include="FaceFacory.cpp" />
+    <ClCompile Include="Flock.cpp" />
     <ClCompile Include="InverseKinematics.cpp" />
     <ClCompile Include="Morph.cpp" />
     <ClCompile Include="OBB.cpp" />
@@ -395,11 +398,14 @@
     <ClCompile Include="Utils.h" />
     <ClCompile Include="WavDecoder.cpp" />
     <ClInclude Include="animation.h" />
+    <ClInclude Include="Bird.h" />
+    <ClInclude Include="BirdMesh.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="Eye.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="FaceController.h" />
     <ClInclude Include="FaceFacory.h" />
+    <ClInclude Include="Flock.h" />
     <ClInclude Include="InverseKinematics.h" />
     <ClInclude Include="Morph.h" />
     <ClInclude Include="OBB.h" />

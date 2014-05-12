@@ -39,6 +39,9 @@
     <Filter Include="IK">
       <UniqueIdentifier>{530a4e4c-9bf0-4ceb-8f3c-c8cef6f09a4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Flock">
+      <UniqueIdentifier>{f8395889-040f-49e0-8a99-b99956ed738b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -137,14 +140,23 @@
     <ClCompile Include="FaceController.cpp">
       <Filter>Facial</Filter>
     </ClCompile>
-    <ClCompile Include="FaceFacory.cpp">
-      <Filter>Facial</Filter>
-    </ClCompile>
     <ClCompile Include="InverseKinematics.cpp">
       <Filter>IK</Filter>
     </ClCompile>
     <ClCompile Include="WavDecoder.cpp">
       <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Bird.cpp">
+      <Filter>Flock</Filter>
+    </ClCompile>
+    <ClCompile Include="Flock.cpp">
+      <Filter>Flock</Filter>
+    </ClCompile>
+    <ClCompile Include="FaceFacory.cpp">
+      <Filter>FaceFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="BirdMesh.cpp">
+      <Filter>Flock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -189,14 +201,23 @@
     <ClInclude Include="FaceController.h">
       <Filter>Facial</Filter>
     </ClInclude>
-    <ClInclude Include="FaceFacory.h">
-      <Filter>Facial</Filter>
-    </ClInclude>
     <ClInclude Include="InverseKinematics.h">
       <Filter>IK</Filter>
     </ClInclude>
     <ClInclude Include="WavDecoder.h">
       <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Flock.h">
+      <Filter>Flock</Filter>
+    </ClInclude>
+    <ClInclude Include="Bird.h">
+      <Filter>Flock</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceFacory.h">
+      <Filter>FaceFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="BirdMesh.h">
+      <Filter>Flock</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

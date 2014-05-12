@@ -428,7 +428,7 @@ VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
 
     //calculating the binormal and setting the Tangent Binormal and Normal matrix
 	float3 binormal = normalize(cross( normal, IN.tangent));
-    float3x3 TBNMatrix = float3x3(IN.tangent, binormal , normal);     
+    float3x3 TBNMatrix = float3x3( IN.tangent, binormal, normal);     
     
 	// matrix transform from object space to tagent space
 	float3x3 toTangentSpace = transpose(TBNMatrix);
