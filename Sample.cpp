@@ -808,6 +808,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		mView = *g_Camera.GetViewMatrix();
 		mViewProjection = mView * mProj;
 		V( g_pEffect->SetMatrix( "g_mVP", &mViewProjection ) );
+		V( g_pEffect->SetVector( "g_mCameraPos", &D3DXVECTOR4(vecEye,0.0f)));
 
 		// set world prop
 		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();

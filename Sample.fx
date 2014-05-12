@@ -24,6 +24,7 @@ float    g_fTime;                   // App's time in seconds
 float4x4 g_mWorld;                  // World matrix for object
 float4x4 g_mWorldInverse;           // World Inverse matrix for object
 float4x4 g_mVP;    // World * View * Projection matrix
+float4	 g_mCameraPos;
 
 float4x4 MatrixPalette[35]; 
 int numBoneInfluences = 2;
@@ -67,6 +68,7 @@ sampler WolfSampler = sampler_state
 //Textures
 texture texDiffuse;
 texture texNormalMap;
+texture texSpecular;
 
 //Samplers
 sampler DiffuseSampler = sampler_state
@@ -78,6 +80,14 @@ sampler DiffuseSampler = sampler_state
 };
 
 sampler NormalSampler = sampler_state
+{
+   Texture = (texNormalMap);
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
+   MaxAnisotropy = 16;
+};
+
+sampler SpecularSampler = sampler_state
 {
    Texture = (texNormalMap);
    MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
@@ -397,6 +407,7 @@ struct VS_OUTPUT_NORMAL
 	 float4 position	 : POSITION0;
      float2 tex0		 : TEXCOORD0;
      float3 lightVec	 : TEXCOORD1;
+	 float3 specularVec  : TEXCOORD2;
 };
 
 VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
@@ -438,6 +449,11 @@ VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
 	
     //setting the lightVector
     OUT.lightVec = mul( localLight, toTangentSpace);
+
+	// Calcuate half vector
+	float3 viewDir = g_mCameraPos - posWorld;
+	float3 halfVec = normalize( g_LightDir[0] + viewDir );
+	OUT.specularVec = mul( halfVec, toTangentSpace);
 	
     OUT.tex0 = IN.baseUV;
     
@@ -448,7 +464,7 @@ VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
 float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
 {
     //calculate the color and the normal
-    float4 color = tex2D(DiffuseSampler, IN.tex0);
+    float4 diffuseColor = tex2D(DiffuseSampler, IN.tex0);
 
     //this is how you uncompress a normal map
     float3 normal = 2.0f * tex2D(NormalSampler, IN.tex0).rgb - 1.0f;
@@ -456,9 +472,19 @@ float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
     //normalize the light
     float3 light = normalize(IN.lightVec);
 
-    //set the output color
+	//set the output color
     float diffuse = max(saturate(dot(normal, light)), 0.2f);
-    return color * diffuse;
+
+	// get specular color
+	float4 specularColor = tex2D(SpecularSampler, IN.tex0);
+
+	// normalize half 
+	float3 halfVec = normalize(IN.specularVec);
+    //set the output color
+    float specular = max(saturate(dot(normal, halfVec)), 0.0f);
+	specular = pow( specular, 85.0f) * 0.4f;
+    
+	return diffuseColor * diffuse + specularColor * specular;
 }
 
 //--------------------------------------------------------------------------------------

@@ -150,8 +150,9 @@ FaceModel* FaceFacory::GenerateRandomFace()
 
 	// set a random face tex
 	int index = rand() % (int)m_faceTexes.size();
-	m_faceTexes[index]->AddRef();
+
 	face->m_faceTex = m_faceTexes[index];
+	face->m_faceTex->AddRef();
 
 	return face;
 }

@@ -293,6 +293,7 @@ FaceModel::FaceModel(const char* filename)
 	m_binkMesh = NULL;
 	m_faceTex = NULL;
 	m_normalTex = NULL;
+	m_specularTex = NULL;
 	m_pFaceVertexDecl = NULL;
 
 	//Face Vertex Format
@@ -349,6 +350,7 @@ FaceModel::FaceModel(const char* filename)
 	//Load texture
 	LoadTex( "meshes\\face.jpg", &m_faceTex);
 	LoadTex( "meshes\\face_normal.tga", &m_normalTex);
+	LoadTex( "meshes\\face_specular.tga", &m_specularTex);
 }
 
 FaceModel::FaceModel()
@@ -357,6 +359,7 @@ FaceModel::FaceModel()
 	m_binkMesh = NULL;
 	m_faceTex = NULL;
 	m_normalTex = NULL;
+	m_specularTex = NULL;
 	m_pFaceVertexDecl = NULL;
 
 
@@ -367,7 +370,6 @@ FaceModel::FaceModel()
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},	
 		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
 		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	
-		{0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,  0},
 
 		//2nd Stream
 		{1,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1},
@@ -404,6 +406,7 @@ FaceModel::~FaceModel()
 	SAFE_RELEASE( m_faceTex );
 	SAFE_RELEASE( m_pFaceVertexDecl );
 	SAFE_RELEASE( m_normalTex );
+	SAFE_RELEASE( m_specularTex );
 
 	for (int i = 0; i < m_emotionMeshes.size(); ++i)
 	{
@@ -414,6 +417,9 @@ FaceModel::~FaceModel()
 	{
 		SAFE_RELEASE(m_speechMeshes[i]);
 	}
+
+	m_emotionMeshes.clear();
+	m_speechMeshes.clear();
 }
 
 void FaceModel::Render(FaceController* pController)
@@ -470,6 +476,8 @@ void FaceModel::Render(FaceController* pController)
 
 	g_pEffect->SetTexture("texDiffuse", m_faceTex);
 	g_pEffect->SetTexture("texNormalMap", m_normalTex);
+	g_pEffect->SetTexture("texSpecular", m_specularTex);
+
 	g_pEffect->SetVector("weights", &pController->m_morphWeights);
 
 	//Start Technique

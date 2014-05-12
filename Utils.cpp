@@ -18,7 +18,7 @@ std::wstring GetWC(const char *c)
 	return wstr;
 }
 
-void LoadMesh(const char* c, ID3DXMesh** mesh, ID3DXBuffer** ppAdjacency = NULL, ID3DXBuffer** ppMaterials = NULL, DWORD* materialCount = NULL)
+void LoadMesh(const char* c, ID3DXMesh** mesh, ID3DXBuffer** ppAdjacency, ID3DXBuffer** ppMaterials, DWORD* materialCount)
 {
 	std::wstring conv = GetWC(c);
 
