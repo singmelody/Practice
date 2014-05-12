@@ -295,6 +295,7 @@ FaceModel::FaceModel(const char* filename)
 	m_normalTex = NULL;
 	m_specularTex = NULL;
 	m_pFaceVertexDecl = NULL;
+	m_wrinkleTex = NULL;
 
 	//Face Vertex Format
 	//Face Vertex Format
@@ -349,8 +350,9 @@ FaceModel::FaceModel(const char* filename)
 
 	//Load texture
 	LoadTex( "meshes\\face.jpg", &m_faceTex);
-	LoadTex( "meshes\\face_normal.tga", &m_normalTex);
+	LoadTex( "meshes\\head_base.TSNM.dds", &m_normalTex);
 	LoadTex( "meshes\\face_specular.tga", &m_specularTex);
+	LoadTex( "meshes\\blend_mask.tga", &m_wrinkleTex);
 }
 
 FaceModel::FaceModel()
@@ -361,7 +363,7 @@ FaceModel::FaceModel()
 	m_normalTex = NULL;
 	m_specularTex = NULL;
 	m_pFaceVertexDecl = NULL;
-
+	m_wrinkleTex = NULL;
 
 	//Face Vertex Format
 	D3DVERTEXELEMENT9 faceVertexDecl[] = 
@@ -407,6 +409,7 @@ FaceModel::~FaceModel()
 	SAFE_RELEASE( m_pFaceVertexDecl );
 	SAFE_RELEASE( m_normalTex );
 	SAFE_RELEASE( m_specularTex );
+	SAFE_RELEASE( m_wrinkleTex );
 
 	for (int i = 0; i < m_emotionMeshes.size(); ++i)
 	{
@@ -477,6 +480,9 @@ void FaceModel::Render(FaceController* pController)
 	g_pEffect->SetTexture("texDiffuse", m_faceTex);
 	g_pEffect->SetTexture("texNormalMap", m_normalTex);
 	g_pEffect->SetTexture("texSpecular", m_specularTex);
+	g_pEffect->SetTexture("texBlend", m_wrinkleTex);
+
+	g_pEffect->SetVector("g_wrinkleWeight",&D3DXVECTOR4(pController->m_morphWeights.y, pController->m_morphWeights.z, 0.0f, 0.0f));
 
 	g_pEffect->SetVector("weights", &pController->m_morphWeights);
 

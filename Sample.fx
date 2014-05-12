@@ -26,6 +26,8 @@ float4x4 g_mWorldInverse;           // World Inverse matrix for object
 float4x4 g_mVP;    // World * View * Projection matrix
 float4	 g_mCameraPos;
 
+float4	 g_wrinkleWeight;
+
 float4x4 MatrixPalette[35]; 
 int numBoneInfluences = 2;
 
@@ -69,6 +71,7 @@ sampler WolfSampler = sampler_state
 texture texDiffuse;
 texture texNormalMap;
 texture texSpecular;
+texture texBlend;
 
 //Samplers
 sampler DiffuseSampler = sampler_state
@@ -89,7 +92,15 @@ sampler NormalSampler = sampler_state
 
 sampler SpecularSampler = sampler_state
 {
-   Texture = (texNormalMap);
+   Texture = (texSpecular);
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
+   MaxAnisotropy = 16;
+};
+
+sampler BlendSampler = sampler_state
+{
+   Texture = (texBlend);
    MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
    AddressU  = Wrap;     AddressV  = Wrap;     AddressW  = Wrap;
    MaxAnisotropy = 16;
@@ -469,6 +480,17 @@ float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
     //this is how you uncompress a normal map
     float3 normal = 2.0f * tex2D(NormalSampler, IN.tex0).rgb - 1.0f;
 
+	// sample wrinkle mask texture
+	float4 blend = tex2D( BlendSampler, IN.tex0);
+
+	// calculate final normal weight
+	float w = blend.r + g_wrinkleWeight.x * blend.g + g_wrinkleWeight.y * blend.b;
+
+	normal.x *= w;
+	normal.y *= w;
+
+	normal = normalize(normal);
+
     //normalize the light
     float3 light = normalize(IN.lightVec);
 
@@ -483,6 +505,10 @@ float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
     //set the output color
     float specular = max(saturate(dot(normal, halfVec)), 0.0f);
 	specular = pow( specular, 85.0f) * 0.4f;
+
+
+
+
     
 	return diffuseColor * diffuse + specularColor * specular;
 }

@@ -68,4 +68,5 @@ public:
 	IDirect3DTexture9*		m_faceTex;
 	IDirect3DTexture9*		m_normalTex;
 	IDirect3DTexture9*		m_specularTex;
+	IDirect3DTexture9*		m_wrinkleTex;
 };
