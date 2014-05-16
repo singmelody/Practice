@@ -553,6 +553,8 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	IRenderDevice* device = new D3D11RenderDevice();
 	bool result = device->CreateDevice();
 	result = device->CheckCaps();
+	result = device->CreateSwapChain();
+	assert( device->GetReference() );
     return S_OK;
 }
 
