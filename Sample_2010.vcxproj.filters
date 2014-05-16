@@ -42,6 +42,9 @@
     <Filter Include="Flock">
       <UniqueIdentifier>{f8395889-040f-49e0-8a99-b99956ed738b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3D11">
+      <UniqueIdentifier>{7b9df9a2-6667-4fb8-90f0-1accce0f794a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -158,6 +161,10 @@
     <ClCompile Include="BirdMesh.cpp">
       <Filter>Flock</Filter>
     </ClCompile>
+    <ClCompile Include="IRenderDevice.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11RenderDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -219,6 +226,10 @@
     <ClInclude Include="BirdMesh.h">
       <Filter>Flock</Filter>
     </ClInclude>
+    <ClInclude Include="IRenderDevice.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11RenderDevice.h" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

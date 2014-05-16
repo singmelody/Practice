@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "InverseKinematics.h"
 #include "WavDecoder.h"
+#include "D3D11RenderDevice.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -549,6 +550,9 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	// create speak face controller
 	g_speakController = new FaceController( D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModel);
 
+	IRenderDevice* device = new D3D11RenderDevice();
+	bool result = device->CreateDevice();
+	result = device->CheckCaps();
     return S_OK;
 }
 
