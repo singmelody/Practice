@@ -554,7 +554,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	bool result = device->CreateDevice();
 	result = device->CheckCaps();
 	result = device->CreateSwapChain();
-	assert( device->GetReference() );
+	result = device->CreateRenderTargetView();
+	result = device->CreateDepthStencilBuffer();
+	result = device->BindRTAndDepthToMS();
+	assert( device->CreateViewPort() );
+	assert( device->GetReference() == 0);	
     return S_OK;
 }
 

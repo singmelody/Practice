@@ -17,6 +17,14 @@ public:
 
 	bool CreateSwapChain();
 
+	bool CreateRenderTargetView();
+
+	bool CreateDepthStencilBuffer();
+
+	bool BindRTAndDepthToMS();
+
+	bool CreateViewPort();
+
 	UINT GetReference();
 
 private:
@@ -25,5 +33,7 @@ private:
 	ID3D11DeviceContext*	m_d3d11DeviceContext;
 	IDXGISwapChain*			m_swapChain;
 	UINT					m_m4xMsaaQuality;
+	ID3D11RenderTargetView* m_renderTargetView;
+	ID3D11DepthStencilView* m_depthStencilView;
 };
 

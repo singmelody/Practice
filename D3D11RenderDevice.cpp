@@ -6,7 +6,9 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_d3d11DeviceContext(NULL),
 	m_featureLevel(new D3D_FEATURE_LEVEL()),
 	m_m4xMsaaQuality(NULL),
-	m_swapChain(NULL)
+	m_swapChain(NULL),
+	m_renderTargetView(NULL),
+	m_depthStencilView(NULL)
 {
 
 }
@@ -20,9 +22,11 @@ D3D11RenderDevice::~D3D11RenderDevice(void)
 
 void D3D11RenderDevice::Release()
 {
-	SAFE_RELEASE(m_d3d11DeviceContext);
-	SAFE_RELEASE(m_swapChain);
 	SAFE_DELETE(m_featureLevel);
+	SAFE_RELEASE(m_depthStencilView);
+	SAFE_RELEASE(m_renderTargetView);
+	SAFE_RELEASE(m_swapChain);
+	SAFE_RELEASE(m_d3d11DeviceContext);
 }
 
 
@@ -124,7 +128,69 @@ UINT D3D11RenderDevice::GetReference()
 {
 	Release();
 	UINT reference = m_d3d11Device->Release();
-	SAFE_RELEASE(m_d3d11Device);
 	
 	return reference;
+}
+
+bool D3D11RenderDevice::CreateRenderTargetView()
+{
+	ID3D11Texture2D* backBuffer;
+	m_swapChain->GetBuffer( NULL, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
+	HRESULT hr = m_d3d11Device->CreateRenderTargetView( backBuffer, 0, &m_renderTargetView);
+	SAFE_RELEASE(backBuffer);
+
+	if( FAILED( hr ) )
+		return false;
+
+	return true;
+}
+
+bool D3D11RenderDevice::CreateDepthStencilBuffer()
+{
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = 640;
+	desc.Height= 480;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	desc.SampleDesc.Count = 4;
+	desc.SampleDesc.Quality = m_m4xMsaaQuality - 1;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	ID3D11Texture2D* depthStencilBuffer;
+	HRESULT hr = m_d3d11Device->CreateTexture2D( &desc, 0, &depthStencilBuffer);
+	if(FAILED(hr))
+		return false;
+
+	hr = m_d3d11Device->CreateDepthStencilView( depthStencilBuffer, NULL, &m_depthStencilView);
+	if(FAILED(hr))
+		return false;
+
+	SAFE_RELEASE(depthStencilBuffer);
+
+	return true;
+}
+
+bool D3D11RenderDevice::BindRTAndDepthToMS()
+{
+	m_d3d11DeviceContext->OMSetRenderTargets( 1, &m_renderTargetView, m_depthStencilView);
+	return true;
+}
+
+bool D3D11RenderDevice::CreateViewPort()
+{
+	D3D11_VIEWPORT vp;
+	vp.Width	= 640;
+	vp.Height	= 480;
+	vp.MaxDepth	= 1;
+	vp.MinDepth = 0;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
+
+	m_d3d11DeviceContext->RSSetViewports( 1, &vp);
+
+	return true;
 }
