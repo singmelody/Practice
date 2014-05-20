@@ -558,6 +558,7 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	result = device->CreateDepthStencilBuffer();
 	result = device->BindRTAndDepthToMS();
 	assert( device->CreateViewPort() );
+	assert( device->ShaderParse() );
 	assert( device->GetReference() == 0);	
     return S_OK;
 }

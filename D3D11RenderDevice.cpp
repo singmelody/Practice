@@ -1,5 +1,6 @@
 #include "DXUT.h"
 #include "D3D11RenderDevice.h"
+#include "Utils.h"
 
 D3D11RenderDevice::D3D11RenderDevice(void)
 	: m_d3d11Device(NULL),
@@ -194,3 +195,31 @@ bool D3D11RenderDevice::CreateViewPort()
 
 	return true;
 }
+
+bool D3D11RenderDevice::CreateVertexDecl()
+{
+	return true;
+}
+
+bool D3D11RenderDevice::Op()
+{
+	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
+	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
+	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	return true;
+}
+
+bool D3D11RenderDevice::ShaderParse()
+{
+	LoadShader("Color.fx", &m_fx);
+
+	return true;
+}
+
+D3D11RenderDevice& D3D11RenderDevice::Instance()
+{
+	return m_Instance;
+}
+
+D3D11RenderDevice D3D11RenderDevice::m_Instance;

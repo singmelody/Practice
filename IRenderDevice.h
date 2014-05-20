@@ -20,5 +20,7 @@ public:
 	virtual bool BindRTAndDepthToMS() = 0;
 
 	virtual bool CreateViewPort() = 0;
+
+	virtual bool ShaderParse() = 0;
 };
 

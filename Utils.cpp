@@ -4,6 +4,8 @@
 #include <string>
 #include "Morph.h"
 #include <iostream>
+#include <D3DX11async.h>
+#include "D3D11RenderDevice.h"
 
 std::wstring GetWC(const char *c)
 {
@@ -35,6 +37,39 @@ void LoadTex(const char* c, IDirect3DTexture9** tex)
 	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str() );
 	D3DXCreateTextureFromFile(DXUTGetD3D9Device(), str, tex);
 }
+
+extern bool LoadShader(const char* c, ID3DX11Effect** effect)
+{
+	std::wstring conv = GetWC(c);
+
+	WCHAR str[MAX_PATH];
+	DXUTFindDXSDKMediaFileCch( str, MAX_PATH, conv.c_str());
+	
+	DWORD compileFlag = NULL;
+
+#if _DEBUG
+	compileFlag |= D3D10_SHADER_DEBUG;
+	compileFlag |= D3D10_SHADER_SKIP_OPTIMIZATION;
+#endif
+	ID3D10Blob* compiledShader;
+	ID3D10Blob* compiledError;
+	HRESULT hr = D3DX11CompileFromFile( str, NULL, NULL, NULL, "fx_5_0", compileFlag, NULL, NULL, &compiledShader, &compiledError, NULL);
+
+	if( compiledError != NULL || FAILED(hr))
+	{
+		SAFE_RELEASE(compiledError);
+		return false;
+	}
+
+	D3DX11CreateEffectFromMemory( compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
+		0, D3D11RenderDevice::Instance().m_d3d11Device, effect);
+
+	SAFE_RELEASE(compiledShader);
+	SAFE_RELEASE(compiledError);
+
+	return true;
+}
+
 
 extern void LoadMeshHierarchy(const char* c, const LPD3DXALLOCATEHIERARCHY& hier, D3DXFRAME** frame)
 {

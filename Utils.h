@@ -4,11 +4,15 @@
 #include "skinnedMesh.h"
 #include "animation.h"
 #include <string>
+#include <Inc/d3dx11effect.h>
+
 
 extern std::wstring GetWC(const char *c);
 extern void LoadMesh(const char* c, ID3DXMesh** mesh, ID3DXBuffer** ppAdjacency = NULL, ID3DXBuffer** ppMaterials = NULL, DWORD* materialCount = NULL);
 extern void LoadMeshHierarchy(const char* c, const LPD3DXALLOCATEHIERARCHY& hier, D3DXFRAME** mesh);
 extern void LoadTex(const char* c, IDirect3DTexture9** tex);
+extern bool LoadShader(const char* c, ID3DX11Effect** effect);
+
 extern void PrintMeshDeclaration(ID3DXMesh* pMesh);
 
 #define PATH_TO_TEXTURES "meshes\\"
