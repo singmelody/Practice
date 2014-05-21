@@ -192,8 +192,8 @@ bool D3D11RenderDevice::CreateViewPort()
 	D3D11_VIEWPORT vp;
 	vp.Width	= 640;
 	vp.Height	= 480;
-	vp.MaxDepth	= 1;
-	vp.MinDepth = 0;
+	vp.MaxDepth	= 1.0f;
+	vp.MinDepth = 0.0f;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 
@@ -225,29 +225,33 @@ bool D3D11RenderDevice::Op()
 {
 	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
 	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
-	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	m_d3d11DeviceContext->IASetInputLayout(m_vertexDesc);
 	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	UINT stride = sizeof(SimpleVertex);
 	UINT offset = NULL;
-
 	m_d3d11DeviceContext->IASetVertexBuffers( 0, 1, &m_vertexBuff, &stride, &offset);
 	m_d3d11DeviceContext->IASetIndexBuffer( m_indicesBuff, DXGI_FORMAT_R32_UINT, 0);
 
 	XMFLOAT4X4 mWorld;
-	XMFLOAT4X4 mView;
-	XMFLOAT4X4 mProj;
 
 	// Set constants
+	// Build the view matrix.
+	XMVECTOR pos    = XMVectorSet( 0.0f, -3.5f, -3.5f, 1.0f );
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMFLOAT4X4 mView11;
+
+	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&mView11, V);
+
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mWorld, I);
-	XMStoreFloat4x4(&mView, I);
-	XMStoreFloat4x4(&mProj, I);
 	XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	XMMATRIX view  = XMLoadFloat4x4(&mView);
-	XMMATRIX proj  = XMLoadFloat4x4(&mProj);
+	XMMATRIX view  = V;
+	XMMATRIX proj  = XMMatrixPerspectiveFovLH(0.25f*D3DX_PI, 640/(float)480.0f, 1.0f, 1000.0f);
 	XMMATRIX worldViewProj = world*view*proj;
 
 	m_fxWorldViewProj->SetMatrix( reinterpret_cast<float*>(&worldViewProj));
@@ -258,7 +262,7 @@ bool D3D11RenderDevice::Op()
 	{
 		m_tech->GetPassByIndex(p)->Apply( 0, m_d3d11DeviceContext);
 
-		m_d3d11DeviceContext->DrawIndexed( 3, 0, 0);
+		m_d3d11DeviceContext->DrawIndexed( 36, 0, 0);
 	}
 
 	HRESULT hr = m_swapChain->Present( 0, 0);
@@ -286,25 +290,47 @@ D3D11RenderDevice& D3D11RenderDevice::Instance()
 	return m_Instance;
 }
 
+namespace Colors
+{
+	XMGLOBALCONST XMVECTORF32 White     = {1.0f, 1.0f, 1.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Black     = {0.0f, 0.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Red       = {1.0f, 0.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Green     = {0.0f, 1.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Blue      = {0.0f, 0.0f, 1.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Yellow    = {1.0f, 1.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Cyan      = {0.0f, 1.0f, 1.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Magenta   = {1.0f, 0.0f, 1.0f, 1.0f};
+
+	XMGLOBALCONST XMVECTORF32 Silver    = {0.75f, 0.75f, 0.75f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 LightSteelBlue = {0.69f, 0.77f, 0.87f, 1.0f};
+}
+
+
 bool D3D11RenderDevice::CreateGBuffer()
 {
 	// Create vertex buffer
 	SimpleVertex vertices[] =
 	{
-		{ XMFLOAT3( -1.0f, -1.0f, -1.0f ),XMFLOAT4(  0.0f, 1.0f, 0.0f , 1.0f) },
-		{ XMFLOAT3( -1.0f, +1.0f, -1.0f ), XMFLOAT4(  1.0f, 0.0f, 0.0f , 1.0f) },
-		{ XMFLOAT3( +1.0f, +1.0f, -1.0f ), XMFLOAT4(  0.0f, 0.0f, 0.0f , 1.0f) },
+		{ XMFLOAT3(-1.0f, -1.0f, -1.0f), (const float*)&Colors::White   },
+		{ XMFLOAT3(-1.0f, +1.0f, -1.0f), (const float*)&Colors::Black   },
+		{ XMFLOAT3(+1.0f, +1.0f, -1.0f), (const float*)&Colors::Red     },
+		{ XMFLOAT3(+1.0f, -1.0f, -1.0f), (const float*)&Colors::Green   },
+		{ XMFLOAT3(-1.0f, -1.0f, +1.0f), (const float*)&Colors::Blue    },
+		{ XMFLOAT3(-1.0f, +1.0f, +1.0f), (const float*)&Colors::Yellow  },
+		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), (const float*)&Colors::Cyan    },
+		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), (const float*)&Colors::Magenta }
 	};
 	
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(SimpleVertex) * 3;
+	vbd.ByteWidth = sizeof(SimpleVertex) * 24;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA initData;
+	memset( &initData, 0, sizeof(initData));
 	initData.pSysMem = vertices;
 
 	HRESULT HR = m_d3d11Device->CreateBuffer(
@@ -314,11 +340,35 @@ bool D3D11RenderDevice::CreateGBuffer()
 		return false;
 
 	// Create indices 
-	UINT indices[] = { 0, 1, 2};
+	UINT indices[] = {
+		// front face
+		0, 1, 2,
+		0, 2, 3,
+
+		// back face
+		4, 6, 5,
+		4, 7, 6,
+
+		// left face
+		4, 5, 1,
+		4, 1, 0,
+
+		// right face
+		3, 2, 6,
+		3, 6, 7,
+
+		// top face
+		1, 5, 6,
+		1, 6, 2,
+
+		// bottom face
+		4, 0, 3, 
+		4, 3, 7
+	};
 
 	D3D11_BUFFER_DESC ibDesc;
 	ibDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	ibDesc.ByteWidth = sizeof(UINT) * 3;
+	ibDesc.ByteWidth = sizeof(UINT) * 36;
 	ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibDesc.CPUAccessFlags = 0;
 	ibDesc.MiscFlags = 0;

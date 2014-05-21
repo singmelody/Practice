@@ -785,188 +785,178 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 {
     // If the settings dialog is being shown, then
     // render it instead of rendering the app's scene
-    if( g_SettingsDlg.IsActive() )
-    {
-        g_SettingsDlg.OnRender( fElapsedTime );
-        return;
-    }
-
-    HRESULT hr;
-    D3DXMATRIXA16 mViewProjection;
-    D3DXVECTOR3 vLightDir[MAX_LIGHTS];
-    D3DXCOLOR vLightDiffuse[MAX_LIGHTS];
-    UINT iPass, cPasses;
-    D3DXMATRIXA16 mWorld;
-    D3DXMATRIXA16 mView;
-    D3DXMATRIXA16 mProj;
-
-	// Build the view matrix.
-// 	XMVECTOR pos    = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-// 	XMVECTOR target = XMVectorZero();
-// 	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-// 	XMFLOAT4X4 mView11;
-// 	
-// 	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-// 	XMStoreFloat4x4(&mView11, V);
+//     if( g_SettingsDlg.IsActive() )
+//     {
+//         g_SettingsDlg.OnRender( fElapsedTime );
+//         return;
+//     }
+	HRESULT hr;
+	D3DXMATRIXA16 mViewProjection;
+	D3DXVECTOR3 vLightDir[MAX_LIGHTS];
+	D3DXCOLOR vLightDiffuse[MAX_LIGHTS];
+	UINT iPass, cPasses;
+	D3DXMATRIXA16 mWorld;
+	D3DXMATRIXA16 mView;
+	D3DXMATRIXA16 mProj;
 
 	D3D11RenderDevice::Instance().Op();
 
-    // Clear the render target and the zbuffer 
-    V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DXCOLOR( 0.0f, 0.25f, 0.25f, 0.55f ), 1.0f, 0 ) );
-
-    // Render the scene
-    if( SUCCEEDED( pd3dDevice->BeginScene() ) )
-    {
-		// Setup the camera's view parameters
-//		g_Angle += fElapsedTime;
-//		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
-		g_Camera.SetViewParams( &vecEye, &vecAt );
-//		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
-
-		// set view projection prop
-		mProj = *g_Camera.GetProjMatrix();
-		mView = *g_Camera.GetViewMatrix();
-		mViewProjection = mView * mProj;
-		V( g_pEffect->SetMatrix( "g_mVP", &mViewProjection ) );
-		V( g_pEffect->SetVector( "g_mCameraPos", &D3DXVECTOR4(vecEye,0.0f)));
-
-		// set world prop
-		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();
-		V( g_pEffect->SetMatrix( "g_mWorld", &mWorld ) );
-
-		// Render the light arrow so the user can visually see the light dir
-        for( int i = 0; i < g_nNumActiveLights; i++ )
-        {
-            D3DXCOLOR arrowColor = ( i == g_nActiveLight ) ? D3DXCOLOR( 1, 1, 0, 1 ) : D3DXCOLOR( 1, 1, 1, 1 );
-            V( g_LightControl[i].OnRender9( arrowColor, &mView, &mProj, g_Camera.GetEyePt() ) );
-            vLightDir[i] = g_LightControl[i].GetLightDirection(); //  D3DXVECTOR3(-20.0f, 75.0f, -120.0f);
-            vLightDiffuse[i] = g_fLightScale * D3DXCOLOR( 1, 1, 1, 1 );
-        }
-
-        V( g_pEffect->SetValue( "g_LightDir", vLightDir, sizeof( D3DXVECTOR3 ) * MAX_LIGHTS ) );
-        V( g_pEffect->SetValue( "g_LightDiffuse", vLightDiffuse, sizeof( D3DXVECTOR4 ) * MAX_LIGHTS ) );
-
-        // Update the effect's variables.  Instead of using strings, it would 
-        // be more efficient to cache a handle to the parameter by calling 
-        // ID3DXEffect::GetParameterByName
-        V( g_pEffect->SetFloat( "g_fTime", ( float )fTime ) );
-
-        D3DXCOLOR vWhite = D3DXCOLOR( 1, 1, 1, 1 );
-        V( g_pEffect->SetValue( "g_MaterialDiffuseColor", &vWhite, sizeof( D3DXCOLOR ) ) );
-        V( g_pEffect->SetFloat( "g_fTime", ( float )fTime ) );
-        V( g_pEffect->SetInt( "g_nNumLights", g_nNumActiveLights ) );
-
-        // Render the scene with this technique 
-        // as defined in the .fx file
-
-		std::string techName;
-        switch( g_nNumActiveLights )
-        {
-            case 1:
-				techName = "RenderSceneWithTexture1Light"; break;
-            case 2:
-				techName = "RenderSceneWithTexture2Light"; break;
-            case 3:
-				techName = "RenderSceneWithTexture3Light"; break;
-        }
-
-// 		for (int i = 0; i < CONTROLLER_NUM; ++i)
+//     // Clear the render target and the zbuffer 
+//     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DXCOLOR( 0.0f, 0.25f, 0.25f, 0.55f ), 1.0f, 0 ) );
+// 
+//     // Render the scene
+//     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
+//     {
+// 		// Setup the camera's view parameters
+// //		g_Angle += fElapsedTime;
+// //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
+// 		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
+// 		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
+// 		g_Camera.SetViewParams( &vecEye, &vecAt );
+// //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
+// 
+// 		// set view projection prop
+// 		mProj = *g_Camera.GetProjMatrix();
+// 		mView = *g_Camera.GetViewMatrix();
+// 		mViewProjection = mView * mProj;
+// 		V( g_pEffect->SetMatrix( "g_mVP", &mViewProjection ) );
+// 		V( g_pEffect->SetVector( "g_mCameraPos", &D3DXVECTOR4(vecEye,0.0f)));
+// 
+// 		// set world prop
+// 		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();
+// 		V( g_pEffect->SetMatrix( "g_mWorld", &mWorld ) );
+// 
+// 		// Render the light arrow so the user can visually see the light dir
+//         for( int i = 0; i < g_nNumActiveLights; i++ )
+//         {
+//             D3DXCOLOR arrowColor = ( i == g_nActiveLight ) ? D3DXCOLOR( 1, 1, 0, 1 ) : D3DXCOLOR( 1, 1, 1, 1 );
+//             V( g_LightControl[i].OnRender9( arrowColor, &mView, &mProj, g_Camera.GetEyePt() ) );
+//             vLightDir[i] = g_LightControl[i].GetLightDirection(); //  D3DXVECTOR3(-20.0f, 75.0f, -120.0f);
+//             vLightDiffuse[i] = g_fLightScale * D3DXCOLOR( 1, 1, 1, 1 );
+//         }
+// 
+//         V( g_pEffect->SetValue( "g_LightDir", vLightDir, sizeof( D3DXVECTOR3 ) * MAX_LIGHTS ) );
+//         V( g_pEffect->SetValue( "g_LightDiffuse", vLightDiffuse, sizeof( D3DXVECTOR4 ) * MAX_LIGHTS ) );
+// 
+//         // Update the effect's variables.  Instead of using strings, it would 
+//         // be more efficient to cache a handle to the parameter by calling 
+//         // ID3DXEffect::GetParameterByName
+//         V( g_pEffect->SetFloat( "g_fTime", ( float )fTime ) );
+// 
+//         D3DXCOLOR vWhite = D3DXCOLOR( 1, 1, 1, 1 );
+//         V( g_pEffect->SetValue( "g_MaterialDiffuseColor", &vWhite, sizeof( D3DXCOLOR ) ) );
+//         V( g_pEffect->SetFloat( "g_fTime", ( float )fTime ) );
+//         V( g_pEffect->SetInt( "g_nNumLights", g_nNumActiveLights ) );
+// 
+//         // Render the scene with this technique 
+//         // as defined in the .fx file
+// 
+// 		std::string techName;
+//         switch( g_nNumActiveLights )
+//         {
+//             case 1:
+// 				techName = "RenderSceneWithTexture1Light"; break;
+//             case 2:
+// 				techName = "RenderSceneWithTexture2Light"; break;
+//             case 3:
+// 				techName = "RenderSceneWithTexture3Light"; break;
+//         }
+// 
+// // 		for (int i = 0; i < CONTROLLER_NUM; ++i)
+// // 		{
+// // 			//g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
+// // 			g_animControllers[i]->AdvanceTime( fElapsedTime, NULL);
+// // 			g_SkinnedMesh->SetPose( g_postions[i]);
+// // 
+// // 			// update ik
+// // 			if(g_ik)
+// // 			{
+// // 				g_ik->UpdateHeadIK();
+// // 				g_ik->UpdateArmIK();
+// // 			}
+// // #ifdef SOFT
+// // 			// Apply the SoftSkin technique contained in the effect  
+// // 			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
+// // #else
+// // 			// Apply the HALSkin technique contained in the effect
+// // 			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+// // #endif
+// // 
+// // 		}
+// 
+// 		// set view projection prop
+// 		mProj = *g_Camera.GetProjMatrix();
+// 		mView = *g_Camera.GetViewMatrix();
+// 		mViewProjection = mView * mProj;
+// 		V( g_pEffect->SetMatrix( "g_mVP", &mViewProjection ) );
+// 
+// 		// set world prop
+// 		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();
+// 		V( g_pEffect->SetMatrix( "g_mWorld", &mWorld ) );
+// 
+// 		// set texture
+// 		g_pEffect->SetTexture("g_MeshTexture", NULL);
+// //		g_Morph->Render(techName.c_str());
+// 
+// // 		g_MultiMorph->Update(fElapsedTime);
+// // 		g_MultiMorph->Render(techName.c_str());
+// 
+// // 		g_MorphSkeleton->Update(fElapsedTime);
+// // 		g_MorphSkeleton->Render();
+// 
+// // 		g_Face->Update(fElapsedTime);
+// // 		g_Face->Render(techName.c_str());
+// 
+// // 		g_ComplexFace->Update(fElapsedTime);
+// // 		g_ComplexFace->Render(techName.c_str());
+// 
+// // 		// Update face controllers
+// 		for (int i = 0; i < g_faceControllers.size(); ++i)
 // 		{
-// 			//g_animControllers[i]->AdvanceTime( fElapsedTime * 0.5f, &g_callbackHandler);
-// 			g_animControllers[i]->AdvanceTime( fElapsedTime, NULL);
-// 			g_SkinnedMesh->SetPose( g_postions[i]);
-// 
-// 			// update ik
-// 			if(g_ik)
-// 			{
-// 				g_ik->UpdateHeadIK();
-// 				g_ik->UpdateArmIK();
-// 			}
-// #ifdef SOFT
-// 			// Apply the SoftSkin technique contained in the effect  
-// 			g_SkinnedMesh->RenderSoft(NULL, "SkinSoft", techName.c_str());
-// #else
-// 			// Apply the HALSkin technique contained in the effect
-// 			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
-// #endif
-// 
+// 			g_faceControllers[i]->Update(fElapsedTime);
+// 			g_faceControllers[i]->Render(techName.c_str());
 // 		}
-
-		// set view projection prop
-		mProj = *g_Camera.GetProjMatrix();
-		mView = *g_Camera.GetViewMatrix();
-		mViewProjection = mView * mProj;
-		V( g_pEffect->SetMatrix( "g_mVP", &mViewProjection ) );
-
-		// set world prop
-		D3DXMatrixIdentity(&mWorld); //= g_mCenterWorld * *g_Camera.GetWorldMatrix();
-		V( g_pEffect->SetMatrix( "g_mWorld", &mWorld ) );
-
-		// set texture
-		g_pEffect->SetTexture("g_MeshTexture", NULL);
-//		g_Morph->Render(techName.c_str());
-
-// 		g_MultiMorph->Update(fElapsedTime);
-// 		g_MultiMorph->Render(techName.c_str());
-
-// 		g_MorphSkeleton->Update(fElapsedTime);
-// 		g_MorphSkeleton->Render();
-
-// 		g_Face->Update(fElapsedTime);
-// 		g_Face->Render(techName.c_str());
-
-// 		g_ComplexFace->Update(fElapsedTime);
-// 		g_ComplexFace->Render(techName.c_str());
-
-// 		// Update face controllers
-		for (int i = 0; i < g_faceControllers.size(); ++i)
-		{
-			g_faceControllers[i]->Update(fElapsedTime);
-			g_faceControllers[i]->Render(techName.c_str());
-		}
-
-// 		g_FaceControllerGenerate->Update(fElapsedTime);
-// 		g_FaceControllerGenerate->Render(techName.c_str());
-
-// 		g_speakController->SpeakUpdate(fElapsedTime);
-// 		g_speakController->Render(techName.c_str());
-
-
-		// Physics
-// 		g_physicsEngine->Update(fElapsedTime);
-// 		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
-
-
-		// Render Shadow
-		{
-//			RenderShadow();
-		}
-
-		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
-		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
-		pd3dDevice->SetTransform(D3DTS_PROJECTION, g_Camera.GetProjMatrix());
-
-		if(g_bShowSkeloton)
-		{
-			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
-			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
-
-			g_Anim->Update(fElapsedTime);
-			g_Anim->Draw();
-		}
-
-
-        g_HUD.OnRender( fElapsedTime );
-        g_SampleUI.OnRender( fElapsedTime );
-
-        RenderText( fTime );
-//		TrackStatus();
-		ShowCallBackUI( fElapsedTime );
-
-        V( pd3dDevice->EndScene() );
-    }
+// 
+// // 		g_FaceControllerGenerate->Update(fElapsedTime);
+// // 		g_FaceControllerGenerate->Render(techName.c_str());
+// 
+// // 		g_speakController->SpeakUpdate(fElapsedTime);
+// // 		g_speakController->Render(techName.c_str());
+// 
+// 
+// 		// Physics
+// // 		g_physicsEngine->Update(fElapsedTime);
+// // 		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
+// 
+// 
+// 		// Render Shadow
+// 		{
+// //			RenderShadow();
+// 		}
+// 
+// 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
+// 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
+// 		pd3dDevice->SetTransform(D3DTS_PROJECTION, g_Camera.GetProjMatrix());
+// 
+// 		if(g_bShowSkeloton)
+// 		{
+// 			pd3dDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L);
+// 			g_SkinnedMesh->RenderSkeleton(NULL, NULL, mWorld);
+// 
+// 			g_Anim->Update(fElapsedTime);
+// 			g_Anim->Draw();
+// 		}
+// 
+// 
+//         g_HUD.OnRender( fElapsedTime );
+//         g_SampleUI.OnRender( fElapsedTime );
+// 
+//         RenderText( fTime );
+// //		TrackStatus();
+// 		ShowCallBackUI( fElapsedTime );
+// 
+//         V( pd3dDevice->EndScene() );
+//     }
 }
 
 std::string IntToString(int i)

@@ -167,7 +167,9 @@
     <ClCompile Include="IRenderDevice.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
-    <ClCompile Include="D3D11RenderDevice.cpp" />
+    <ClCompile Include="D3D11RenderDevice.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -232,7 +234,9 @@
     <ClInclude Include="IRenderDevice.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11RenderDevice.h" />
+    <ClInclude Include="D3D11RenderDevice.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
