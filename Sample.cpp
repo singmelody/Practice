@@ -1310,6 +1310,8 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_speakController);
 	SAFE_DELETE(g_ik);
 
+	assert( D3D11RenderDevice::Instance().GetReference() == 0);
+
 	for (int i = 0; i < g_faceControllers.size(); ++i)
 	{
 		FaceController* controller = g_faceControllers[i];
