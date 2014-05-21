@@ -38,7 +38,7 @@ void LoadTex(const char* c, IDirect3DTexture9** tex)
 	D3DXCreateTextureFromFile(DXUTGetD3D9Device(), str, tex);
 }
 
-extern bool LoadShader(const char* c, ID3DX11Effect** effect)
+extern bool LoadShader(const char* c, ID3DX11Effect* &effect)
 {
 	std::wstring conv = GetWC(c);
 
@@ -51,8 +51,8 @@ extern bool LoadShader(const char* c, ID3DX11Effect** effect)
 	compileFlag |= D3D10_SHADER_DEBUG;
 	compileFlag |= D3D10_SHADER_SKIP_OPTIMIZATION;
 #endif
-	ID3D10Blob* compiledShader;
-	ID3D10Blob* compiledError;
+	ID3D10Blob* compiledShader = NULL;
+	ID3D10Blob* compiledError = NULL;
 	HRESULT hr = D3DX11CompileFromFile( str, NULL, NULL, NULL, "fx_5_0", compileFlag, NULL, NULL, &compiledShader, &compiledError, NULL);
 
 	if( compiledError != NULL || FAILED(hr))
@@ -61,8 +61,28 @@ extern bool LoadShader(const char* c, ID3DX11Effect** effect)
 		return false;
 	}
 
-	D3DX11CreateEffectFromMemory( compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
-		0, D3D11RenderDevice::Instance().m_d3d11Device, effect);
+	ID3D11Device* device = D3D11RenderDevice::Instance().m_d3d11Device;
+	hr = D3DX11CreateEffectFromMemory( compiledShader->GetBufferPointer(), compiledShader->GetBufferSize(),
+		0, device, &effect);
+	if(hr == D3D11_ERROR_FILE_NOT_FOUND)
+	{
+		return false;
+	}
+	else if(hr == D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS)
+	{
+		return false;
+	}
+	else if(hr == D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS)
+	{
+		return false;
+	}
+	else if(hr == D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD)
+	{
+		return false;
+	}
+
+	if(FAILED(hr))
+		return false;
 
 	SAFE_RELEASE(compiledShader);
 	SAFE_RELEASE(compiledError);

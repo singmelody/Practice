@@ -550,16 +550,16 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	// create speak face controller
 	g_speakController = new FaceController( D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModel);
 
-	IRenderDevice* device = new D3D11RenderDevice();
-	bool result = device->CreateDevice();
-	result = device->CheckCaps();
-	result = device->CreateSwapChain();
-	result = device->CreateRenderTargetView();
-	result = device->CreateDepthStencilBuffer();
-	result = device->BindRTAndDepthToMS();
-	assert( device->CreateViewPort() );
-	assert( device->ShaderParse() );
-	assert( device->GetReference() == 0);	
+	bool result = D3D11RenderDevice::Instance().CreateDevice();
+	result = D3D11RenderDevice::Instance().CheckCaps();
+	result = D3D11RenderDevice::Instance().CreateSwapChain();
+	result = D3D11RenderDevice::Instance().CreateRenderTargetView();
+	result = D3D11RenderDevice::Instance().CreateDepthStencilBuffer();
+	result = D3D11RenderDevice::Instance().BindRTAndDepthToMS();
+	assert( D3D11RenderDevice::Instance().CreateViewPort() );
+	assert( D3D11RenderDevice::Instance().ShaderParse() );
+	assert( D3D11RenderDevice::Instance().CreateVertexDecl() );
+	assert( D3D11RenderDevice::Instance().CreateGBuffer() );
     return S_OK;
 }
 
@@ -799,6 +799,17 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
     D3DXMATRIXA16 mWorld;
     D3DXMATRIXA16 mView;
     D3DXMATRIXA16 mProj;
+
+	// Build the view matrix.
+// 	XMVECTOR pos    = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+// 	XMVECTOR target = XMVectorZero();
+// 	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+// 	XMFLOAT4X4 mView11;
+// 	
+// 	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
+// 	XMStoreFloat4x4(&mView11, V);
+
+	D3D11RenderDevice::Instance().Op();
 
     // Clear the render target and the zbuffer 
     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DXCOLOR( 0.0f, 0.25f, 0.25f, 0.55f ), 1.0f, 0 ) );

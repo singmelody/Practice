@@ -1,6 +1,7 @@
 #pragma once
 #include "IRenderDevice.h"
 #include <D3DX11.h>
+#include <xnamath.h>
 #include <inc/d3dx11effect.h>
 
 
@@ -30,9 +31,17 @@ public:
 	UINT GetReference();
 
 	//--------- temp
+	struct SimpleVertex
+	{
+		XMFLOAT3 Pos;
+		XMFLOAT4 Color;
+	};
+
 	static D3D11RenderDevice& Instance();
 
 	bool CreateVertexDecl();
+
+	bool CreateGBuffer();
 
 	bool ShaderParse();
 
@@ -56,5 +65,10 @@ public:
 
 	//--------- temp
 	ID3DX11Effect*			m_fx;
+	ID3DX11EffectTechnique* m_tech;
+	ID3DX11EffectMatrixVariable* m_fxWorldViewProj;
+	ID3D11InputLayout*		m_vertexDesc;
+	ID3D11Buffer*			m_vertexBuff;
+	ID3D11Buffer*			m_indicesBuff; 
 };
 

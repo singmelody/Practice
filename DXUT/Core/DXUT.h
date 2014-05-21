@@ -124,7 +124,7 @@
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 #endif
 
-
+#define BT_NO_SIMD_OPERATOR_OVERLOADS 1;
 
 //--------------------------------------------------------------------------------------
 // Structs

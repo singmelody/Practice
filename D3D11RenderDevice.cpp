@@ -2,6 +2,7 @@
 #include "D3D11RenderDevice.h"
 #include "Utils.h"
 
+
 D3D11RenderDevice::D3D11RenderDevice(void)
 	: m_d3d11Device(NULL),
 	m_d3d11DeviceContext(NULL),
@@ -9,7 +10,8 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_m4xMsaaQuality(NULL),
 	m_swapChain(NULL),
 	m_renderTargetView(NULL),
-	m_depthStencilView(NULL)
+	m_depthStencilView(NULL),
+	m_fx(NULL)
 {
 
 }
@@ -23,11 +25,15 @@ D3D11RenderDevice::~D3D11RenderDevice(void)
 
 void D3D11RenderDevice::Release()
 {
+	SAFE_RELEASE(m_vertexDesc);
+	SAFE_RELEASE(m_vertexBuff);
+	SAFE_RELEASE(m_indicesBuff);
 	SAFE_DELETE(m_featureLevel);
 	SAFE_RELEASE(m_depthStencilView);
 	SAFE_RELEASE(m_renderTargetView);
 	SAFE_RELEASE(m_swapChain);
 	SAFE_RELEASE(m_d3d11DeviceContext);
+	SAFE_RELEASE(m_fx);
 }
 
 
@@ -198,6 +204,20 @@ bool D3D11RenderDevice::CreateViewPort()
 
 bool D3D11RenderDevice::CreateVertexDecl()
 {
+	D3D11_INPUT_ELEMENT_DESC desc[] = 
+	{
+		"POSITION",	0,	DXGI_FORMAT_R32G32B32_FLOAT,	0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0,
+		"COLOR",	0,	DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	12,	D3D11_INPUT_PER_VERTEX_DATA, 0,
+	};
+
+	D3DX11_PASS_DESC passDesc;
+	m_tech->GetPassByIndex(0)->GetDesc(&passDesc);
+
+	HRESULT hr = m_d3d11Device->CreateInputLayout( desc, 2, passDesc.pIAInputSignature, passDesc.IAInputSignatureSize, &m_vertexDesc);
+
+	if(FAILED(hr))
+		return false;
+
 	return true;
 }
 
@@ -207,12 +227,56 @@ bool D3D11RenderDevice::Op()
 	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
 	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
+	m_d3d11DeviceContext->IASetInputLayout(m_vertexDesc);
+	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UINT stride = sizeof(SimpleVertex);
+	UINT offset = NULL;
+
+	m_d3d11DeviceContext->IASetVertexBuffers( 0, 1, &m_vertexBuff, &stride, &offset);
+	m_d3d11DeviceContext->IASetIndexBuffer( m_indicesBuff, DXGI_FORMAT_R32_UINT, 0);
+
+	XMFLOAT4X4 mWorld;
+	XMFLOAT4X4 mView;
+	XMFLOAT4X4 mProj;
+
+	// Set constants
+	XMMATRIX I = XMMatrixIdentity();
+	XMStoreFloat4x4(&mWorld, I);
+	XMStoreFloat4x4(&mView, I);
+	XMStoreFloat4x4(&mProj, I);
+	XMMATRIX world = XMLoadFloat4x4(&mWorld);
+	XMMATRIX view  = XMLoadFloat4x4(&mView);
+	XMMATRIX proj  = XMLoadFloat4x4(&mProj);
+	XMMATRIX worldViewProj = world*view*proj;
+
+	m_fxWorldViewProj->SetMatrix( reinterpret_cast<float*>(&worldViewProj));
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	m_tech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		m_tech->GetPassByIndex(p)->Apply( 0, m_d3d11DeviceContext);
+
+		m_d3d11DeviceContext->DrawIndexed( 3, 0, 0);
+	}
+
+	HRESULT hr = m_swapChain->Present( 0, 0);
+	if(FAILED(hr))
+		return false;
+
 	return true;
 }
 
 bool D3D11RenderDevice::ShaderParse()
 {
-	LoadShader("Color.fx", &m_fx);
+	bool result = LoadShader("Color.fx", m_fx);
+
+	if(!result)
+		return false;
+
+	m_tech = m_fx->GetTechniqueByName("ColorTech");
+	m_fxWorldViewProj = m_fx->GetVariableByName("gWorldViewProj")->AsMatrix();
 
 	return true;
 }
@@ -220,6 +284,54 @@ bool D3D11RenderDevice::ShaderParse()
 D3D11RenderDevice& D3D11RenderDevice::Instance()
 {
 	return m_Instance;
+}
+
+bool D3D11RenderDevice::CreateGBuffer()
+{
+	// Create vertex buffer
+	SimpleVertex vertices[] =
+	{
+		{ XMFLOAT3( -1.0f, -1.0f, -1.0f ),XMFLOAT4(  0.0f, 1.0f, 0.0f , 1.0f) },
+		{ XMFLOAT3( -1.0f, +1.0f, -1.0f ), XMFLOAT4(  1.0f, 0.0f, 0.0f , 1.0f) },
+		{ XMFLOAT3( +1.0f, +1.0f, -1.0f ), XMFLOAT4(  0.0f, 0.0f, 0.0f , 1.0f) },
+	};
+	
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(SimpleVertex) * 3;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	initData.pSysMem = vertices;
+
+	HRESULT HR = m_d3d11Device->CreateBuffer(
+		&vbd, &initData, &m_vertexBuff);
+
+	if(FAILED(HR))
+		return false;
+
+	// Create indices 
+	UINT indices[] = { 0, 1, 2};
+
+	D3D11_BUFFER_DESC ibDesc;
+	ibDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	ibDesc.ByteWidth = sizeof(UINT) * 3;
+	ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibDesc.CPUAccessFlags = 0;
+	ibDesc.MiscFlags = 0;
+	ibDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA initIndexData;
+	initIndexData.pSysMem = indices;
+
+	HR = m_d3d11Device->CreateBuffer( &ibDesc, &initIndexData, &m_indicesBuff);
+	if(FAILED(HR))
+		return false;
+
+	return true;
 }
 
 D3D11RenderDevice D3D11RenderDevice::m_Instance;
