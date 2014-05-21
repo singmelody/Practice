@@ -417,7 +417,12 @@
     <ClInclude Include="RagDoll.h" />
     <ClInclude Include="skinnedMesh.h" />
     <ClInclude Include="WavDecoder.h" />
-    <None Include="Color.fx" />
+    <CustomBuild Include="Color.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">G:\DX2010\Utilities\bin\x86\fxc.exe /Fc /Od /Zi /T fx_5_0 /Fo "%(FullPath)o" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">fxc compile for debug: %(FullPath)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Directory)%(Filename).fxo</Outputs>
+    </CustomBuild>
     <None Include="DXUT\Optional\directx.ico" />
     <ClInclude Include="DXUT\Core\DXUT.h" />
     <ClInclude Include="DXUT\Core\DXUTenum.h" />

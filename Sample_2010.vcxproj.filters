@@ -17,10 +17,6 @@
     <Filter Include="Util">
       <UniqueIdentifier>{95af701b-7262-41c4-a49e-7023ed360823}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{2c3d4c8c-5d1a-459a-a05a-a4e4b608a44e}</UniqueIdentifier>
-      <Extensions>fx;fxh;hlsl</Extensions>
-    </Filter>
     <Filter Include="Ragdoll">
       <UniqueIdentifier>{e62a486b-9fd9-4151-9fb5-a8eb325ef726}</UniqueIdentifier>
     </Filter>
@@ -44,6 +40,11 @@
     </Filter>
     <Filter Include="D3D11">
       <UniqueIdentifier>{7b9df9a2-6667-4fb8-90f0-1accce0f794a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FX">
+      <UniqueIdentifier>{2c3d4c8c-5d1a-459a-a05a-a4e4b608a44e}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -104,9 +105,6 @@
     <ClCompile Include="DXUT\Optional\SDKmisc.cpp">
       <Filter>DXUT</Filter>
     </ClCompile>
-    <None Include="Color.fx">
-      <Filter>Shader</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
@@ -173,7 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
-      <Filter>Shader</Filter>
+      <Filter>FX</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -239,5 +237,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="Color.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

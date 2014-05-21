@@ -31,6 +31,13 @@ float4 PS(VertexOut pin) : SV_Target
 	return pin.Color;
 }
 
+RasterizerState WireframeRS
+{
+	FillMode = Wireframe;
+	CullMode = Back;
+	FrontCounterClockwise = false;
+};
+
 technique11 ColorTech
 {
 	pass P0
@@ -38,5 +45,7 @@ technique11 ColorTech
 		SetVertexShader( CompileShader( vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader( CompileShader( ps_5_0, PS() ));
+		
+		//SetRasterizerState(WireframeRS);
 	}
 }
