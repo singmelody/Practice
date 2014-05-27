@@ -45,6 +45,7 @@ void D3D11RenderDevice::Release()
 	SAFE_RELEASE(m_gsFx);
 	SAFE_RELEASE(m_TreeSpritesVB);
 	SAFE_RELEASE(m_TreeTextureMapArraySRV);
+	SAFE_DELETE(m_treeEffect);
 }
 
 
