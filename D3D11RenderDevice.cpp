@@ -19,9 +19,9 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_gsFx(NULL),
 	m_TreeSpritesVB(NULL),
 	m_treeEffect(NULL),
-	m_AlphaToCoverageOn(true)
+	m_AlphaToCoverageOn(true),
+	m_TreeTextureMapArraySRV(NULL)
 {
-
 }
 
 
@@ -46,6 +46,10 @@ void D3D11RenderDevice::Release()
 	SAFE_RELEASE(m_TreeSpritesVB);
 	SAFE_RELEASE(m_TreeTextureMapArraySRV);
 	SAFE_DELETE(m_treeEffect);
+	
+	RenderStates::DestroyAll();
+	InputLayouts::DestroyAll();
+	Effects::DestroyAll();
 }
 
 
@@ -248,21 +252,24 @@ bool D3D11RenderDevice::Render()
 	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMFLOAT4X4 mView11;
 
+	m_EyePosW = XMFLOAT3( -43.0f, 23.0f, -63.3f);
+
 	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&mView11, V);
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&mWorld, I);
 	XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	XMMATRIX view  = V;
-	XMMATRIX proj  = XMMatrixPerspectiveFovLH(0.25f*D3DX_PI, 640/(float)480.0f, 1.0f, 1000.0f);
-	XMMATRIX worldViewProj = world*view*proj;
+	m_View  = V;
+	m_Proj  = XMMatrixPerspectiveFovLH(0.25f*D3DX_PI, 640/(float)480.0f, 1.0f, 1000.0f);
+	XMMATRIX worldViewProj = world*m_View*m_Proj;
 
 	m_fxWorldViewProj->SetMatrix( reinterpret_cast<float*>(&worldViewProj));
 
+	RenderSpriteTree();
+
 	RenderCube();
 
-	RenderSpriteTree();
 
 	HRESULT hr = m_swapChain->Present( 0, 0);
 	if(FAILED(hr))
@@ -343,12 +350,15 @@ bool D3D11RenderDevice::BuildTreeSpritesBuffer()
 
 	for(UINT i = 0; i < TreeCount; ++i)
 	{
-		float x = MathHelper::RandF(-35.0f, 35.0f);
-		float z = MathHelper::RandF(-35.0f, 35.0f);
-		float y = 2.0f; //GetHillHeight(x,z);
+// 		float x = MathHelper::RandF(-35.0f, 35.0f);
+// 		float z = MathHelper::RandF(-35.0f, 35.0f);
+// 		float y = MathHelper::RandF(5.0f, 20.0f); //GetHillHeight(x,z);
+
+		float x = 20.0f;//MathHelper::RandF(-35.0f, 35.0f);
+		float z = 20.0f;//MathHelper::RandF(-35.0f, 35.0f);
+		float y = 10.0f;//GetHillHeight(x,z);
 
 		// Move tree slightly above land height.
-		y += 10.0f;
 
 		v[i].Pos  = XMFLOAT3(x,y,z);
 		v[i].Size = XMFLOAT2(24.0f, 24.0f);
@@ -363,6 +373,10 @@ bool D3D11RenderDevice::BuildTreeSpritesBuffer()
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.pSysMem = v;
 	HR(m_d3d11Device->CreateBuffer(&vbd, &vinitData, &m_TreeSpritesVB));
+
+	Effects::InitAll();
+	InputLayouts::InitAll(m_d3d11Device);
+	RenderStates::InitAll(m_d3d11Device);
 
 	return true;
 }
@@ -483,7 +497,7 @@ bool D3D11RenderDevice::RenderSpriteTree()
 	UINT stride = sizeof(Vertex::TreePointSprite);
 	UINT offset = 0;
 
-	ID3DX11EffectTechnique* treeTech = m_treeEffect->Light3TexAlphaClipTech;
+	ID3DX11EffectTechnique* treeTech = m_treeEffect->Light3TexAlphaClipFogTech;
 // 	switch(mRenderOptions)
 // 	{
 // 	case RenderOptions::Lighting:
