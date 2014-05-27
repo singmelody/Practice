@@ -55,6 +55,8 @@ public:
 
 	bool BuildCubeBuffer();
 
+	bool BuildLight();
+
 	D3D11RenderDevice(void);
 	virtual ~D3D11RenderDevice(void);
 
@@ -84,5 +86,13 @@ public:
 	static const UINT TreeCount;
 	ID3D11Buffer*			m_TreeSpritesVB;
 	TreeSpriteEffect*		m_treeEffect;
+	DirectionalLight		m_DirLights[3];
+	Material				m_TreeMat;
+	XMFLOAT3				m_EyePosW;
+	bool					m_AlphaToCoverageOn;
+	ID3D11ShaderResourceView* m_TreeTextureMapArraySRV;
+
+	XMMATRIX				m_View;
+	XMMATRIX				m_Proj; 
 };
 

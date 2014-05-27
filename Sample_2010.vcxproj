@@ -398,6 +398,7 @@
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PhysicsMgr.cpp" />
     <ClCompile Include="RagDoll.cpp" />
+    <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="skinnedMesh.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Utils.h" />
@@ -422,6 +423,7 @@
     <ClInclude Include="OBB.h" />
     <ClInclude Include="PhysicsMgr.h" />
     <ClInclude Include="RagDoll.h" />
+    <ClInclude Include="RenderStates.h" />
     <ClInclude Include="skinnedMesh.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WavDecoder.h" />

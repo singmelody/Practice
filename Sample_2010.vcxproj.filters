@@ -186,6 +186,9 @@
     <ClCompile Include="LightHelper.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="RenderStates.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -263,6 +266,9 @@
       <Filter>D3D11</Filter>
     </ClInclude>
     <ClInclude Include="LightHelper.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderStates.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>

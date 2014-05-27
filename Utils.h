@@ -5,13 +5,21 @@
 #include "animation.h"
 #include <string>
 #include <Inc/d3dx11effect.h>
-
+#include <d3d11.h>
+#include <D3DX11tex.h>
 
 extern std::wstring GetWC(const char *c);
 extern void LoadMesh(const char* c, ID3DXMesh** mesh, ID3DXBuffer** ppAdjacency = NULL, ID3DXBuffer** ppMaterials = NULL, DWORD* materialCount = NULL);
 extern void LoadMeshHierarchy(const char* c, const LPD3DXALLOCATEHIERARCHY& hier, D3DXFRAME** mesh);
 extern void LoadTex(const char* c, IDirect3DTexture9** tex);
 extern bool LoadShader(const char* c, ID3DX11Effect* &effect);
+
+extern ID3D11ShaderResourceView* CreateTexture2DArraySRV(
+	ID3D11Device* device, ID3D11DeviceContext* context,
+	std::vector<std::string>& filenames,
+	DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE,
+	UINT filter = D3DX11_FILTER_NONE, 
+	UINT mipFilter = D3DX11_FILTER_LINEAR);
 
 extern void PrintMeshDeclaration(ID3DXMesh* pMesh);
 
