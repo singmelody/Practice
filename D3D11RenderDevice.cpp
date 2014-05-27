@@ -280,6 +280,14 @@ bool D3D11RenderDevice::ShaderParse()
 		return false;
 
 	m_tech = m_fx->GetTechniqueByName("ColorTech");
+
+	result = LoadShader("TreeSprite.fx", m_gsFx);
+	if(!result)
+		return false;
+
+	m_gsTech = m_gsFx->GetTechniqueByName("Light3TexAlphaClipFog");
+
+
 	m_fxWorldViewProj = m_fx->GetVariableByName("gWorldViewProj")->AsMatrix();
 
 	return true;

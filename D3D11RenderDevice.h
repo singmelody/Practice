@@ -65,7 +65,9 @@ public:
 
 	//--------- temp
 	ID3DX11Effect*			m_fx;
+	ID3DX11Effect*			m_gsFx;
 	ID3DX11EffectTechnique* m_tech;
+	ID3DX11EffectTechnique* m_gsTech;
 	ID3DX11EffectMatrixVariable* m_fxWorldViewProj;
 	ID3D11InputLayout*		m_vertexDesc;
 	ID3D11Buffer*			m_vertexBuff;

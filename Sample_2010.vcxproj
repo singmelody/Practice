@@ -444,6 +444,8 @@
     <ClCompile Include="DXUT\Optional\DXUTsettingsdlg.cpp" />
     <ClCompile Include="DXUT\Optional\SDKmesh.cpp" />
     <ClCompile Include="DXUT\Optional\SDKmisc.cpp" />
+    <None Include="LightHelper.fx" />
+    <None Include="TreeSprite.fx" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
