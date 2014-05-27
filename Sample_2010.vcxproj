@@ -391,6 +391,7 @@
     <ClCompile Include="Flock.cpp" />
     <ClCompile Include="InverseKinematics.cpp" />
     <ClCompile Include="IRenderDevice.cpp" />
+    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Morph.cpp" />
     <ClCompile Include="OBB.cpp" />
     <ClCompile Include="PhysicsMgr.cpp" />
@@ -398,6 +399,7 @@
     <ClCompile Include="skinnedMesh.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Utils.h" />
+    <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="WavDecoder.cpp" />
     <ClInclude Include="animation.h" />
     <ClInclude Include="Bird.h" />
@@ -411,11 +413,13 @@
     <ClInclude Include="Flock.h" />
     <ClInclude Include="InverseKinematics.h" />
     <ClInclude Include="IRenderDevice.h" />
+    <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Morph.h" />
     <ClInclude Include="OBB.h" />
     <ClInclude Include="PhysicsMgr.h" />
     <ClInclude Include="RagDoll.h" />
     <ClInclude Include="skinnedMesh.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="WavDecoder.h" />
     <CustomBuild Include="Color.fx">
       <FileType>Document</FileType>

@@ -1,7 +1,10 @@
 #include "DXUT.h"
 #include "D3D11RenderDevice.h"
 #include "Utils.h"
+#include "Vertex.h"
+#include "MathHelper.h"
 
+const UINT D3D11RenderDevice::TreeCount = 16;
 
 D3D11RenderDevice::D3D11RenderDevice(void)
 	: m_d3d11Device(NULL),
@@ -34,6 +37,8 @@ void D3D11RenderDevice::Release()
 	SAFE_RELEASE(m_swapChain);
 	SAFE_RELEASE(m_d3d11DeviceContext);
 	SAFE_RELEASE(m_fx);
+	SAFE_RELEASE(m_gsFx);
+	SAFE_RELEASE(m_TreeSpritesVB);
 }
 
 
@@ -281,7 +286,9 @@ bool D3D11RenderDevice::ShaderParse()
 
 	m_tech = m_fx->GetTechniqueByName("ColorTech");
 
+
 	result = LoadShader("TreeSprite.fx", m_gsFx);
+
 	if(!result)
 		return false;
 
@@ -316,6 +323,45 @@ namespace Colors
 
 bool D3D11RenderDevice::CreateGBuffer()
 {
+	BuildCubeBuffer();
+
+	BuildTreeSpritesBuffer();
+
+	return true;
+}
+
+bool D3D11RenderDevice::BuildTreeSpritesBuffer()
+{
+	Vertex::TreePointSprite v[TreeCount];
+
+	for(UINT i = 0; i < TreeCount; ++i)
+	{
+		float x = MathHelper::RandF(-35.0f, 35.0f);
+		float z = MathHelper::RandF(-35.0f, 35.0f);
+		float y = 2.0f; //GetHillHeight(x,z);
+
+		// Move tree slightly above land height.
+		y += 10.0f;
+
+		v[i].Pos  = XMFLOAT3(x,y,z);
+		v[i].Size = XMFLOAT2(24.0f, 24.0f);
+	}
+
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(Vertex::TreePointSprite) * TreeCount;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = v;
+	HR(m_d3d11Device->CreateBuffer(&vbd, &vinitData, &m_TreeSpritesVB));
+
+	return true;
+}
+
+bool D3D11RenderDevice::BuildCubeBuffer()
+{
 	// Create vertex buffer
 	SimpleVertex vertices[] =
 	{
@@ -328,7 +374,7 @@ bool D3D11RenderDevice::CreateGBuffer()
 		{ XMFLOAT3(+1.0f, +1.0f, +1.0f), (const float*)&Colors::Cyan    },
 		{ XMFLOAT3(+1.0f, -1.0f, +1.0f), (const float*)&Colors::Magenta }
 	};
-	
+
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.ByteWidth = sizeof(SimpleVertex) * 24;
@@ -391,5 +437,6 @@ bool D3D11RenderDevice::CreateGBuffer()
 
 	return true;
 }
+
 
 D3D11RenderDevice D3D11RenderDevice::m_Instance;

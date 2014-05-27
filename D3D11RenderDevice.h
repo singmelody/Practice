@@ -47,6 +47,10 @@ public:
 
 	bool Op();
 
+	bool BuildTreeSpritesBuffer();
+
+	bool BuildCubeBuffer();
+
 	D3D11RenderDevice(void);
 	virtual ~D3D11RenderDevice(void);
 
@@ -63,6 +67,7 @@ public:
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11DepthStencilView* m_depthStencilView;
 
+
 	//--------- temp
 	ID3DX11Effect*			m_fx;
 	ID3DX11Effect*			m_gsFx;
@@ -71,6 +76,8 @@ public:
 	ID3DX11EffectMatrixVariable* m_fxWorldViewProj;
 	ID3D11InputLayout*		m_vertexDesc;
 	ID3D11Buffer*			m_vertexBuff;
-	ID3D11Buffer*			m_indicesBuff; 
+	ID3D11Buffer*			m_indicesBuff;
+	static const UINT TreeCount;
+	ID3D11Buffer*			m_TreeSpritesVB;
 };
 
