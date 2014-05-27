@@ -14,7 +14,10 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_swapChain(NULL),
 	m_renderTargetView(NULL),
 	m_depthStencilView(NULL),
-	m_fx(NULL)
+	m_fx(NULL),
+	m_gsFx(NULL),
+	m_TreeSpritesVB(NULL),
+	m_treeEffect(NULL)
 {
 
 }
@@ -226,49 +229,11 @@ bool D3D11RenderDevice::CreateVertexDecl()
 	return true;
 }
 
-bool D3D11RenderDevice::Op()
+bool D3D11RenderDevice::Render()
 {
-	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
-	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
-	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+	RenderCube();
 
-	m_d3d11DeviceContext->IASetInputLayout(m_vertexDesc);
-	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	UINT stride = sizeof(SimpleVertex);
-	UINT offset = NULL;
-	m_d3d11DeviceContext->IASetVertexBuffers( 0, 1, &m_vertexBuff, &stride, &offset);
-	m_d3d11DeviceContext->IASetIndexBuffer( m_indicesBuff, DXGI_FORMAT_R32_UINT, 0);
-
-	XMFLOAT4X4 mWorld;
-
-	// Set constants
-	// Build the view matrix.
-	XMVECTOR pos    = XMVectorSet( 0.0f, -3.5f, -3.5f, 1.0f );
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMFLOAT4X4 mView11;
-
-	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView11, V);
-
-	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&mWorld, I);
-	XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	XMMATRIX view  = V;
-	XMMATRIX proj  = XMMatrixPerspectiveFovLH(0.25f*D3DX_PI, 640/(float)480.0f, 1.0f, 1000.0f);
-	XMMATRIX worldViewProj = world*view*proj;
-
-	m_fxWorldViewProj->SetMatrix( reinterpret_cast<float*>(&worldViewProj));
-
-	D3DX11_TECHNIQUE_DESC techDesc;
-	m_tech->GetDesc(&techDesc);
-	for (UINT p = 0; p < techDesc.Passes; ++p)
-	{
-		m_tech->GetPassByIndex(p)->Apply( 0, m_d3d11DeviceContext);
-
-		m_d3d11DeviceContext->DrawIndexed( 36, 0, 0);
-	}
+	RenderSpriteTree();
 
 	HRESULT hr = m_swapChain->Present( 0, 0);
 	if(FAILED(hr))
@@ -293,6 +258,7 @@ bool D3D11RenderDevice::ShaderParse()
 		return false;
 
 	m_gsTech = m_gsFx->GetTechniqueByName("Light3TexAlphaClipFog");
+	m_treeEffect = new TreeSpriteEffect(m_gsFx);
 
 
 	m_fxWorldViewProj = m_fx->GetVariableByName("gWorldViewProj")->AsMatrix();
@@ -436,6 +402,102 @@ bool D3D11RenderDevice::BuildCubeBuffer()
 		return false;
 
 	return true;
+}
+
+bool D3D11RenderDevice::RenderCube()
+{
+	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
+	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
+	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	m_d3d11DeviceContext->IASetInputLayout(m_vertexDesc);
+	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UINT stride = sizeof(SimpleVertex);
+	UINT offset = NULL;
+	m_d3d11DeviceContext->IASetVertexBuffers( 0, 1, &m_vertexBuff, &stride, &offset);
+	m_d3d11DeviceContext->IASetIndexBuffer( m_indicesBuff, DXGI_FORMAT_R32_UINT, 0);
+
+	XMFLOAT4X4 mWorld;
+
+	// Set constants
+	// Build the view matrix.
+	XMVECTOR pos    = XMVectorSet( 0.0f, -3.5f, -3.5f, 1.0f );
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMFLOAT4X4 mView11;
+
+	XMMATRIX V = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&mView11, V);
+
+	XMMATRIX I = XMMatrixIdentity();
+	XMStoreFloat4x4(&mWorld, I);
+	XMMATRIX world = XMLoadFloat4x4(&mWorld);
+	XMMATRIX view  = V;
+	XMMATRIX proj  = XMMatrixPerspectiveFovLH(0.25f*D3DX_PI, 640/(float)480.0f, 1.0f, 1000.0f);
+	XMMATRIX worldViewProj = world*view*proj;
+
+	m_fxWorldViewProj->SetMatrix( reinterpret_cast<float*>(&worldViewProj));
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	m_tech->GetDesc(&techDesc);
+	for (UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		m_tech->GetPassByIndex(p)->Apply( 0, m_d3d11DeviceContext);
+
+		m_d3d11DeviceContext->DrawIndexed( 36, 0, 0);
+	}
+
+	return true;
+}
+
+bool D3D11RenderDevice::RenderSpriteTree()
+{
+	m_treeEffect->SetDirLights(mDirLights);
+	m_treeEffect->SetEyePosW(mEyePosW);
+	m_treeEffect->SetFogColor(Colors::Silver);
+	m_treeEffect->SetFogStart(15.0f);
+	m_treeEffect->SetFogRange(175.0f);
+	m_treeEffect->SetViewProj(viewProj);
+	m_treeEffect->SetMaterial(mTreeMat);
+	m_treeEffect->SetTreeTextureMapArray(mTreeTextureMapArraySRV);
+
+	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	m_d3d11DeviceContext->IASetInputLayout(InputLayouts::TreePointSprite);
+	UINT stride = sizeof(Vertex::TreePointSprite);
+	UINT offset = 0;
+
+	ID3DX11EffectTechnique* treeTech = m_treeEffect->Light3TexAlphaClipTech;
+// 	switch(mRenderOptions)
+// 	{
+// 	case RenderOptions::Lighting:
+// 		treeTech = m_treeEffect->Light3Tech;
+// 		break;
+// 	case RenderOptions::Textures:
+// 		treeTech = m_treeEffect->Light3TexAlphaClipTech;
+// 		break;
+// 	case RenderOptions::TexturesAndFog:
+// 		treeTech = m_treeEffect->Light3TexAlphaClipFogTech;
+// 		break;
+// 	}
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	treeTech->GetDesc( &techDesc );
+	for(UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		md3dImmediateContext->IASetVertexBuffers(0, 1, &mTreeSpritesVB, &stride, &offset);
+
+		float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+		if(mAlphaToCoverageOn)
+		{
+			md3dImmediateContext->OMSetBlendState(RenderStates::AlphaToCoverageBS, blendFactor, 0xffffffff);
+		}
+		treeTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
+		md3dImmediateContext->Draw(TreeCount, 0);
+
+		md3dImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
+	}
 }
 
 

@@ -3,7 +3,7 @@
 #include <D3DX11.h>
 #include <xnamath.h>
 #include <inc/d3dx11effect.h>
-
+#include "Effects.h"
 
 class D3D11RenderDevice :
 	public IRenderDevice
@@ -45,7 +45,11 @@ public:
 
 	bool ShaderParse();
 
-	bool Op();
+	bool Render();
+
+	bool RenderCube();
+
+	bool RenderSpriteTree();
 
 	bool BuildTreeSpritesBuffer();
 
@@ -79,5 +83,6 @@ public:
 	ID3D11Buffer*			m_indicesBuff;
 	static const UINT TreeCount;
 	ID3D11Buffer*			m_TreeSpritesVB;
+	TreeSpriteEffect*		m_treeEffect;
 };
 

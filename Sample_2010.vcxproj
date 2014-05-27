@@ -384,6 +384,7 @@
     <ClCompile Include="BirdMesh.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="D3D11RenderDevice.cpp" />
+    <ClCompile Include="Effects.cpp" />
     <ClCompile Include="Eye.cpp" />
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="FaceController.cpp" />
@@ -391,6 +392,7 @@
     <ClCompile Include="Flock.cpp" />
     <ClCompile Include="InverseKinematics.cpp" />
     <ClCompile Include="IRenderDevice.cpp" />
+    <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Morph.cpp" />
     <ClCompile Include="OBB.cpp" />
@@ -406,6 +408,7 @@
     <ClInclude Include="BirdMesh.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="D3D11RenderDevice.h" />
+    <ClInclude Include="Effects.h" />
     <ClInclude Include="Eye.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="FaceController.h" />
@@ -413,6 +416,7 @@
     <ClInclude Include="Flock.h" />
     <ClInclude Include="InverseKinematics.h" />
     <ClInclude Include="IRenderDevice.h" />
+    <ClInclude Include="LightHelper.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Morph.h" />
     <ClInclude Include="OBB.h" />

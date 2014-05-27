@@ -799,7 +799,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 	D3DXMATRIXA16 mView;
 	D3DXMATRIXA16 mProj;
 
-	D3D11RenderDevice::Instance().Op();
+	D3D11RenderDevice::Instance().Render();
 
 //     // Clear the render target and the zbuffer 
 //     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DXCOLOR( 0.0f, 0.25f, 0.25f, 0.55f ), 1.0f, 0 ) );
