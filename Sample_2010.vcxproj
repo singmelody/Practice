@@ -456,6 +456,7 @@
     <ClCompile Include="DXUT\Optional\SDKmisc.cpp" />
     <None Include="LightHelper.fx" />
     <None Include="TreeSprite.fx" />
+    <None Include="VecAdd.fx" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />

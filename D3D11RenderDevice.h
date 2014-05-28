@@ -55,7 +55,11 @@ public:
 
 	bool BuildCubeBuffer();
 
+	bool BuildBuffersAndViews();
+
 	bool BuildLight();
+
+	void DoComputeWork();
 
 	D3D11RenderDevice(void);
 	virtual ~D3D11RenderDevice(void);
@@ -77,8 +81,10 @@ public:
 	//--------- temp
 	ID3DX11Effect*			m_fx;
 	ID3DX11Effect*			m_gsFx;
+	ID3DX11Effect*			m_csFx;
 	ID3DX11EffectTechnique* m_tech;
 	ID3DX11EffectTechnique* m_gsTech;
+	ID3DX11EffectTechnique* m_csTech;
 	ID3DX11EffectMatrixVariable* m_fxWorldViewProj;
 	ID3D11InputLayout*		m_vertexDesc;
 	ID3D11Buffer*			m_vertexBuff;
@@ -86,6 +92,7 @@ public:
 	static const UINT TreeCount;
 	ID3D11Buffer*			m_TreeSpritesVB;
 	TreeSpriteEffect*		m_treeEffect;
+	VecAddEffect*			m_vecAddEffect;
 	DirectionalLight		m_DirLights[3];
 	Material				m_TreeMat;
 	XMFLOAT3				m_EyePosW;
@@ -94,5 +101,14 @@ public:
 
 	XMMATRIX				m_View;
 	XMMATRIX				m_Proj; 
+
+	ID3D11ShaderResourceView* m_InputASRV;
+	ID3D11ShaderResourceView* m_InputBSRV;
+	ID3D11UnorderedAccessView* m_OutputUAV;
+
+	ID3D11Buffer* m_OutputBuffer;
+	ID3D11Buffer* m_OutputDebugBuffer;
+
+	UINT		  m_NumElements;
 };
 

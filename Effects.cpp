@@ -57,3 +57,24 @@ void Effects::DestroyAll()
 // 	SafeDelete(TreeSpriteFX);
 }
 #pragma endregion
+
+#pragma region VecAddEffect
+
+
+VecAddEffect::VecAddEffect(ID3DX11Effect* mf) 	
+	: Effect(mf)
+{
+	VecAddTech  = mFX->GetTechniqueByName("VecAdd");
+
+	InputA = mFX->GetVariableByName("gInputA")->AsShaderResource();
+	InputB = mFX->GetVariableByName("gInputB")->AsShaderResource();
+	Output = mFX->GetVariableByName("gOutput")->AsUnorderedAccessView();
+}
+
+VecAddEffect::~VecAddEffect()
+{
+
+}
+
+
+#pragma endregion

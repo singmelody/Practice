@@ -12,6 +12,7 @@
 #include <Inc/d3dx11effect.h>
 #include <xnamath.h>
 #include "LightHelper.h"
+#include <string>
 
 #pragma region Effect
 class Effect
@@ -58,6 +59,25 @@ public:
 	ID3DX11EffectVariable* Mat;
 
 	ID3DX11EffectShaderResourceVariable* TreeTextureMapArray;
+};
+#pragma endregion
+
+#pragma region VecAddEffect
+class VecAddEffect : public Effect
+{
+public:
+	VecAddEffect(ID3DX11Effect* mf);
+	~VecAddEffect();
+
+	void SetInputA(ID3D11ShaderResourceView* srv)  { InputA->SetResource(srv); }
+	void SetInputB(ID3D11ShaderResourceView* srv)  { InputB->SetResource(srv); }
+	void SetOutput(ID3D11UnorderedAccessView* uav) { Output->SetUnorderedAccessView(uav); }
+
+	ID3DX11EffectTechnique* VecAddTech;
+
+	ID3DX11EffectShaderResourceVariable* InputA;
+	ID3DX11EffectShaderResourceVariable* InputB;
+	ID3DX11EffectUnorderedAccessViewVariable* Output;
 };
 #pragma endregion
 

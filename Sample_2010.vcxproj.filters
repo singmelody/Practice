@@ -111,6 +111,9 @@
     <None Include="LightHelper.fx">
       <Filter>FX</Filter>
     </None>
+    <None Include="VecAdd.fx">
+      <Filter>FX</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />

@@ -4,6 +4,13 @@
 #include "Vertex.h"
 #include "MathHelper.h"
 #include "RenderStates.h"
+#include <fstream>
+
+struct Data
+{
+	XMFLOAT3 v1;
+	XMFLOAT2 v2;
+};
 
 const UINT D3D11RenderDevice::TreeCount = 16;
 
@@ -17,10 +24,17 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_depthStencilView(NULL),
 	m_fx(NULL),
 	m_gsFx(NULL),
+	m_csFx(NULL),
 	m_TreeSpritesVB(NULL),
 	m_treeEffect(NULL),
 	m_AlphaToCoverageOn(true),
-	m_TreeTextureMapArraySRV(NULL)
+	m_TreeTextureMapArraySRV(NULL),
+	m_InputASRV(NULL), 
+	m_InputBSRV(NULL), 
+	m_OutputUAV(NULL),
+	m_OutputBuffer(NULL),
+	m_OutputDebugBuffer(NULL),
+	m_NumElements(32)
 {
 }
 
@@ -43,9 +57,16 @@ void D3D11RenderDevice::Release()
 	SAFE_RELEASE(m_d3d11DeviceContext);
 	SAFE_RELEASE(m_fx);
 	SAFE_RELEASE(m_gsFx);
+	SAFE_RELEASE(m_csFx)
 	SAFE_RELEASE(m_TreeSpritesVB);
 	SAFE_RELEASE(m_TreeTextureMapArraySRV);
 	SAFE_DELETE(m_treeEffect);
+	SAFE_DELETE(m_vecAddEffect);
+	SAFE_RELEASE(m_InputASRV);
+	SAFE_RELEASE(m_InputBSRV);
+	SAFE_RELEASE(m_OutputUAV);
+	SAFE_RELEASE(m_OutputBuffer);
+	SAFE_RELEASE(m_OutputDebugBuffer);
 	
 	RenderStates::DestroyAll();
 	InputLayouts::DestroyAll();
@@ -296,6 +317,12 @@ bool D3D11RenderDevice::ShaderParse()
 	m_gsTech = m_gsFx->GetTechniqueByName("Light3TexAlphaClipFog");
 	m_treeEffect = new TreeSpriteEffect(m_gsFx);
 
+	result = LoadShader("VecAdd.fx", m_csFx);
+	if(!result)
+		return false;
+
+	m_csTech = m_csFx->GetTechniqueByName("VecAdd");
+	m_vecAddEffect = new VecAddEffect(m_csFx);
 
 	m_fxWorldViewProj = m_fx->GetVariableByName("gWorldViewProj")->AsMatrix();
 
@@ -341,6 +368,10 @@ bool D3D11RenderDevice::CreateGBuffer()
 
 	BuildLight();
 
+	BuildBuffersAndViews();
+
+	DoComputeWork();
+
 	return true;
 }
 
@@ -350,12 +381,8 @@ bool D3D11RenderDevice::BuildTreeSpritesBuffer()
 
 	for(UINT i = 0; i < TreeCount; ++i)
 	{
-// 		float x = MathHelper::RandF(-35.0f, 35.0f);
-// 		float z = MathHelper::RandF(-35.0f, 35.0f);
-// 		float y = MathHelper::RandF(5.0f, 20.0f); //GetHillHeight(x,z);
-
-		float x = 20.0f;//MathHelper::RandF(-35.0f, 35.0f);
-		float z = 20.0f;//MathHelper::RandF(-35.0f, 35.0f);
+		float x = MathHelper::RandF(-35.0f, 35.0f);
+		float z = MathHelper::RandF(-35.0f, 35.0f);
 		float y = 10.0f;//GetHillHeight(x,z);
 
 		// Move tree slightly above land height.
@@ -552,6 +579,132 @@ bool D3D11RenderDevice::BuildLight()
 	m_TreeMat.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_TreeMat.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_TreeMat.Specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
+
+	return true;
+}
+
+void D3D11RenderDevice::DoComputeWork()
+{
+	D3DX11_TECHNIQUE_DESC techDesc;
+
+	m_vecAddEffect->SetInputA(m_InputASRV);
+	m_vecAddEffect->SetInputB(m_InputBSRV);
+	m_vecAddEffect->SetOutput(m_OutputUAV);
+
+	m_csTech->GetDesc(&techDesc);
+	for(UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		ID3DX11EffectPass* pass = m_csTech->GetPassByIndex(p);
+		pass->Apply(0, m_d3d11DeviceContext);
+
+		m_d3d11DeviceContext->Dispatch(1, 1, 1);
+	}
+
+	// Unbind the input textures from the CS for good housekeeping.
+	ID3D11ShaderResourceView* nullSRV[1] = { 0 };
+	m_d3d11DeviceContext->CSSetShaderResources( 0, 1, nullSRV );
+
+	// Unbind output from compute shader (we are going to use this output as an input in the next pass, 
+	// and a resource cannot be both an output and input at the same time.
+	ID3D11UnorderedAccessView* nullUAV[1] = { 0 };
+	m_d3d11DeviceContext->CSSetUnorderedAccessViews( 0, 1, nullUAV, 0 );
+
+	// Disable compute shader.
+	m_d3d11DeviceContext->CSSetShader(0, 0, 0);
+
+	std::ofstream fout("results.txt");
+	// Copy the output buffer to system memory.
+	m_d3d11DeviceContext->CopyResource(m_OutputDebugBuffer, m_OutputBuffer);
+
+	D3D11_MAPPED_SUBRESOURCE mappedData; 
+	m_d3d11DeviceContext->Map(m_OutputDebugBuffer, 0, D3D11_MAP_READ, 0, &mappedData);
+
+	Data* dataView = reinterpret_cast<Data*>(mappedData.pData);
+
+	for(int i = 0; i < m_NumElements; ++i)
+	{
+		fout << "(" << dataView[i].v1.x << ", " << dataView[i].v1.y << ", " << dataView[i].v1.z <<
+			", " << dataView[i].v2.x << ", " << dataView[i].v2.y << ")" << std::endl;
+	}
+
+	m_d3d11DeviceContext->Unmap(m_OutputDebugBuffer, 0);
+
+	fout.close();
+}
+
+bool D3D11RenderDevice::BuildBuffersAndViews()
+{
+	std::vector<Data> dataA(m_NumElements);
+	std::vector<Data> dataB(m_NumElements);
+	for(int i = 0; i < m_NumElements; ++i)
+	{
+		dataA[i].v1 = XMFLOAT3(i, i, i);
+		dataA[i].v2 = XMFLOAT2(i, 0);
+
+		dataB[i].v1 = XMFLOAT3(-i, i, 0.0f);
+		dataB[i].v2 = XMFLOAT2(0, -i);
+	}
+
+	// Create a buffer to be bound as a shader input (D3D11_BIND_SHADER_RESOURCE).
+	D3D11_BUFFER_DESC inputDesc;
+	inputDesc.Usage = D3D11_USAGE_DEFAULT;
+	inputDesc.ByteWidth = sizeof(Data) * m_NumElements;
+	inputDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	inputDesc.CPUAccessFlags = 0;
+	inputDesc.StructureByteStride = sizeof(Data);
+	inputDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+
+	D3D11_SUBRESOURCE_DATA vinitDataA;
+	vinitDataA.pSysMem = &dataA[0];
+
+	ID3D11Buffer* bufferA = 0;
+	HR(m_d3d11Device->CreateBuffer(&inputDesc, &vinitDataA, &bufferA));
+
+	D3D11_SUBRESOURCE_DATA vinitDataB;
+	vinitDataB.pSysMem = &dataB[0];
+
+	ID3D11Buffer* bufferB = 0;
+	HR(m_d3d11Device->CreateBuffer(&inputDesc, &vinitDataB, &bufferB));
+
+	// Create a read-write buffer the compute shader can write to (D3D11_BIND_UNORDERED_ACCESS).
+	D3D11_BUFFER_DESC outputDesc;
+	outputDesc.Usage = D3D11_USAGE_DEFAULT;
+	outputDesc.ByteWidth = sizeof(Data) * m_NumElements;
+	outputDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+	outputDesc.CPUAccessFlags = 0;
+	outputDesc.StructureByteStride = sizeof(Data);
+	outputDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	HR(m_d3d11Device->CreateBuffer(&outputDesc, 0, &m_OutputBuffer));
+	
+	// Create a system memory version of the buffer to read the results back from.
+	outputDesc.Usage = D3D11_USAGE_STAGING;
+	outputDesc.BindFlags = 0;
+	outputDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	HR(m_d3d11Device->CreateBuffer(&outputDesc, 0, &m_OutputDebugBuffer));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+	srvDesc.BufferEx.FirstElement = 0;
+	srvDesc.BufferEx.Flags = 0;
+	srvDesc.BufferEx.NumElements = m_NumElements;
+
+	m_d3d11Device->CreateShaderResourceView(bufferA, &srvDesc, &m_InputASRV);
+	m_d3d11Device->CreateShaderResourceView(bufferB, &srvDesc, &m_InputBSRV);
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.Flags = 0;
+	uavDesc.Buffer.NumElements = m_NumElements;
+
+	m_d3d11Device->CreateUnorderedAccessView(m_OutputBuffer, &uavDesc, &m_OutputUAV);
+
+	// Views hold references to buffers, so we can release these.
+	SAFE_RELEASE(bufferA);
+	SAFE_RELEASE(bufferB);
+
 
 	return true;
 }
