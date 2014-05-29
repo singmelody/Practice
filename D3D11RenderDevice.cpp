@@ -167,6 +167,7 @@ bool D3D11RenderDevice::CheckCaps()
 
 bool D3D11RenderDevice::CreateSwapChain()
 {
+	bool mEnable4xMsaa = false;
 	HRESULT hr;
 
 	IDXGIDevice* dxgiDevice = NULL;
@@ -186,8 +187,16 @@ bool D3D11RenderDevice::CreateSwapChain()
 	desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	desc.SampleDesc.Count = 4;	// todo msaa check
-	desc.SampleDesc.Quality = m_m4xMsaaQuality - 1;
+	if( mEnable4xMsaa )
+	{
+		desc.SampleDesc.Count = 4;	// todo msaa check
+		desc.SampleDesc.Quality = m_m4xMsaaQuality - 1;
+	}
+	else
+	{
+		desc.SampleDesc.Count = 1;	// todo msaa check
+		desc.SampleDesc.Quality = 0;
+	}
 	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	desc.BufferCount = 1;
 	desc.OutputWindow = DXUTGetHWND();
@@ -228,14 +237,25 @@ bool D3D11RenderDevice::CreateRenderTargetView()
 
 bool D3D11RenderDevice::CreateDepthStencilBuffer()
 {
+	bool mEnable4xMsaa = false;
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width = 640;
 	desc.Height= 480;
 	desc.MipLevels = 1;
 	desc.ArraySize = 1;
 	desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	desc.SampleDesc.Count = 4;
-	desc.SampleDesc.Quality = m_m4xMsaaQuality - 1;
+
+	if( mEnable4xMsaa )
+	{
+		desc.SampleDesc.Count = 4;
+		desc.SampleDesc.Quality = m_m4xMsaaQuality - 1;
+	}
+	else
+	{
+		desc.SampleDesc.Count   = 1;
+		desc.SampleDesc.Quality = 0;	
+	}
+
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	desc.CPUAccessFlags = 0;
@@ -305,7 +325,7 @@ bool D3D11RenderDevice::Render()
 	//--------------------------- Blur Up -------------------------------
 
 	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
-	m_d3d11DeviceContext->ClearRenderTargetView( m_OffscreenRTV, ClearColor);
+	m_d3d11DeviceContext->ClearRenderTargetView( m_OffscreenRTV, reinterpret_cast<const float*>(&Colors::Silver));
 	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	XMFLOAT4X4 mWorld;
@@ -335,9 +355,6 @@ bool D3D11RenderDevice::Render()
 
 	RenderCube();
 
-	// Restore default blend state
-	float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
-	m_d3d11DeviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
 	//------------------------------------Blur Below---------------------------------
 	//
 	// Restore the back buffer.  The offscreen render target will serve as an input into

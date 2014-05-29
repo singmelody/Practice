@@ -1,3 +1,9 @@
+//=============================================================================
+// Blur.fx by Frank Luna (C) 2011 All Rights Reserved.
+//
+// Performs a separable blur with a blur radius of 5.  
+//=============================================================================
+
 cbuffer cbSettings
 {
 	float gWeights[11] = 
@@ -15,25 +21,27 @@ Texture2D gInput;
 RWTexture2D<float4> gOutput;
 
 #define N 256
-#define CacheSize ( N + 2* gBlurRadius)
-
+#define CacheSize (N + 2*gBlurRadius)
 groupshared float4 gCache[CacheSize];
 
-[numthreads(N,1,1)]
-void HorzBlurCS(int3 groupThreadID: SV_GroupThreadID,
+[numthreads(N, 1, 1)]
+void HorzBlurCS(int3 groupThreadID : SV_GroupThreadID,
 				int3 dispatchThreadID : SV_DispatchThreadID)
 {
+	//
 	// Fill local thread storage to reduce bandwidth.  To blur 
 	// N pixels, we will need to load N + 2*BlurRadius pixels
 	// due to the blur radius.
-
+	//
+	
+	// This thread group runs N threads.  To get the extra 2*BlurRadius pixels, 
+	// have 2*BlurRadius threads sample an extra pixel.
 	if(groupThreadID.x < gBlurRadius)
 	{
 		// Clamp out of bound samples that occur at image borders.
 		int x = max(dispatchThreadID.x - gBlurRadius, 0);
 		gCache[groupThreadID.x] = gInput[int2(x, dispatchThreadID.y)];
 	}
-	
 	if(groupThreadID.x >= N-gBlurRadius)
 	{
 		// Clamp out of bound samples that occur at image borders.
@@ -41,14 +49,13 @@ void HorzBlurCS(int3 groupThreadID: SV_GroupThreadID,
 		gCache[groupThreadID.x+2*gBlurRadius] = gInput[int2(x, dispatchThreadID.y)];
 	}
 
-		// Clamp out of bound samples that occur at image borders.
+	// Clamp out of bound samples that occur at image borders.
 	gCache[groupThreadID.x+gBlurRadius] = gInput[min(dispatchThreadID.xy, gInput.Length.xy-1)];
-
 
 	// Wait for all threads to finish.
 	GroupMemoryBarrierWithGroupSync();
-
-		//
+	
+	//
 	// Now blur each pixel.
 	//
 
