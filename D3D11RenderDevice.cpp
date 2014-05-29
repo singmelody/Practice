@@ -5,12 +5,31 @@
 #include "MathHelper.h"
 #include "RenderStates.h"
 #include <fstream>
+#include "GeometryGenerator.h"
 
 struct Data
 {
 	XMFLOAT3 v1;
 	XMFLOAT2 v2;
 };
+
+
+namespace Colors
+{
+	XMGLOBALCONST XMVECTORF32 White     = {1.0f, 1.0f, 1.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Black     = {0.0f, 0.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Red       = {1.0f, 0.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Green     = {0.0f, 1.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Blue      = {0.0f, 0.0f, 1.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Yellow    = {1.0f, 1.0f, 0.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Cyan      = {0.0f, 1.0f, 1.0f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 Magenta   = {1.0f, 0.0f, 1.0f, 1.0f};
+
+	XMGLOBALCONST XMVECTORF32 Silver    = {0.75f, 0.75f, 0.75f, 1.0f};
+	XMGLOBALCONST XMVECTORF32 LightSteelBlue = {0.69f, 0.77f, 0.87f, 1.0f};
+}
+
+
 
 const UINT D3D11RenderDevice::TreeCount = 16;
 
@@ -316,6 +335,9 @@ bool D3D11RenderDevice::Render()
 
 	RenderCube();
 
+	// Restore default blend state
+	float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
+	m_d3d11DeviceContext->OMSetBlendState(0, blendFactor, 0xffffffff);
 	//------------------------------------Blur Below---------------------------------
 	//
 	// Restore the back buffer.  The offscreen render target will serve as an input into
@@ -325,7 +347,14 @@ bool D3D11RenderDevice::Render()
 	renderTargets[0] = m_renderTargetView;
 	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
 
-	m_d3d11DeviceContext->ClearRenderTargetView( m_OffscreenRTV, ClearColor);
+	//m_blurFilter->SetGaussianWeights(4.0f);
+	m_blurFilter->BlurInPlace( m_d3d11DeviceContext, m_OffscreenSRV, m_OffscreenUAV, 4);
+
+	//
+	// Draw fullscreen quad with texture of blurred scene on it.
+	//
+
+	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
 	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	RenderScreen();
@@ -396,22 +425,6 @@ D3D11RenderDevice& D3D11RenderDevice::Instance()
 	return m_Instance;
 }
 
-namespace Colors
-{
-	XMGLOBALCONST XMVECTORF32 White     = {1.0f, 1.0f, 1.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Black     = {0.0f, 0.0f, 0.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Red       = {1.0f, 0.0f, 0.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Green     = {0.0f, 1.0f, 0.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Blue      = {0.0f, 0.0f, 1.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Yellow    = {1.0f, 1.0f, 0.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Cyan      = {0.0f, 1.0f, 1.0f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 Magenta   = {1.0f, 0.0f, 1.0f, 1.0f};
-
-	XMGLOBALCONST XMVECTORF32 Silver    = {0.75f, 0.75f, 0.75f, 1.0f};
-	XMGLOBALCONST XMVECTORF32 LightSteelBlue = {0.69f, 0.77f, 0.87f, 1.0f};
-}
-
-
 bool D3D11RenderDevice::CreateGBuffer()
 {
 	BuildCubeBuffer();
@@ -425,6 +438,8 @@ bool D3D11RenderDevice::CreateGBuffer()
 	DoComputeWork();
 
 	BuildOffscreenViews();
+
+	BuildScreenGeometryBuffers();
 
 	return true;
 }
@@ -861,7 +876,7 @@ bool D3D11RenderDevice::BuildScreenGeometryBuffers()
 	vbd.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.pSysMem = &vertices[0];
-	HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mScreenQuadVB));
+	HR(m_d3d11Device->CreateBuffer(&vbd, &vinitData, &m_ScreenQuadVB));
 
 	//
 	// Pack the indices of all the meshes into one index buffer.
@@ -875,7 +890,9 @@ bool D3D11RenderDevice::BuildScreenGeometryBuffers()
 	ibd.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = &quad.Indices[0];
-	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mScreenQuadIB));
+	HR(m_d3d11Device->CreateBuffer(&ibd, &iinitData, &m_ScreenQuadIB));
+
+	return true;
 }
 
 
