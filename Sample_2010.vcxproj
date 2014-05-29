@@ -382,6 +382,7 @@
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="Bird.cpp" />
     <ClCompile Include="BirdMesh.cpp" />
+    <ClCompile Include="BlurFilter.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="D3D11RenderDevice.cpp" />
     <ClCompile Include="Effects.cpp" />
@@ -390,6 +391,7 @@
     <ClCompile Include="FaceController.cpp" />
     <ClCompile Include="FaceFacory.cpp" />
     <ClCompile Include="Flock.cpp" />
+    <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="InverseKinematics.cpp" />
     <ClCompile Include="IRenderDevice.cpp" />
     <ClCompile Include="LightHelper.cpp" />
@@ -407,6 +409,7 @@
     <ClInclude Include="animation.h" />
     <ClInclude Include="Bird.h" />
     <ClInclude Include="BirdMesh.h" />
+    <ClInclude Include="BlurFilter.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="D3D11RenderDevice.h" />
     <ClInclude Include="Effects.h" />
@@ -415,6 +418,7 @@
     <ClInclude Include="FaceController.h" />
     <ClInclude Include="FaceFacory.h" />
     <ClInclude Include="Flock.h" />
+    <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="InverseKinematics.h" />
     <ClInclude Include="IRenderDevice.h" />
     <ClInclude Include="LightHelper.h" />
@@ -433,6 +437,8 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">fxc compile for debug: %(FullPath)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Directory)%(Filename).fxo</Outputs>
     </CustomBuild>
+    <None Include="Basic.fx" />
+    <None Include="Blur.fx" />
     <None Include="DXUT\Optional\directx.ico" />
     <ClInclude Include="DXUT\Core\DXUT.h" />
     <ClInclude Include="DXUT\Core\DXUTenum.h" />

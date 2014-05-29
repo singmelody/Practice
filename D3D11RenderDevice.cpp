@@ -34,7 +34,16 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_OutputUAV(NULL),
 	m_OutputBuffer(NULL),
 	m_OutputDebugBuffer(NULL),
-	m_NumElements(32)
+	m_NumElements(32),
+	m_blurFilter(NULL),
+	m_blurFx(NULL),
+	m_OffscreenSRV(NULL),
+	m_OffscreenUAV(NULL),
+	m_OffscreenRTV(NULL),
+	m_basicEffect(NULL),
+	m_basicFx(NULL),
+	m_ScreenQuadVB(NULL),
+	m_ScreenQuadIB(NULL)
 {
 }
 
@@ -67,7 +76,16 @@ void D3D11RenderDevice::Release()
 	SAFE_RELEASE(m_OutputUAV);
 	SAFE_RELEASE(m_OutputBuffer);
 	SAFE_RELEASE(m_OutputDebugBuffer);
-	
+	SAFE_DELETE(m_blurFilter);
+	SAFE_RELEASE(m_blurFx);
+	SAFE_RELEASE(m_OffscreenRTV);
+	SAFE_RELEASE(m_OffscreenSRV);
+	SAFE_RELEASE(m_OffscreenUAV);
+	SAFE_RELEASE(m_basicFx);
+	SAFE_DELETE(m_basicEffect);
+	SAFE_RELEASE(m_ScreenQuadIB);
+	SAFE_RELEASE(m_ScreenQuadVB);
+
 	RenderStates::DestroyAll();
 	InputLayouts::DestroyAll();
 	Effects::DestroyAll();
@@ -260,8 +278,15 @@ bool D3D11RenderDevice::CreateVertexDecl()
 
 bool D3D11RenderDevice::Render()
 {
+	// Render to our offscreen texture.  Note that we can use the same depth/stencil buffer
+	// we normally use since our offscreen texture matches the dimensions.  
+	ID3D11RenderTargetView* renderTargets[1] = {m_OffscreenRTV};
+	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
+
+	//--------------------------- Blur Up -------------------------------
+
 	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
-	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
+	m_d3d11DeviceContext->ClearRenderTargetView( m_OffscreenRTV, ClearColor);
 	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	XMFLOAT4X4 mWorld;
@@ -291,6 +316,19 @@ bool D3D11RenderDevice::Render()
 
 	RenderCube();
 
+	//------------------------------------Blur Below---------------------------------
+	//
+	// Restore the back buffer.  The offscreen render target will serve as an input into
+	// the compute shader for blurring, so we must unbind it from the OM stage before we
+	// can use it as an input into the compute shader.
+	//
+	renderTargets[0] = m_renderTargetView;
+	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
+
+	m_d3d11DeviceContext->ClearRenderTargetView( m_OffscreenRTV, ClearColor);
+	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	RenderScreen();
 
 	HRESULT hr = m_swapChain->Present( 0, 0);
 	if(FAILED(hr))
@@ -317,12 +355,26 @@ bool D3D11RenderDevice::ShaderParse()
 	m_gsTech = m_gsFx->GetTechniqueByName("Light3TexAlphaClipFog");
 	m_treeEffect = new TreeSpriteEffect(m_gsFx);
 
+	result = LoadShader("Basic.fx", m_basicFx);
+	if(!result)
+		return false;
+
+	m_basicEffect = new BasicEffect(m_basicFx);
+
+
 	result = LoadShader("VecAdd.fx", m_csFx);
 	if(!result)
 		return false;
 
 	m_csTech = m_csFx->GetTechniqueByName("VecAdd");
 	m_vecAddEffect = new VecAddEffect(m_csFx);
+
+	result = LoadShader("Blur.fx", m_blurFx);
+	if(!result)
+		return false;
+
+	m_blurFilter = new BlurFilter();
+	m_blurFilter->Init(m_d3d11Device, 640, 480, DXGI_FORMAT_R8G8B8A8_UNORM, m_blurFx);
 
 	m_fxWorldViewProj = m_fx->GetVariableByName("gWorldViewProj")->AsMatrix();
 
@@ -371,6 +423,8 @@ bool D3D11RenderDevice::CreateGBuffer()
 	BuildBuffersAndViews();
 
 	DoComputeWork();
+
+	BuildOffscreenViews();
 
 	return true;
 }
@@ -707,6 +761,121 @@ bool D3D11RenderDevice::BuildBuffersAndViews()
 
 
 	return true;
+}
+
+bool D3D11RenderDevice::RenderScreen()
+{
+	m_d3d11DeviceContext->IASetInputLayout(InputLayouts::Basic32);
+	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	UINT stride = sizeof(Vertex::Basic32);
+	UINT offset = 0;
+
+	XMMATRIX identity = XMMatrixIdentity();
+
+	ID3DX11EffectTechnique* texOnlyTech = m_basicEffect->Light0TexTech;
+	D3DX11_TECHNIQUE_DESC techDesc;
+
+	texOnlyTech->GetDesc( &techDesc );
+	for(UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		m_d3d11DeviceContext->IASetVertexBuffers(0, 1, &m_ScreenQuadVB, &stride, &offset);
+		m_d3d11DeviceContext->IASetIndexBuffer(m_ScreenQuadIB, DXGI_FORMAT_R32_UINT, 0);
+
+		m_basicEffect->SetWorld(identity);
+		m_basicEffect->SetWorldInvTranspose(identity);
+		m_basicEffect->SetWorldViewProj(identity);
+		m_basicEffect->SetTexTransform(identity);
+		m_basicEffect->SetDiffuseMap(m_blurFilter->GetBlurredOutput());
+
+		texOnlyTech->GetPassByIndex(p)->Apply(0, m_d3d11DeviceContext);
+		m_d3d11DeviceContext->DrawIndexed(6, 0, 0);
+	}
+
+	return true;
+}
+
+bool D3D11RenderDevice::BuildOffscreenViews()
+{
+	// We call this function everytime the window is resized so that the render target is a quarter
+	// the client area dimensions.  So Release the previous views before we create new ones.
+	SAFE_RELEASE(m_OffscreenSRV);
+	SAFE_RELEASE(m_OffscreenRTV);
+	SAFE_RELEASE(m_OffscreenUAV);
+
+	D3D11_TEXTURE2D_DESC texDesc;
+
+	texDesc.Width     = 640;
+	texDesc.Height    = 480;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format    = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texDesc.SampleDesc.Count   = 1;  
+	texDesc.SampleDesc.Quality = 0;  
+	texDesc.Usage          = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags      = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	texDesc.CPUAccessFlags = 0; 
+	texDesc.MiscFlags      = 0;
+
+	ID3D11Texture2D* offscreenTex = 0;
+	HR(m_d3d11Device->CreateTexture2D(&texDesc, 0, &offscreenTex));
+
+	// Null description means to create a view to all mipmap levels using 
+	// the format the texture was created with.
+	HR(m_d3d11Device->CreateShaderResourceView(offscreenTex, 0, &m_OffscreenSRV));
+	HR(m_d3d11Device->CreateRenderTargetView(offscreenTex, 0, &m_OffscreenRTV));
+	HR(m_d3d11Device->CreateUnorderedAccessView(offscreenTex, 0, &m_OffscreenUAV));
+
+	// View saves a reference to the texture so we can release our reference.
+	SAFE_RELEASE(offscreenTex);
+
+	return true;
+}
+
+bool D3D11RenderDevice::BuildScreenGeometryBuffers()
+{
+	GeometryGenerator::MeshData quad;
+
+	GeometryGenerator geoGen;
+	geoGen.CreateFullscreenQuad(quad);
+
+	//
+	// Extract the vertex elements we are interested in and pack the
+	// vertices of all the meshes into one vertex buffer.
+	//
+
+	std::vector<Vertex::Basic32> vertices(quad.Vertices.size());
+
+	for(UINT i = 0; i < quad.Vertices.size(); ++i)
+	{
+		vertices[i].Pos    = quad.Vertices[i].Position;
+		vertices[i].Normal = quad.Vertices[i].Normal;
+		vertices[i].Tex    = quad.Vertices[i].TexC;
+	}
+
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(Vertex::Basic32) * quad.Vertices.size();
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = &vertices[0];
+	HR(md3dDevice->CreateBuffer(&vbd, &vinitData, &mScreenQuadVB));
+
+	//
+	// Pack the indices of all the meshes into one index buffer.
+	//
+
+	D3D11_BUFFER_DESC ibd;
+	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+	ibd.ByteWidth = sizeof(UINT) * quad.Indices.size();
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA iinitData;
+	iinitData.pSysMem = &quad.Indices[0];
+	HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mScreenQuadIB));
 }
 
 

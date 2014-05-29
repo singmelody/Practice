@@ -4,14 +4,12 @@
 #include <xnamath.h>
 #include <inc/d3dx11effect.h>
 #include "Effects.h"
+#include "BlurFilter.h"
 
 class D3D11RenderDevice :
 	public IRenderDevice
 {
 public:
-
-
-
 	void Release();
 
 	bool CreateDevice();
@@ -51,6 +49,8 @@ public:
 
 	bool RenderSpriteTree();
 
+	bool RenderScreen();
+
 	bool BuildTreeSpritesBuffer();
 
 	bool BuildCubeBuffer();
@@ -58,6 +58,10 @@ public:
 	bool BuildBuffersAndViews();
 
 	bool BuildLight();
+
+	bool BuildOffscreenViews();
+
+	bool BuildScreenGeometryBuffers();
 
 	void DoComputeWork();
 
@@ -80,19 +84,28 @@ public:
 
 	//--------- temp
 	ID3DX11Effect*			m_fx;
+	ID3DX11Effect*			m_basicFx;
 	ID3DX11Effect*			m_gsFx;
 	ID3DX11Effect*			m_csFx;
+	ID3DX11Effect*			m_blurFx;
+
 	ID3DX11EffectTechnique* m_tech;
 	ID3DX11EffectTechnique* m_gsTech;
 	ID3DX11EffectTechnique* m_csTech;
+
 	ID3DX11EffectMatrixVariable* m_fxWorldViewProj;
 	ID3D11InputLayout*		m_vertexDesc;
 	ID3D11Buffer*			m_vertexBuff;
 	ID3D11Buffer*			m_indicesBuff;
 	static const UINT TreeCount;
+
 	ID3D11Buffer*			m_TreeSpritesVB;
 	TreeSpriteEffect*		m_treeEffect;
 	VecAddEffect*			m_vecAddEffect;
+	BasicEffect*			m_basicEffect;
+	
+	BlurFilter*				m_blurFilter;
+
 	DirectionalLight		m_DirLights[3];
 	Material				m_TreeMat;
 	XMFLOAT3				m_EyePosW;
@@ -110,5 +123,12 @@ public:
 	ID3D11Buffer* m_OutputDebugBuffer;
 
 	UINT		  m_NumElements;
+
+	ID3D11ShaderResourceView* m_OffscreenSRV;
+	ID3D11UnorderedAccessView* m_OffscreenUAV;
+	ID3D11RenderTargetView* m_OffscreenRTV;
+
+	ID3D11Buffer* m_ScreenQuadVB;
+	ID3D11Buffer* m_ScreenQuadIB;
 };
 

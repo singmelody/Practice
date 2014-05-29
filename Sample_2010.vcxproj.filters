@@ -46,6 +46,9 @@
       <Extensions>
       </Extensions>
     </Filter>
+    <Filter Include="Filter">
+      <UniqueIdentifier>{a4b1e93a-e01e-4d9a-b99e-ad69a2fb6b95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -112,6 +115,12 @@
       <Filter>FX</Filter>
     </None>
     <None Include="VecAdd.fx">
+      <Filter>FX</Filter>
+    </None>
+    <None Include="Blur.fx">
+      <Filter>FX</Filter>
+    </None>
+    <None Include="Basic.fx">
       <Filter>FX</Filter>
     </None>
   </ItemGroup>
@@ -190,6 +199,12 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="RenderStates.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="BlurFilter.cpp">
+      <Filter>Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryGenerator.cpp">
       <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -272,6 +287,12 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="RenderStates.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurFilter.h">
+      <Filter>Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryGenerator.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
