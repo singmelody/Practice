@@ -88,6 +88,7 @@ public:
 	ID3DX11Effect*			m_gsFx;
 	ID3DX11Effect*			m_csFx;
 	ID3DX11Effect*			m_blurFx;
+	ID3DX11Effect*			m_tsFx;
 
 	ID3DX11EffectTechnique* m_tech;
 	ID3DX11EffectTechnique* m_gsTech;
@@ -103,6 +104,7 @@ public:
 	TreeSpriteEffect*		m_treeEffect;
 	VecAddEffect*			m_vecAddEffect;
 	BasicEffect*			m_basicEffect;
+	TessellationEffect*		m_tsEffect;
 	
 	BlurFilter*				m_blurFilter;
 

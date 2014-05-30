@@ -62,7 +62,9 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_basicEffect(NULL),
 	m_basicFx(NULL),
 	m_ScreenQuadVB(NULL),
-	m_ScreenQuadIB(NULL)
+	m_ScreenQuadIB(NULL),
+	m_tsFx(NULL),
+	m_tsEffect(NULL)
 {
 }
 
@@ -104,6 +106,8 @@ void D3D11RenderDevice::Release()
 	SAFE_DELETE(m_basicEffect);
 	SAFE_RELEASE(m_ScreenQuadIB);
 	SAFE_RELEASE(m_ScreenQuadVB);
+	SAFE_DELETE(m_treeEffect);
+	SAFE_RELEASE(m_tsFx);
 
 	RenderStates::DestroyAll();
 	InputLayouts::DestroyAll();
@@ -317,15 +321,15 @@ bool D3D11RenderDevice::CreateVertexDecl()
 
 bool D3D11RenderDevice::Render()
 {
-	// Render to our offscreen texture.  Note that we can use the same depth/stencil buffer
-	// we normally use since our offscreen texture matches the dimensions.  
-	ID3D11RenderTargetView* renderTargets[1] = {m_OffscreenRTV};
-	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
+// 	// Render to our offscreen texture.  Note that we can use the same depth/stencil buffer
+// 	// we normally use since our offscreen texture matches the dimensions.  
+// 	ID3D11RenderTargetView* renderTargets[1] = {m_OffscreenRTV};
+// 	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
 
 	//--------------------------- Blur Up -------------------------------
 
 	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red, green, blue, alpha
-	m_d3d11DeviceContext->ClearRenderTargetView( m_OffscreenRTV, reinterpret_cast<const float*>(&Colors::Silver));
+	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
 	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	XMFLOAT4X4 mWorld;
@@ -355,26 +359,26 @@ bool D3D11RenderDevice::Render()
 
 	RenderCube();
 
-	//------------------------------------Blur Below---------------------------------
-	//
-	// Restore the back buffer.  The offscreen render target will serve as an input into
-	// the compute shader for blurring, so we must unbind it from the OM stage before we
-	// can use it as an input into the compute shader.
-	//
-	renderTargets[0] = m_renderTargetView;
-	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
-
-	//m_blurFilter->SetGaussianWeights(4.0f);
-	m_blurFilter->BlurInPlace( m_d3d11DeviceContext, m_OffscreenSRV, m_OffscreenUAV, 4);
-
-	//
-	// Draw fullscreen quad with texture of blurred scene on it.
-	//
-
-	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
-	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	RenderScreen();
+// 	//------------------------------------Blur Below---------------------------------
+// 	//
+// 	// Restore the back buffer.  The offscreen render target will serve as an input into
+// 	// the compute shader for blurring, so we must unbind it from the OM stage before we
+// 	// can use it as an input into the compute shader.
+// 	//
+// 	renderTargets[0] = m_renderTargetView;
+// 	m_d3d11DeviceContext->OMSetRenderTargets(1, renderTargets, m_depthStencilView);
+// 
+// 	//m_blurFilter->SetGaussianWeights(4.0f);
+// 	m_blurFilter->BlurInPlace( m_d3d11DeviceContext, m_OffscreenSRV, m_OffscreenUAV, 4);
+// 
+// 	//
+// 	// Draw fullscreen quad with texture of blurred scene on it.
+// 	//
+// 
+// 	m_d3d11DeviceContext->ClearRenderTargetView( m_renderTargetView, ClearColor);
+// 	m_d3d11DeviceContext->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+// 
+// 	RenderScreen();
 
 	HRESULT hr = m_swapChain->Present( 0, 0);
 	if(FAILED(hr))
@@ -406,6 +410,12 @@ bool D3D11RenderDevice::ShaderParse()
 		return false;
 
 	m_basicEffect = new BasicEffect(m_basicFx);
+
+	result = LoadShader("Tessellation.fx", m_tsFx);
+	if(!result)
+		return false;
+
+	m_tsEffect = new TessellationEffect(m_tsFx);
 
 
 	result = LoadShader("VecAdd.fx", m_csFx);
