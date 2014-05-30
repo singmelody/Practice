@@ -146,3 +146,26 @@ BasicEffect::~BasicEffect()
 {
 }
 #pragma endregion
+
+#pragma region TessellationEffect
+TessellationEffect::TessellationEffect(ID3DX11Effect* mf) : Effect(mf)
+{
+	TessTech = mFX->GetTechniqueByName("Tess");
+
+	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	TexTransform      = mFX->GetVariableByName("gTexTransform")->AsMatrix();
+	EyePosW           = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor          = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart          = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights         = mFX->GetVariableByName("gDirLights");
+	Mat               = mFX->GetVariableByName("gMaterial");
+	DiffuseMap        = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
+}
+
+TessellationEffect::~TessellationEffect()
+{
+}
+#pragma endregion

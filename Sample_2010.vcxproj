@@ -461,6 +461,7 @@
     <ClCompile Include="DXUT\Optional\SDKmesh.cpp" />
     <ClCompile Include="DXUT\Optional\SDKmisc.cpp" />
     <None Include="LightHelper.fx" />
+    <None Include="Tessellation.fx" />
     <None Include="TreeSprite.fx" />
     <None Include="VecAdd.fx" />
   </ItemGroup>
