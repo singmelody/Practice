@@ -51,6 +51,8 @@ public:
 
 	bool RenderScreen();
 
+	bool RenderTessellation();
+
 	bool BuildTreeSpritesBuffer();
 
 	bool BuildCubeBuffer();
@@ -62,6 +64,8 @@ public:
 	bool BuildOffscreenViews();
 
 	bool BuildScreenGeometryBuffers();
+
+	bool BuildQuadPatchBuffer();
 
 	void DoComputeWork();
 
@@ -132,5 +136,6 @@ public:
 
 	ID3D11Buffer* m_ScreenQuadVB;
 	ID3D11Buffer* m_ScreenQuadIB;
+	ID3D11Buffer* m_QuadPatchVB;
 };
 
