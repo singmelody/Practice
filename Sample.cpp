@@ -26,6 +26,7 @@
 #include "WavDecoder.h"
 #include "D3D11RenderDevice.h"
 #include "Flock.h"
+#include "Crowd.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -64,6 +65,7 @@ FaceFacory*					g_pFaceFactory = NULL;
 FaceController*				g_speakController = NULL;
 InverseKinematics*			g_ik = NULL;
 Flock*						g_Flock;
+Crowd*						g_Crowd;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -404,7 +406,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	//_CrtSetBreakAlloc(1976);
+	_CrtSetBreakAlloc(2240);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
@@ -564,6 +566,8 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 // 	assert( D3D11RenderDevice::Instance().CreateGBuffer() );
 
 	g_Flock = new Flock(50);
+
+	g_Crowd = new Crowd(50);
 
     return S_OK;
 }
@@ -815,8 +819,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 20.0f, -20.0f);
-		D3DXVECTOR3 vecAt ( 0.0f, 10.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 0.0f, 5.0f, -20.0f);
+		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -922,8 +926,12 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 			g_faceControllers[i]->Render(techName.c_str());
 // 		}
 
-		g_Flock->Update(fElapsedTime);
-		g_Flock->Render(false);
+// 		g_Flock->Update(fElapsedTime);
+// 		g_Flock->Render(false);
+
+		//Update crowd
+		g_Crowd->Update(fElapsedTime);
+		g_Crowd->Render();
 
 // 		g_FaceControllerGenerate->Update(fElapsedTime);
 // 		g_FaceControllerGenerate->Render(techName.c_str());
@@ -1318,6 +1326,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_speakController);
 	SAFE_DELETE(g_ik);
 	SAFE_DELETE(g_Flock);
+	SAFE_DELETE(g_Crowd);
 
 	//assert( D3D11RenderDevice::Instance().GetReference() == 0);
 
