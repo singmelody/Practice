@@ -10,7 +10,8 @@
 
 
 const DWORD LineVertex::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
-const DWORD VERTEX::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+const DWORD VERTEX::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+const DWORD DeclVertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 SkinnedMesh::SkinnedMesh()
 {
@@ -109,14 +110,14 @@ void SkinnedMesh::RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world)
 		D3DXVECTOR3 ParentBone = D3DXVECTOR3(w2(3, 0), w2(3, 1), w2(3, 2));
 
 		float length = D3DXVec3Length(&(thisBone - ParentBone));
-// 		if( length < 2.0f)
-// 		{
-// 			DXUTGetD3D9Device()->SetTransform(D3DTS_WORLD, &world);
-// 			VERTEX vert[] = {VERTEX(ParentBone, 0xffff0000), VERTEX(thisBone, 0xff00ff00)};
-// 			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
-// 			DXUTGetD3D9Device()->SetFVF(VERTEX::FVF);
-// 			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(VERTEX));
-// 		}
+		if( length < 2.0f)
+		{
+			DXUTGetD3D9Device()->SetTransform(D3DTS_WORLD, &world);
+			VERTEX vert[] = {VERTEX(ParentBone, 0xffff0000), VERTEX(thisBone, 0xff00ff00)};
+			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
+			DXUTGetD3D9Device()->SetFVF(VERTEX::FVF);
+			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(VERTEX));
+		}
 	}
 
 	if(bone->pFrameSibling)RenderSkeleton((Bone*)bone->pFrameSibling, parent, world);
@@ -482,7 +483,7 @@ D3DXINTERSECTINFO BoneMesh::GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 	if( pSkinInfo != NULL )
 	{
 		// make sure vertex format is correct
-		if(OriginalMesh->GetFVF() != VERTEX::FVF )
+		if(OriginalMesh->GetFVF() != DeclVertex::FVF )
 		{
 			hitInfo.FaceIndex = 0xffffffff;
 			return hitInfo;
@@ -559,7 +560,7 @@ ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 		return NULL;
 
 	//Get source Vertex & index buffer
-	VERTEX *v = NULL;
+	DeclVertex *v = NULL;
 	WORD *i = NULL;
 	OriginalMesh->LockVertexBuffer(D3DLOCK_READONLY, (VOID**)&v);
 	OriginalMesh->LockIndexBuffer(D3DLOCK_READONLY, (VOID**)&i);
@@ -571,11 +572,11 @@ ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 	D3DXCreateMeshFVF(1, 
 		3, 
 		D3DXMESH_MANAGED, 
-		VERTEX::FVF, 
+		DeclVertex::FVF, 
 		DXUTGetD3D9Device(), 
 		&decalMesh);
 
-	VERTEX *vDest = NULL;
+	DeclVertex *vDest = NULL;
 	WORD *iDest = NULL;
 	decalMesh->LockVertexBuffer(0, (VOID**)&vDest);
 	decalMesh->LockIndexBuffer(0, (VOID**)&iDest);

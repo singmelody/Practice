@@ -7,14 +7,15 @@
 #include "OBB.h"
 //#define SOFT 1
 
-// struct VERTEX{
-// 	VERTEX();
-// 	VERTEX(D3DXVECTOR3 pos, D3DCOLOR col){position = pos; color = col;}
-// 	D3DXVECTOR3 position;
-// 	D3DCOLOR color;
-// 	static const DWORD FVF;
-// };
 struct VERTEX{
+	VERTEX();
+	VERTEX(D3DXVECTOR3 pos, D3DCOLOR col){position = pos; color = col;}
+	D3DXVECTOR3 position;
+	D3DCOLOR color;
+	static const DWORD FVF;
+};
+
+struct DeclVertex{
 	D3DXVECTOR3 position;
 	D3DXVECTOR3 normal;
 	D3DXVECTOR2 uv;
