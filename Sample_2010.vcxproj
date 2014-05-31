@@ -463,6 +463,7 @@
     <None Include="LightHelper.fx" />
     <None Include="Tessellation.fx" />
     <None Include="TreeSprite.fx" />
+    <None Include="TriTessellation.fx" />
     <None Include="VecAdd.fx" />
   </ItemGroup>
   <ItemGroup>

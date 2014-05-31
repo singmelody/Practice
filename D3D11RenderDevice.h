@@ -53,6 +53,8 @@ public:
 
 	bool RenderTessellation();
 
+	bool RenderTriangleTessellation();
+
 	bool BuildTreeSpritesBuffer();
 
 	bool BuildCubeBuffer();
@@ -66,6 +68,8 @@ public:
 	bool BuildScreenGeometryBuffers();
 
 	bool BuildQuadPatchBuffer();
+
+	bool BuildTriPatchBuffers();
 
 	void DoComputeWork();
 
@@ -93,6 +97,7 @@ public:
 	ID3DX11Effect*			m_csFx;
 	ID3DX11Effect*			m_blurFx;
 	ID3DX11Effect*			m_tsFx;
+	ID3DX11Effect*			m_triTsFx;
 
 	ID3DX11EffectTechnique* m_tech;
 	ID3DX11EffectTechnique* m_gsTech;
@@ -102,6 +107,7 @@ public:
 	ID3D11InputLayout*		m_vertexDesc;
 	ID3D11Buffer*			m_vertexBuff;
 	ID3D11Buffer*			m_indicesBuff;
+
 	static const UINT TreeCount;
 
 	ID3D11Buffer*			m_TreeSpritesVB;
@@ -109,7 +115,8 @@ public:
 	VecAddEffect*			m_vecAddEffect;
 	BasicEffect*			m_basicEffect;
 	TessellationEffect*		m_tsEffect;
-	
+	TessellationEffect*		m_triEffect;
+
 	BlurFilter*				m_blurFilter;
 
 	DirectionalLight		m_DirLights[3];
@@ -137,5 +144,6 @@ public:
 	ID3D11Buffer* m_ScreenQuadVB;
 	ID3D11Buffer* m_ScreenQuadIB;
 	ID3D11Buffer* m_QuadPatchVB;
+	ID3D11Buffer* m_TriPatchVB;
 };
 

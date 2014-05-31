@@ -65,7 +65,10 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_ScreenQuadIB(NULL),
 	m_tsFx(NULL),
 	m_tsEffect(NULL),
-	m_QuadPatchVB(NULL)
+	m_QuadPatchVB(NULL),
+	m_triEffect(NULL),
+	m_triTsFx(NULL),
+	m_TriPatchVB(NULL)
 {
 }
 
@@ -111,6 +114,9 @@ void D3D11RenderDevice::Release()
 	SAFE_RELEASE(m_tsFx);
 	SAFE_DELETE(m_tsEffect);
 	SAFE_RELEASE(m_QuadPatchVB);
+	SAFE_DELETE(m_triEffect);
+	SAFE_RELEASE(m_triTsFx);
+	SAFE_RELEASE(m_TriPatchVB);
 
 	RenderStates::DestroyAll();
 	InputLayouts::DestroyAll();
@@ -364,6 +370,8 @@ bool D3D11RenderDevice::Render()
 
 	RenderTessellation();
 
+	RenderTriangleTessellation();
+
 // 	//------------------------------------Blur Below---------------------------------
 // 	//
 // 	// Restore the back buffer.  The offscreen render target will serve as an input into
@@ -422,6 +430,12 @@ bool D3D11RenderDevice::ShaderParse()
 
 	m_tsEffect = new TessellationEffect(m_tsFx);
 
+	result = LoadShader("TriTessellation.fx", m_triTsFx);
+	if(!result)
+		return false;
+
+	m_triEffect = new TessellationEffect(m_triTsFx);
+
 
 	result = LoadShader("VecAdd.fx", m_csFx);
 	if(!result)
@@ -474,6 +488,8 @@ bool D3D11RenderDevice::CreateGBuffer()
 	BuildScreenGeometryBuffers();
 
 	BuildQuadPatchBuffer();
+
+	BuildTriPatchBuffers();
 
 	return true;
 }
@@ -991,6 +1007,73 @@ bool D3D11RenderDevice::BuildQuadPatchBuffer()
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.pSysMem = vertices;
 	HR(m_d3d11Device->CreateBuffer(&vbd, &vinitData, &m_QuadPatchVB));
+
+	return true;
+}
+
+bool D3D11RenderDevice::BuildTriPatchBuffers()
+{
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(XMFLOAT3) * 3;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+
+	XMFLOAT3 vertices[3] = 
+	{
+		XMFLOAT3(-10.0f, 0.0f, -10.0f),
+		XMFLOAT3(  0.0f, 0.0f, +10.0f),
+		XMFLOAT3(+10.0f, 0.0f, -10.0f),
+	};
+
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = vertices;
+	HR(m_d3d11Device->CreateBuffer(&vbd, &vinitData, &m_TriPatchVB));
+
+	return true;
+}
+
+bool D3D11RenderDevice::RenderTriangleTessellation()
+{
+	m_d3d11DeviceContext->IASetInputLayout(InputLayouts::Pos);
+	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+
+	UINT stride = sizeof(Vertex::Pos);
+	UINT offset = 0;
+
+	// Set per frame constants.
+	m_triEffect->SetEyePosW(m_EyePosW);
+	m_triEffect->SetFogColor(Colors::Silver);
+	m_triEffect->SetFogStart(15.0f);
+	m_triEffect->SetFogRange(175.0f);
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	m_triEffect->TessTech->GetDesc( &techDesc );
+
+	for(UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		m_d3d11DeviceContext->IASetVertexBuffers(0, 1, &m_TriPatchVB, &stride, &offset);
+
+		// Set per object constants.
+		XMMATRIX world = XMMatrixIdentity();
+		XMMATRIX offMatrix =  XMMatrixTranslation( 10.0f, 10.0f, 0.0f);
+		world *= offMatrix;
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*m_View*m_Proj;
+
+		m_triEffect->SetWorld(world);
+		m_triEffect->SetWorldInvTranspose(worldInvTranspose);
+		m_triEffect->SetWorldViewProj(worldViewProj);
+		m_triEffect->SetTexTransform(XMMatrixIdentity());
+		//m_triEffect->SetMaterial(0);
+		m_triEffect->SetDiffuseMap(0);
+
+		m_triEffect->TessTech->GetPassByIndex(p)->Apply(0, m_d3d11DeviceContext);
+
+		m_d3d11DeviceContext->RSSetState(RenderStates::WireframeRS);
+		m_d3d11DeviceContext->Draw(3, 0);
+	}
 
 	return true;
 }
