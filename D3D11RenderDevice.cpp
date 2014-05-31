@@ -964,7 +964,7 @@ bool D3D11RenderDevice::RenderTessellation()
 
 		m_tsEffect->TessTech->GetPassByIndex(p)->Apply(0, m_d3d11DeviceContext);
 
-		m_d3d11DeviceContext->RSSetState(RenderStates::WireframeRS);
+		//m_d3d11DeviceContext->RSSetState(RenderStates::WireframeRS);
 		m_d3d11DeviceContext->Draw(4, 0);
 	}
 

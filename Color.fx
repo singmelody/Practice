@@ -43,7 +43,9 @@ technique11 ColorTech
 	pass P0
 	{
 		SetVertexShader( CompileShader( vs_5_0, VS()));
-		SetGeometryShader(NULL);
+		SetHullShader( NULL );
+        SetDomainShader( NULL );
+		SetGeometryShader(NULL );
 		SetPixelShader( CompileShader( ps_5_0, PS() ));
 		
 		//SetRasterizerState(WireframeRS);
