@@ -79,7 +79,6 @@ VecAddEffect::~VecAddEffect()
 
 #pragma endregion
 
-
 #pragma region BlurEffect
 BlurEffect::BlurEffect(ID3DX11Effect* mf) : Effect(mf)
 {
@@ -95,7 +94,6 @@ BlurEffect::~BlurEffect()
 {
 }
 #pragma endregion
-
 
 #pragma region BasicEffect
 BasicEffect::BasicEffect(ID3DX11Effect* mf)
@@ -166,6 +164,30 @@ TessellationEffect::TessellationEffect(ID3DX11Effect* mf) : Effect(mf)
 }
 
 TessellationEffect::~TessellationEffect()
+{
+}
+#pragma endregion
+
+#pragma region BezierTessellationEffect
+BezierTessellationEffect::BezierTessellationEffect(ID3DX11Effect* mf)
+	: Effect(mf)
+{
+	TessTech = mFX->GetTechniqueByName("Tess");
+
+	WorldViewProj     = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+	World             = mFX->GetVariableByName("gWorld")->AsMatrix();
+	WorldInvTranspose = mFX->GetVariableByName("gWorldInvTranspose")->AsMatrix();
+	TexTransform      = mFX->GetVariableByName("gTexTransform")->AsMatrix();
+	EyePosW           = mFX->GetVariableByName("gEyePosW")->AsVector();
+	FogColor          = mFX->GetVariableByName("gFogColor")->AsVector();
+	FogStart          = mFX->GetVariableByName("gFogStart")->AsScalar();
+	FogRange          = mFX->GetVariableByName("gFogRange")->AsScalar();
+	DirLights         = mFX->GetVariableByName("gDirLights");
+	Mat               = mFX->GetVariableByName("gMaterial");
+	DiffuseMap        = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
+}
+
+BezierTessellationEffect::~BezierTessellationEffect()
 {
 }
 #pragma endregion

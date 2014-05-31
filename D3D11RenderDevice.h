@@ -55,6 +55,8 @@ public:
 
 	bool RenderTriangleTessellation();
 
+	bool RenderBezierTessellation();
+
 	bool BuildTreeSpritesBuffer();
 
 	bool BuildCubeBuffer();
@@ -70,6 +72,8 @@ public:
 	bool BuildQuadPatchBuffer();
 
 	bool BuildTriPatchBuffers();
+
+	bool BuildBezierPatchBuffer();
 
 	void DoComputeWork();
 
@@ -98,6 +102,7 @@ public:
 	ID3DX11Effect*			m_blurFx;
 	ID3DX11Effect*			m_tsFx;
 	ID3DX11Effect*			m_triTsFx;
+	ID3DX11Effect*			m_bezierFx;
 
 	ID3DX11EffectTechnique* m_tech;
 	ID3DX11EffectTechnique* m_gsTech;
@@ -116,6 +121,7 @@ public:
 	BasicEffect*			m_basicEffect;
 	TessellationEffect*		m_tsEffect;
 	TessellationEffect*		m_triEffect;
+	BezierTessellationEffect* m_bezierEffect;
 
 	BlurFilter*				m_blurFilter;
 
@@ -145,5 +151,6 @@ public:
 	ID3D11Buffer* m_ScreenQuadIB;
 	ID3D11Buffer* m_QuadPatchVB;
 	ID3D11Buffer* m_TriPatchVB;
+	ID3D11Buffer* m_BezierPatchVB;
 };
 

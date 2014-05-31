@@ -438,6 +438,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Directory)%(Filename).fxo</Outputs>
     </CustomBuild>
     <None Include="Basic.fx" />
+    <None Include="BezierTessellation.fx" />
     <None Include="Blur.fx" />
     <None Include="DXUT\Optional\directx.ico" />
     <ClInclude Include="DXUT\Core\DXUT.h" />

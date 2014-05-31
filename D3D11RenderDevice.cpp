@@ -68,7 +68,10 @@ D3D11RenderDevice::D3D11RenderDevice(void)
 	m_QuadPatchVB(NULL),
 	m_triEffect(NULL),
 	m_triTsFx(NULL),
-	m_TriPatchVB(NULL)
+	m_TriPatchVB(NULL),
+	m_bezierEffect(NULL),
+	m_bezierFx(NULL),
+	m_BezierPatchVB(NULL)
 {
 }
 
@@ -117,6 +120,9 @@ void D3D11RenderDevice::Release()
 	SAFE_DELETE(m_triEffect);
 	SAFE_RELEASE(m_triTsFx);
 	SAFE_RELEASE(m_TriPatchVB);
+	SAFE_DELETE(m_bezierEffect);
+	SAFE_RELEASE(m_bezierFx);
+	SAFE_RELEASE(m_BezierPatchVB);
 
 	RenderStates::DestroyAll();
 	InputLayouts::DestroyAll();
@@ -372,6 +378,8 @@ bool D3D11RenderDevice::Render()
 
 	RenderTriangleTessellation();
 
+	RenderBezierTessellation();
+
 // 	//------------------------------------Blur Below---------------------------------
 // 	//
 // 	// Restore the back buffer.  The offscreen render target will serve as an input into
@@ -436,6 +444,12 @@ bool D3D11RenderDevice::ShaderParse()
 
 	m_triEffect = new TessellationEffect(m_triTsFx);
 
+	result = LoadShader("BezierTessellation.fx", m_bezierFx);
+	if(!result)
+		return false;
+
+	m_bezierEffect = new BezierTessellationEffect(m_bezierFx);
+
 
 	result = LoadShader("VecAdd.fx", m_csFx);
 	if(!result)
@@ -490,6 +504,8 @@ bool D3D11RenderDevice::CreateGBuffer()
 	BuildQuadPatchBuffer();
 
 	BuildTriPatchBuffers();
+
+	BuildBezierPatchBuffer();
 
 	return true;
 }
@@ -1057,7 +1073,7 @@ bool D3D11RenderDevice::RenderTriangleTessellation()
 
 		// Set per object constants.
 		XMMATRIX world = XMMatrixIdentity();
-		XMMATRIX offMatrix =  XMMatrixTranslation( 10.0f, 10.0f, 0.0f);
+		XMMATRIX offMatrix =  XMMatrixTranslation( 20.0f, 20.0f, 0.0f);
 		world *= offMatrix;
 		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
 		XMMATRIX worldViewProj = world*m_View*m_Proj;
@@ -1071,9 +1087,97 @@ bool D3D11RenderDevice::RenderTriangleTessellation()
 
 		m_triEffect->TessTech->GetPassByIndex(p)->Apply(0, m_d3d11DeviceContext);
 
-		m_d3d11DeviceContext->RSSetState(RenderStates::WireframeRS);
+		//m_d3d11DeviceContext->RSSetState(RenderStates::WireframeRS);
 		m_d3d11DeviceContext->Draw(3, 0);
 	}
+
+	return true;
+}
+
+bool D3D11RenderDevice::RenderBezierTessellation()
+{
+	m_d3d11DeviceContext->IASetInputLayout(InputLayouts::Pos);
+	m_d3d11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST);
+
+	UINT stride = sizeof(Vertex::Pos);
+	UINT offset = 0;
+
+	// Set per frame constants.
+	m_bezierEffect->SetEyePosW(m_EyePosW);
+	m_bezierEffect->SetFogColor(Colors::Silver);
+	m_bezierEffect->SetFogStart(15.0f);
+	m_bezierEffect->SetFogRange(175.0f);
+
+	D3DX11_TECHNIQUE_DESC techDesc;
+	m_bezierEffect->TessTech->GetDesc( &techDesc );
+
+	for(UINT p = 0; p < techDesc.Passes; ++p)
+	{
+		m_d3d11DeviceContext->IASetVertexBuffers(0, 1, &m_BezierPatchVB, &stride, &offset);
+
+		// Set per object constants.
+		XMMATRIX world = XMMatrixIdentity();
+		XMMATRIX offMatrix =  XMMatrixTranslation( -20.0f, -20.0f, 0.0f);
+		world *= offMatrix;
+
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*m_View*m_Proj;
+
+		m_bezierEffect->SetWorld(world);
+		m_bezierEffect->SetWorldInvTranspose(worldInvTranspose);
+		m_bezierEffect->SetWorldViewProj(worldViewProj);
+		m_bezierEffect->SetTexTransform(XMMatrixIdentity());
+		//m_bezierEffect->SetMaterial(0);
+		m_bezierEffect->SetDiffuseMap(0);
+
+		m_bezierEffect->TessTech->GetPassByIndex(p)->Apply(0, m_d3d11DeviceContext);
+
+		m_d3d11DeviceContext->RSSetState(RenderStates::WireframeRS);
+		m_d3d11DeviceContext->Draw(16, 0);
+	}
+
+	return true;
+}
+
+bool D3D11RenderDevice::BuildBezierPatchBuffer()
+{
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(XMFLOAT3) * 16;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+
+	XMFLOAT3 vertices[16] = 
+	{
+		// Row 0
+		XMFLOAT3(-10.0f, -10.0f, +15.0f),
+		XMFLOAT3(-5.0f,  0.0f, +15.0f),
+		XMFLOAT3(+5.0f,  0.0f, +15.0f),
+		XMFLOAT3(+10.0f, 0.0f, +15.0f), 
+
+		// Row 1
+		XMFLOAT3(-15.0f, 0.0f, +5.0f),
+		XMFLOAT3(-5.0f,  0.0f, +5.0f),
+		XMFLOAT3(+5.0f,  20.0f, +5.0f),
+		XMFLOAT3(+15.0f, 0.0f, +5.0f), 
+
+		// Row 2
+		XMFLOAT3(-15.0f, 0.0f, -5.0f),
+		XMFLOAT3(-5.0f,  0.0f, -5.0f),
+		XMFLOAT3(+5.0f,  0.0f, -5.0f),
+		XMFLOAT3(+15.0f, 0.0f, -5.0f), 
+
+		// Row 3
+		XMFLOAT3(-10.0f, 10.0f, -15.0f),
+		XMFLOAT3(-5.0f,  0.0f, -15.0f),
+		XMFLOAT3(+5.0f,  0.0f, -15.0f),
+		XMFLOAT3(+25.0f, 10.0f, -15.0f)
+	};
+
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.pSysMem = vertices;
+	HR(m_d3d11Device->CreateBuffer(&vbd, &vinitData, &m_BezierPatchVB));
 
 	return true;
 }
