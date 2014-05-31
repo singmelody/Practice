@@ -129,10 +129,18 @@ void Obstacle::Render()
 
 	world = sca * rot * pos;
 
+	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("RenderSceneWithTexture1Light");
+	g_pEffect->SetTechnique(hTech);
+	g_pEffect->Begin(NULL, NULL);
+	g_pEffect->BeginPass(0);
+
 	g_pEffect->SetMatrix("g_mWorld", &world);
 	g_pEffect->CommitChanges();
 
 	sm_cylinder->DrawSubset(0);
+
+	g_pEffect->EndPass();
+	g_pEffect->End();
 }
 
 D3DXVECTOR3 Obstacle::GetForce(CrowdEntity* pEntity)
