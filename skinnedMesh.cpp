@@ -8,15 +8,9 @@
 //									SKINNED MESH												//
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct VERTEX{
-	VERTEX();
-	VERTEX(D3DXVECTOR3 pos, D3DCOLOR col){position = pos; color = col;}
-	D3DXVECTOR3 position;
-	D3DCOLOR color;
-	static const DWORD FVF;
-};
 
-const DWORD VERTEX::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+const DWORD LineVertex::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+const DWORD VERTEX::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 SkinnedMesh::SkinnedMesh()
 {
@@ -115,14 +109,14 @@ void SkinnedMesh::RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world)
 		D3DXVECTOR3 ParentBone = D3DXVECTOR3(w2(3, 0), w2(3, 1), w2(3, 2));
 
 		float length = D3DXVec3Length(&(thisBone - ParentBone));
-		if( length < 2.0f)
-		{
-			DXUTGetD3D9Device()->SetTransform(D3DTS_WORLD, &world);
-			VERTEX vert[] = {VERTEX(ParentBone, 0xffff0000), VERTEX(thisBone, 0xff00ff00)};
-			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
-			DXUTGetD3D9Device()->SetFVF(VERTEX::FVF);
-			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(VERTEX));
-		}
+// 		if( length < 2.0f)
+// 		{
+// 			DXUTGetD3D9Device()->SetTransform(D3DTS_WORLD, &world);
+// 			VERTEX vert[] = {VERTEX(ParentBone, 0xffff0000), VERTEX(thisBone, 0xff00ff00)};
+// 			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
+// 			DXUTGetD3D9Device()->SetFVF(VERTEX::FVF);
+// 			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(VERTEX));
+// 		}
 	}
 
 	if(bone->pFrameSibling)RenderSkeleton((Bone*)bone->pFrameSibling, parent, world);
@@ -290,6 +284,42 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 	{ 
 		BoneMesh* boneMesh = (BoneMesh*)bone->pMeshContainer;
 
+		ID3DXMesh* hitMesh = boneMesh->GetHitMesh(g_rayOrg, g_rayDir);
+
+		//Temp rendering of original mesh and decal mesh
+		if(boneMesh->pSkinInfo != NULL)
+		{
+			bool isHead = strcmp(bone->Name, "Face") == 0;
+
+			D3DXMATRIX W;
+			D3DXMatrixTranslation(&W, -1.0f, isHead ? 1.63f : 0.0f, 0.0f);
+			g_pEffect->SetMatrix("g_mWorld", &W);
+			g_pEffect->SetTexture("g_MeshTexture", boneMesh->textures[0]);
+
+			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Decal");
+			g_pEffect->SetTechnique(hTech);
+			g_pEffect->Begin(NULL, NULL);
+			g_pEffect->BeginPass(0);			
+
+			if(hitMesh != NULL)
+			{
+				hitMesh->DrawSubset(0);
+				hitMesh->Release();
+			}
+
+			//Render original mesh as wireframe
+			DXUTGetD3D9Device()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+			g_pEffect->CommitChanges();
+			boneMesh->OriginalMesh->DrawSubset(0);
+
+			g_pEffect->EndPass();
+			g_pEffect->End();			
+
+			//restore renderstates
+			DXUTGetD3D9Device()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			DXUTGetD3D9Device()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		}
+
 		if(boneMesh->pSkinInfo != NULL)
 		{
 			int numBones = boneMesh->pSkinInfo->GetNumBones();
@@ -442,4 +472,127 @@ ID3DXAnimationController* SkinnedMesh::GetController()
 D3DXFRAME* SkinnedMesh::GetBone(const char* name)
 {
 	return D3DXFrameFind( m_pRootBone, name);
+}
+
+D3DXINTERSECTINFO BoneMesh::GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
+{
+	D3DXINTERSECTINFO hitInfo;
+
+	// Must test against software skinned model
+	if( pSkinInfo != NULL )
+	{
+		// make sure vertex format is correct
+		if(OriginalMesh->GetFVF() != VERTEX::FVF )
+		{
+			hitInfo.FaceIndex = 0xffffffff;
+			return hitInfo;
+		}
+
+		// set up bone transforms
+		int numBones = pSkinInfo->GetNumBones();
+		for (int i = 0; i < numBones; ++i)
+		{
+			D3DXMatrixMultiply(&currentBoneMatrices[i],
+				&boneOffsetMatrices[i], 
+				boneMatrixPtrs[i]);
+		}
+
+		//Create temp mesh
+		ID3DXMesh *tempMesh = NULL;
+		OriginalMesh->CloneMeshFVF(D3DXMESH_MANAGED, 
+			OriginalMesh->GetFVF(), 
+			DXUTGetD3D9Device(), 
+			&tempMesh);
+
+		//get source and destination buffer
+		BYTE *src = NULL;
+		BYTE *dest = NULL;
+		OriginalMesh->LockVertexBuffer(D3DLOCK_READONLY, (VOID**)&src);		
+		tempMesh->LockVertexBuffer(0, (VOID**)&dest);
+
+		//Perform the software skinning
+		pSkinInfo->UpdateSkinnedMesh(currentBoneMatrices, NULL, src, dest);
+
+		//unlock buffers
+		OriginalMesh->UnlockVertexBuffer();
+		tempMesh->UnlockVertexBuffer();
+
+		//Perform the intersection test
+		BOOL Hit;
+		D3DXIntersect(tempMesh, 
+			&rayOrg, 
+			&rayDir, 
+			&Hit, 
+			&hitInfo.FaceIndex, 
+			&hitInfo.U, 
+			&hitInfo.V, 
+			&hitInfo.Dist, 
+			NULL, 
+			NULL);
+
+		//Release temporary mesh
+		tempMesh->Release();
+
+		if(Hit)
+		{
+			//Successful hit
+			return hitInfo;
+		}
+	}
+
+	//No Hit
+	hitInfo.FaceIndex = 0xffffffff;
+	hitInfo.Dist = -1.0f;
+	return hitInfo;	
+}
+
+ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
+{
+	//Only supports skinned meshes for now
+	if(pSkinInfo == NULL)
+		return NULL;
+
+	D3DXINTERSECTINFO hitInfo = GetFace(rayOrg, rayDir);
+
+	//No face was hit
+	if(hitInfo.FaceIndex == 0xffffffff)
+		return NULL;
+
+	//Get source Vertex & index buffer
+	VERTEX *v = NULL;
+	WORD *i = NULL;
+	OriginalMesh->LockVertexBuffer(D3DLOCK_READONLY, (VOID**)&v);
+	OriginalMesh->LockIndexBuffer(D3DLOCK_READONLY, (VOID**)&i);
+
+	//Create decal mesh
+	ID3DXMesh* decalMesh = NULL;
+
+	//Create a new mesh from selected faces
+	D3DXCreateMeshFVF(1, 
+		3, 
+		D3DXMESH_MANAGED, 
+		VERTEX::FVF, 
+		DXUTGetD3D9Device(), 
+		&decalMesh);
+
+	VERTEX *vDest = NULL;
+	WORD *iDest = NULL;
+	decalMesh->LockVertexBuffer(0, (VOID**)&vDest);
+	decalMesh->LockIndexBuffer(0, (VOID**)&iDest);
+
+	vDest[0] = v[i[hitInfo.FaceIndex * 3 + 0]];
+	vDest[1] = v[i[hitInfo.FaceIndex * 3 + 1]];
+	vDest[2] = v[i[hitInfo.FaceIndex * 3 + 2]];
+
+	iDest[0] = 0;
+	iDest[1] = 1;
+	iDest[2] = 2;
+
+	//unlock buffers
+	decalMesh->UnlockIndexBuffer();
+	decalMesh->UnlockVertexBuffer();
+	OriginalMesh->UnlockIndexBuffer();
+	OriginalMesh->UnlockVertexBuffer();
+
+	return decalMesh;
 }

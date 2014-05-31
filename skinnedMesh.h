@@ -7,6 +7,28 @@
 #include "OBB.h"
 //#define SOFT 1
 
+// struct VERTEX{
+// 	VERTEX();
+// 	VERTEX(D3DXVECTOR3 pos, D3DCOLOR col){position = pos; color = col;}
+// 	D3DXVECTOR3 position;
+// 	D3DCOLOR color;
+// 	static const DWORD FVF;
+// };
+struct VERTEX{
+	D3DXVECTOR3 position;
+	D3DXVECTOR3 normal;
+	D3DXVECTOR2 uv;
+	static const DWORD FVF;
+};
+
+struct LineVertex{
+	LineVertex();
+	LineVertex(D3DXVECTOR3 pos, D3DCOLOR col){position = pos; color = col;}
+	D3DXVECTOR3 position;
+	D3DCOLOR color;
+	static const DWORD FVF;
+};
+
 struct Bone: public D3DXFRAME
 {
 	D3DXMATRIX CombinedTransformationMatrix;
@@ -59,7 +81,8 @@ struct BoneMesh: public D3DXMESHCONTAINER
 		pSkinInfo = NULL;
 	}
 
-
+	D3DXINTERSECTINFO GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir);
+	ID3DXMesh* GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir);
 };
 
 class SkinnedMesh

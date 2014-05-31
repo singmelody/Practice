@@ -819,8 +819,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 5.0f, -20.0f);
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
+		D3DXVECTOR3 vecEye( -0.5f, 1.5f, -3.0f);
+		D3DXVECTOR3 vecAt ( -0.5f, 1.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -930,8 +930,39 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_Flock->Render(false);
 
 		//Update crowd
-		g_Crowd->Update(fElapsedTime);
-		g_Crowd->Render();
+		//g_Crowd->Update(fElapsedTime);
+		//g_Crowd->Render();
+
+		// Decals
+		//Set Ray Org & Dir	
+		POINT p;
+		GetCursorPos(&p);
+
+		float x = (p.x - 320) / 640.0f;
+		float y = (p.y - 240) / -480.0f;
+		g_rayOrg = D3DXVECTOR3(0.0f, 1.0f, -3.0f);
+		g_rayDir = D3DXVECTOR3(x, y, 1.0f);
+		D3DXVec3Normalize(&g_rayDir, &g_rayDir);
+
+		//render intersection ray
+		{
+			LineVertex vert[] = {LineVertex(g_rayOrg, 0xffff0000), LineVertex(g_rayOrg + g_rayDir * 3.0f, 0xff00ff00)};
+			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
+			DXUTGetD3D9Device()->SetFVF(LineVertex::FVF);
+			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(LineVertex));
+		}
+
+		//Render Drone
+		{
+			D3DXMATRIX identity;
+			D3DXMatrixIdentity(&identity);
+			g_pEffect->SetMatrix("g_mWorld", &identity);
+			g_pEffect->SetMatrix("g_mVP", &(mView * mProj));
+
+			g_animControllers[0]->AdvanceTime(fElapsedTime, NULL);
+			g_SkinnedMesh->SetPose(identity);
+			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+		}
 
 // 		g_FaceControllerGenerate->Update(fElapsedTime);
 // 		g_FaceControllerGenerate->Render(techName.c_str());

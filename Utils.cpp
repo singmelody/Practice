@@ -248,3 +248,5 @@ ComplexFace*	g_ComplexFace = NULL;
 FaceModel*		g_FaceModel = NULL;
 FaceModel*		g_FaceModelGenerate = NULL;
 FaceController* g_FaceControllerGenerate = NULL;
+D3DXVECTOR3		g_rayOrg;
+D3DXVECTOR3		g_rayDir;	

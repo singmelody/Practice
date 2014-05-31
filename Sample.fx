@@ -670,3 +670,14 @@ technique MorphSkeleton
     }
 }
 
+technique Decal
+{
+    pass P0
+    {      
+		Lighting = true;
+		CullMode = None;
+		    
+        VertexShader = compile vs_2_0 RenderSceneVS( 1, true, false );
+        PixelShader  = compile ps_2_0 RenderScenePS( true ); // trivial pixel shader (could use FF instead if desired)
+    }
+}

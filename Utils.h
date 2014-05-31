@@ -51,6 +51,8 @@ extern FaceModel*		g_FaceModel;
 extern FaceModel*		g_FaceModelGenerate;
 extern FaceController*  g_FaceControllerGenerate;
 extern ComplexFace*		g_ComplexFace;
+extern D3DXVECTOR3		g_rayOrg;
+extern D3DXVECTOR3		g_rayDir;	
 
 enum PHYS_CONTRAINTS
 {
