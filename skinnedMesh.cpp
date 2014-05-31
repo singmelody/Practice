@@ -27,6 +27,8 @@ SkinnedMesh::SkinnedMesh()
 
 SkinnedMesh::~SkinnedMesh()
 {
+	m_animations.clear();
+
 	m_boneHierarchy.DestroyFrame(m_pRootBone);
 
 	SAFE_RELEASE( m_pSphereMesh );

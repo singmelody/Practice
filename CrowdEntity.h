@@ -12,7 +12,7 @@ public:
 	void Update(float deltaTime);
 	void Render();
 	D3DXVECTOR3 GetRandomLocation();
-
+	D3DXVECTOR3& GetPos() { return m_position; }
 private:
 	static SkinnedMesh* sm_pSoldierMesh;
 

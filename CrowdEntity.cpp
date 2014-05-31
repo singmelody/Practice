@@ -1,5 +1,6 @@
 #include "DXUT.h"
 #include "CrowdEntity.h"
+#include "Utils.h"
 
 CrowdEntity::CrowdEntity(Crowd *pCrowd)
 {
@@ -50,7 +51,8 @@ void CrowdEntity::Update(float deltaTime)
 	//Has goal been reached?
 	if(D3DXVec3Length(&forceToGoal) < ENTITY_INFLUENCE_RADIUS)
 	{
-		//Pick a new random goal
+		//Pick a new random goal & pos
+		m_position = GetRandomLocation();
 		m_goal = GetRandomLocation();
 	}
 	D3DXVec3Normalize(&forceToGoal, &forceToGoal);
@@ -82,14 +84,24 @@ void CrowdEntity::Update(float deltaTime)
 		}
 	}
 
+	//Obstacle forces
+	D3DXVECTOR3 forceObstacles(0.0f, 0.0f, 0.0f);
+	for(int i=0; i<(int)m_pCrowd->m_obstacles.size(); i++)
+	{
+		forceObstacles += m_pCrowd->m_obstacles[i]->GetForce(this);
+	}
+
 	//Sum up forces
-	D3DXVECTOR3 acc = forceToGoal + forceAvoidNeighbors;
+	D3DXVECTOR3 acc = forceToGoal + forceAvoidNeighbors + forceObstacles;
 	D3DXVec3Normalize(&acc, &acc);
 
 	//Update velocity & position
 	m_velocity += acc * deltaTime;
 	D3DXVec3Normalize(&m_velocity, &m_velocity);
 	m_position += m_velocity * ENTITY_SPEED * deltaTime;
+
+	//Snap to floor
+	m_pCrowd->SetEntityGroundPos(m_position);
 
 	//Update animation
 	m_pAnimController->AdvanceTime(deltaTime, NULL);

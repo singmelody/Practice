@@ -12,7 +12,7 @@ public:
 	HRESULT Load(const char* fileName);
 	void Render();
 	void Release();
-
+	ID3DXMesh* GetMesh() { return m_mesh; }
 private:
 	ID3DXMesh* m_mesh;
 	std::vector<IDirect3DTexture9*> m_textures;

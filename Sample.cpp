@@ -406,7 +406,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	_CrtSetBreakAlloc(2240);
+	//_CrtSetBreakAlloc(2115);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
