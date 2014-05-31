@@ -3284,32 +3284,32 @@ void DXUTRender3DEnvironment9()
 #endif
 
         // Show the frame on the primary surface.
-        //hr = pd3dDevice->Present( NULL, NULL, NULL, NULL );
-//         if( FAILED( hr ) )
-//         {
-//             if( D3DERR_DEVICELOST == hr )
-//             {
-//                 GetDXUTState().SetDeviceLost( true );
-//             }
-//             else if( D3DERR_DRIVERINTERNALERROR == hr )
-//             {
-//                 // When D3DERR_DRIVERINTERNALERROR is returned from Present(),
-//                 // the application can do one of the following:
-//                 // 
-//                 // - End, with the pop-up window saying that the application cannot continue 
-//                 //   because of problems in the display adapter and that the user should 
-//                 //   contact the adapter manufacturer.
-//                 //
-//                 // - Attempt to restart by calling IDirect3DDevice9::Reset, which is essentially the same 
-//                 //   path as recovering from a lost device. If IDirect3DDevice9::Reset fails with 
-//                 //   D3DERR_DRIVERINTERNALERROR, the application should end immediately with the message 
-//                 //   that the user should contact the adapter manufacturer.
-//                 // 
-//                 // The framework attempts the path of resetting the device
-//                 // 
-//                 GetDXUTState().SetDeviceLost( true );
-//             }
-//         }
+        hr = pd3dDevice->Present( NULL, NULL, NULL, NULL );
+        if( FAILED( hr ) )
+        {
+            if( D3DERR_DEVICELOST == hr )
+            {
+                GetDXUTState().SetDeviceLost( true );
+            }
+            else if( D3DERR_DRIVERINTERNALERROR == hr )
+            {
+                // When D3DERR_DRIVERINTERNALERROR is returned from Present(),
+                // the application can do one of the following:
+                // 
+                // - End, with the pop-up window saying that the application cannot continue 
+                //   because of problems in the display adapter and that the user should 
+                //   contact the adapter manufacturer.
+                //
+                // - Attempt to restart by calling IDirect3DDevice9::Reset, which is essentially the same 
+                //   path as recovering from a lost device. If IDirect3DDevice9::Reset fails with 
+                //   D3DERR_DRIVERINTERNALERROR, the application should end immediately with the message 
+                //   that the user should contact the adapter manufacturer.
+                // 
+                // The framework attempts the path of resetting the device
+                // 
+                GetDXUTState().SetDeviceLost( true );
+            }
+        }
     }
 
     // If the app called DXUTWasKeyPressed() then do the work 
