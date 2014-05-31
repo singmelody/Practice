@@ -55,6 +55,9 @@
     <Filter Include="AI\Crowd">
       <UniqueIdentifier>{3e2da363-2427-47fa-ad39-1dd94de48ba8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Decl">
+      <UniqueIdentifier>{2a2e8976-ba72-4cf5-b37c-385f06338b32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -228,6 +231,9 @@
     <ClCompile Include="CrowdEntity.cpp">
       <Filter>AI\Crowd</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterDecal.cpp">
+      <Filter>Decl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -321,6 +327,9 @@
     </ClInclude>
     <ClInclude Include="CrowdEntity.h">
       <Filter>AI\Crowd</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterDecal.h">
+      <Filter>Decl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -384,6 +384,7 @@
     <ClCompile Include="BirdMesh.cpp" />
     <ClCompile Include="BlurFilter.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
+    <ClCompile Include="CharacterDecal.cpp" />
     <ClCompile Include="Crowd.cpp" />
     <ClCompile Include="CrowdEntity.cpp" />
     <ClCompile Include="D3D11RenderDevice.cpp" />
@@ -413,6 +414,7 @@
     <ClInclude Include="BirdMesh.h" />
     <ClInclude Include="BlurFilter.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
+    <ClInclude Include="CharacterDecal.h" />
     <ClInclude Include="Crowd.h" />
     <ClInclude Include="CrowdEntity.h" />
     <ClInclude Include="D3D11RenderDevice.h" />

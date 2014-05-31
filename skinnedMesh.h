@@ -7,6 +7,8 @@
 #include "OBB.h"
 //#define SOFT 1
 
+class CharacterDecal;
+
 struct VERTEX{
 	VERTEX();
 	VERTEX(D3DXVECTOR3 pos, D3DCOLOR col){position = pos; color = col;}
@@ -15,7 +17,7 @@ struct VERTEX{
 	static const DWORD FVF;
 };
 
-struct DeclVertex{
+struct SimpleDeclVertex{
 	D3DXVECTOR3 position;
 	D3DXVECTOR3 normal;
 	D3DXVECTOR2 uv;
@@ -28,6 +30,14 @@ struct LineVertex{
 	D3DXVECTOR3 position;
 	D3DCOLOR color;
 	static const DWORD FVF;
+};
+
+struct DecalVertex{
+	D3DXVECTOR3 position;
+	float		blendweights;
+	byte		blendindices[4];
+	D3DXVECTOR3 normal;
+	D3DXVECTOR2 uv;
 };
 
 struct Bone: public D3DXFRAME
@@ -63,6 +73,7 @@ struct BoneMesh: public D3DXMESHCONTAINER
 	D3DXMATRIX** boneMatrixPtrs;
 	D3DXMATRIX* boneOffsetMatrices;
 	D3DXMATRIX* currentBoneMatrices;
+	std::vector<CharacterDecal*> m_decals;
 
 	BoneMesh()
 	{
@@ -82,8 +93,12 @@ struct BoneMesh: public D3DXMESHCONTAINER
 		pSkinInfo = NULL;
 	}
 
+	~BoneMesh();
+
 	D3DXINTERSECTINFO GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir);
 	ID3DXMesh* GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir);
+	ID3DXMesh* CreateDecalMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, float decalSize);
+	void AddDecal(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, float decalSize);
 };
 
 class SkinnedMesh
@@ -108,6 +123,8 @@ public:
 	D3DXFRAME* GetBone(const char* name);
 
 	void UpdateMatrices(Bone* bone, D3DXMATRIX *parentMatrix);
+
+	void AddDecal(Bone* pBone = NULL);
 protected:
 	D3DXFRAME *m_pRootBone;
 

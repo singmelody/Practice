@@ -3,7 +3,9 @@
 #include "skinnedMesh.h"
 #include <Windows.h>
 #include "Utils.h"
-
+#include <map>
+#include <queue>
+#include "CharacterDecal.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //									SKINNED MESH												//
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +13,7 @@
 
 const DWORD LineVertex::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
 const DWORD VERTEX::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
-const DWORD DeclVertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+const DWORD SimpleDeclVertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 
 SkinnedMesh::SkinnedMesh()
 {
@@ -285,41 +287,41 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 	{ 
 		BoneMesh* boneMesh = (BoneMesh*)bone->pMeshContainer;
 
-		ID3DXMesh* hitMesh = boneMesh->GetHitMesh(g_rayOrg, g_rayDir);
-
-		//Temp rendering of original mesh and decal mesh
-		if(boneMesh->pSkinInfo != NULL)
-		{
-			bool isHead = strcmp(bone->Name, "Face") == 0;
-
-			D3DXMATRIX W;
-			D3DXMatrixTranslation(&W, -1.0f, isHead ? 1.63f : 0.0f, 0.0f);
-			g_pEffect->SetMatrix("g_mWorld", &W);
-			g_pEffect->SetTexture("g_MeshTexture", boneMesh->textures[0]);
-
-			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Decal");
-			g_pEffect->SetTechnique(hTech);
-			g_pEffect->Begin(NULL, NULL);
-			g_pEffect->BeginPass(0);			
-
-			if(hitMesh != NULL)
-			{
-				hitMesh->DrawSubset(0);
-				hitMesh->Release();
-			}
-
-			//Render original mesh as wireframe
-			DXUTGetD3D9Device()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-			g_pEffect->CommitChanges();
-			boneMesh->OriginalMesh->DrawSubset(0);
-
-			g_pEffect->EndPass();
-			g_pEffect->End();			
-
-			//restore renderstates
-			DXUTGetD3D9Device()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-			DXUTGetD3D9Device()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-		}
+// 		ID3DXMesh* hitMesh = boneMesh->GetHitMesh(g_rayOrg, g_rayDir);
+// 
+// 		//Temp rendering of original mesh and decal mesh
+// 		if(boneMesh->pSkinInfo != NULL)
+// 		{
+// 			bool isHead = strcmp(bone->Name, "Face") == 0;
+// 
+// 			D3DXMATRIX W;
+// 			D3DXMatrixTranslation(&W, -1.0f, isHead ? 1.63f : 0.0f, 0.0f);
+// 			g_pEffect->SetMatrix("g_mWorld", &W);
+// 			g_pEffect->SetTexture("g_MeshTexture", boneMesh->textures[0]);
+// 
+// 			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("SimpleDecal");
+// 			g_pEffect->SetTechnique(hTech);
+// 			g_pEffect->Begin(NULL, NULL);
+// 			g_pEffect->BeginPass(0);			
+// 
+// 			if(hitMesh != NULL)
+// 			{
+// 				hitMesh->DrawSubset(0);
+// 				hitMesh->Release();
+// 			}
+// 
+// 			//Render original mesh as wireframe
+// 			DXUTGetD3D9Device()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+// 			g_pEffect->CommitChanges();
+// 			boneMesh->OriginalMesh->DrawSubset(0);
+// 
+// 			g_pEffect->EndPass();
+// 			g_pEffect->End();			
+// 
+// 			//restore renderstates
+// 			DXUTGetD3D9Device()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+// 			DXUTGetD3D9Device()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+// 		}
 
 		if(boneMesh->pSkinInfo != NULL)
 		{
@@ -366,6 +368,12 @@ void SkinnedMesh::RenderHAL(Bone* bone, const char* animTech, const char* static
 
 				g_pEffect->EndPass();
 				g_pEffect->End();
+
+				//Also render all character decals with the same bone transforms
+				for(int cd=0; cd<(int)boneMesh->m_decals.size(); cd++)
+				{
+					boneMesh->m_decals[cd]->Render();
+				}
 			}
 		}
 		else
@@ -475,6 +483,25 @@ D3DXFRAME* SkinnedMesh::GetBone(const char* name)
 	return D3DXFrameFind( m_pRootBone, name);
 }
 
+void SkinnedMesh::AddDecal(Bone* pBone /*= NULL*/)
+{
+	if(pBone == NULL)
+		pBone = (Bone*)m_pRootBone;
+
+	//Attempt to add decal
+	if(pBone->pMeshContainer != NULL)
+	{
+		BoneMesh* boneMesh = (BoneMesh*)pBone->pMeshContainer;
+		boneMesh->AddDecal(g_rayOrg, g_rayDir, 0.1f);
+	}
+
+	if(pBone->pFrameSibling != NULL)		
+		AddDecal((Bone*)pBone->pFrameSibling);
+
+	if(pBone->pFrameFirstChild != NULL)
+		AddDecal((Bone*)pBone->pFrameFirstChild);
+}
+
 D3DXINTERSECTINFO BoneMesh::GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 {
 	D3DXINTERSECTINFO hitInfo;
@@ -483,7 +510,7 @@ D3DXINTERSECTINFO BoneMesh::GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 	if( pSkinInfo != NULL )
 	{
 		// make sure vertex format is correct
-		if(OriginalMesh->GetFVF() != DeclVertex::FVF )
+		if(OriginalMesh->GetFVF() != SimpleDeclVertex::FVF )
 		{
 			hitInfo.FaceIndex = 0xffffffff;
 			return hitInfo;
@@ -547,6 +574,148 @@ D3DXINTERSECTINFO BoneMesh::GetFace(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 	return hitInfo;	
 }
 
+ID3DXMesh* BoneMesh::CreateDecalMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, float decalSize)
+{
+	//Only supports skinned meshes for now
+	if(pSkinInfo == NULL)
+		return NULL;
+
+	D3DXINTERSECTINFO hitInfo = GetFace(rayOrg, rayDir);
+
+	//No face was hit
+	if(hitInfo.FaceIndex == 0xffffffff)
+		return NULL;
+
+	//Generate adjacency lookup table
+	DWORD* adj = new DWORD[OriginalMesh->GetNumFaces() * 3];
+	OriginalMesh->GenerateAdjacency(0.001f, adj);
+
+	//Get Vertex & index buffer of temp mesh
+	SimpleDeclVertex *v = NULL;
+	WORD *i = NULL;
+	OriginalMesh->LockVertexBuffer(D3DLOCK_READONLY, (VOID**)&v);
+	OriginalMesh->LockIndexBuffer(D3DLOCK_READONLY, (VOID**)&i);
+
+	//Calculate hit position on original mesh
+	WORD i1 = i[hitInfo.FaceIndex * 3 + 0];
+	WORD i2 = i[hitInfo.FaceIndex * 3 + 1];
+	WORD i3 = i[hitInfo.FaceIndex * 3 + 2];
+	D3DXVECTOR3 hitPos;
+	D3DXVec3BaryCentric(&hitPos, 
+		&v[i1].position, 
+		&v[i2].position, 
+		&v[i3].position, 
+		hitInfo.U, 
+		hitInfo.V);
+
+	//Find adjacent faces within in range of hit location
+	std::queue<WORD> openFaces;
+	std::map<WORD, bool> decalFaces;
+
+	//Add first face
+	openFaces.push((WORD)hitInfo.FaceIndex);
+
+	while(!openFaces.empty())
+	{
+		//Get first face
+		WORD face = openFaces.front();
+		openFaces.pop();
+
+		//Get Triangle data for open face
+		WORD i1 = i[face * 3 + 0];
+		WORD i2 = i[face * 3 + 1];
+		WORD i3 = i[face * 3 + 2];
+		D3DXVECTOR3 &v1 = v[i1].position;
+		D3DXVECTOR3 &v2 = v[i2].position;
+		D3DXVECTOR3 &v3 = v[i3].position;
+
+		float testSize = max(decalSize, 0.1f);
+
+		//Should this face be added?
+		if(D3DXVec3Length(&(hitPos - v1)) < testSize ||
+			D3DXVec3Length(&(hitPos - v2)) < testSize ||
+			D3DXVec3Length(&(hitPos - v3)) < testSize ||
+			decalFaces.empty())
+		{
+			decalFaces[face] = true;
+
+			//Add adjacent faces to open queue
+			for(int a=0; a<3; a++)
+			{
+				DWORD adjFace = adj[face * 3 + a];
+
+				if(adjFace != 0xffffffff)
+				{
+					//Check that it hasnt been added to decal faces
+					if(decalFaces.count((WORD)adjFace) == 0)
+						openFaces.push((WORD)adjFace);
+				}
+			}
+		}
+	}
+
+	OriginalMesh->UnlockIndexBuffer();
+	OriginalMesh->UnlockVertexBuffer();
+
+	SAFE_DELETE_ARRAY(adj);
+
+	//Create decal mesh
+	ID3DXMesh* decalMesh = NULL;
+
+	//No faces to create decal with
+	if(decalFaces.empty())
+		return NULL;
+
+	//Create a new mesh from selected faces
+	D3DVERTEXELEMENT9 decl[MAX_FVF_DECL_SIZE];
+	MeshData.pMesh->GetDeclaration(decl);
+
+	D3DXCreateMesh((int)decalFaces.size(), 
+		(int)decalFaces.size() * 3, 
+		D3DXMESH_MANAGED, 
+		decl, 
+		DXUTGetD3D9Device(), 
+		&decalMesh);
+
+	//Lock dest & src buffers
+	DecalVertex* vDest = NULL;
+	WORD* iDest = NULL;
+	DecalVertex* vSrc = NULL;
+	WORD* iSrc = NULL;
+	decalMesh->LockVertexBuffer(0, (VOID**)&vDest);
+	decalMesh->LockIndexBuffer(0, (VOID**)&iDest);
+	MeshData.pMesh->LockVertexBuffer(D3DLOCK_READONLY, (VOID**)&vSrc);
+	MeshData.pMesh->LockIndexBuffer(D3DLOCK_READONLY, (VOID**)&iSrc);
+
+	//Iterate through all faces in the decalFaces map
+	std::map<WORD, bool>::iterator f;
+	int index = 0;
+	for(f=decalFaces.begin(); f!=decalFaces.end(); f++)
+	{
+		WORD faceIndex = (*f).first;
+
+		//Copy vertex data
+		vDest[index * 3 + 0] = vSrc[iSrc[faceIndex * 3 + 0]];
+		vDest[index * 3 + 1] = vSrc[iSrc[faceIndex * 3 + 1]];
+		vDest[index * 3 + 2] = vSrc[iSrc[faceIndex * 3 + 2]];
+
+		//Create indices
+		iDest[index * 3 + 0] = index * 3 + 0;
+		iDest[index * 3 + 1] = index * 3 + 1;
+		iDest[index * 3 + 2] = index * 3 + 2;
+
+		index++;
+	}
+
+	//Unlock buffers
+	decalMesh->UnlockIndexBuffer();
+	decalMesh->UnlockVertexBuffer();
+	MeshData.pMesh->UnlockIndexBuffer();
+	MeshData.pMesh->UnlockIndexBuffer();
+
+	return decalMesh;
+}
+
 ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 {
 	//Only supports skinned meshes for now
@@ -560,7 +729,7 @@ ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 		return NULL;
 
 	//Get source Vertex & index buffer
-	DeclVertex *v = NULL;
+	SimpleDeclVertex *v = NULL;
 	WORD *i = NULL;
 	OriginalMesh->LockVertexBuffer(D3DLOCK_READONLY, (VOID**)&v);
 	OriginalMesh->LockIndexBuffer(D3DLOCK_READONLY, (VOID**)&i);
@@ -572,11 +741,11 @@ ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 	D3DXCreateMeshFVF(1, 
 		3, 
 		D3DXMESH_MANAGED, 
-		DeclVertex::FVF, 
+		SimpleDeclVertex::FVF, 
 		DXUTGetD3D9Device(), 
 		&decalMesh);
 
-	DeclVertex *vDest = NULL;
+	SimpleDeclVertex *vDest = NULL;
 	WORD *iDest = NULL;
 	decalMesh->LockVertexBuffer(0, (VOID**)&vDest);
 	decalMesh->LockIndexBuffer(0, (VOID**)&iDest);
@@ -596,4 +765,26 @@ ID3DXMesh* BoneMesh::GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir)
 	OriginalMesh->UnlockVertexBuffer();
 
 	return decalMesh;
+}
+
+void BoneMesh::AddDecal(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, float decalSize)
+{
+	//Create decal mesh
+	ID3DXMesh* decalMesh = CreateDecalMesh(rayOrg, rayDir, decalSize);
+	if(decalMesh == NULL)
+		return;
+
+	//Add to decal vector
+	m_decals.push_back(new CharacterDecal(decalMesh));
+}
+
+BoneMesh::~BoneMesh()
+{
+	for (int i = 0; i < m_decals.size(); ++i)
+	{
+		SAFE_DELETE(m_decals[i]);
+	}
+	
+	m_decals.clear();
+
 }

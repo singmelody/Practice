@@ -66,6 +66,7 @@ FaceController*				g_speakController = NULL;
 InverseKinematics*			g_ik = NULL;
 Flock*						g_Flock;
 Crowd*						g_Crowd;
+float						g_decalCooldown;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -406,7 +407,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	//_CrtSetBreakAlloc(2115);
+	//_CrtSetBreakAlloc(3132);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
@@ -1155,7 +1156,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bo
 //--------------------------------------------------------------------------------------
 void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUserContext )
 {
-
+	g_decalCooldown -= 0.3f;
     if( bKeyDown )
     {
         switch( nChar )
@@ -1225,6 +1226,14 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 				{
 					SpeakWav();
 					break;
+				}
+			case VK_NUMPAD0:
+				{
+					if( g_decalCooldown <= 0.0f )
+					{
+						g_SkinnedMesh->AddDecal();
+						g_decalCooldown = 0.3f;
+					}
 				}
 
         }

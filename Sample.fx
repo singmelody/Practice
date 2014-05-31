@@ -377,7 +377,7 @@ PS_OUTPUT RenderScenePS( VS_OUTPUT In,
     if( bTexture )
         Output.RGBColor = tex2D(MeshTextureSampler, In.TextureUV) * In.Diffuse;
     else
-        Output.RGBColor = float4(0.5, 1, 0.3, 1) * In.Diffuse ;
+        Output.RGBColor = float4(0.0f, 1.0f, 0.0f, 1.0f) * In.Diffuse ;
 
     return Output;
 }
@@ -670,7 +670,7 @@ technique MorphSkeleton
     }
 }
 
-technique Decal
+technique SimpleDecal
 {
     pass P0
     {      
@@ -678,6 +678,20 @@ technique Decal
 		CullMode = None;
 		    
         VertexShader = compile vs_2_0 RenderSceneVS( 1, true, false );
-        PixelShader  = compile ps_2_0 RenderScenePS( true ); // trivial pixel shader (could use FF instead if desired)
+        PixelShader  = compile ps_2_0 RenderScenePS( true );
+    }
+}
+
+technique Decal
+{
+    pass P0
+    {
+		Lighting = false;
+		AlphaBlendEnable = true;
+		SrcBlend = SRCALPHA;
+		DestBlend = INVSRCALPHA;
+		FillMode = Wireframe;
+        VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
+        PixelShader  = compile ps_2_0 RenderScenePS( false ); 
     }
 }
