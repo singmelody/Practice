@@ -14,4 +14,5 @@ public:
 
 public:
 	ID3DXMesh* m_pDecalMesh;
+	static IDirect3DTexture9* sm_pDecalTexture;
 };

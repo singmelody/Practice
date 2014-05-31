@@ -99,6 +99,7 @@ struct BoneMesh: public D3DXMESHCONTAINER
 	ID3DXMesh* GetHitMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir);
 	ID3DXMesh* CreateDecalMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, float decalSize);
 	void AddDecal(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, float decalSize);
+	void CalculateDecalUV(ID3DXMesh* decalMesh, D3DXVECTOR3 &hitPos, float decalSize);
 };
 
 class SkinnedMesh

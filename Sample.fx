@@ -20,6 +20,8 @@ float4 g_LightAmbient;              // Light's ambient color
 
 texture g_MeshTexture;              // Color texture for mesh
 
+texture g_DecalTexture;              // Color texture for mesh
+
 float    g_fTime;                   // App's time in seconds
 float4x4 g_mWorld;                  // World matrix for object
 float4x4 g_mWorldInverse;           // World Inverse matrix for object
@@ -41,6 +43,14 @@ sampler_state
     MipFilter = LINEAR;
     MinFilter = LINEAR;
     MagFilter = LINEAR;
+};
+
+sampler DecalTextureSampler = sampler_state
+{
+    Texture = <g_DecalTexture>;
+   MinFilter = Linear;   MagFilter = Linear;   MipFilter = Linear;
+   AddressU  = Clamp;    AddressV  = Clamp;    AddressW  = Clamp;
+   MaxAnisotropy = 16;
 };
 
 //Morph Weight
@@ -382,6 +392,20 @@ PS_OUTPUT RenderScenePS( VS_OUTPUT In,
     return Output;
 }
 
+PS_OUTPUT RenderDecalPS( VS_OUTPUT In,
+                         uniform bool bTexture ) 
+{ 
+    PS_OUTPUT Output;
+
+    // Lookup mesh texture and modulate it with diffuse
+    if( bTexture )
+        Output.RGBColor = tex2D(DecalTextureSampler, In.TextureUV) * In.Diffuse;
+    else
+        Output.RGBColor = float4(0.0f, 1.0f, 0.0f, 1.0f) * In.Diffuse ;
+
+    return Output;
+}
+
 //Pixel Shader
 float4 RenderShadowPS(VS_OUTPUT IN,
 					  uniform bool bTexture ) : COLOR0
@@ -690,8 +714,7 @@ technique Decal
 		AlphaBlendEnable = true;
 		SrcBlend = SRCALPHA;
 		DestBlend = INVSRCALPHA;
-		FillMode = Wireframe;
         VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
-        PixelShader  = compile ps_2_0 RenderScenePS( false ); 
+        PixelShader  = compile ps_2_0 RenderDecalPS( true ); 
     }
 }

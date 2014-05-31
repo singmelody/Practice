@@ -713,6 +713,9 @@ ID3DXMesh* BoneMesh::CreateDecalMesh(D3DXVECTOR3 &rayOrg, D3DXVECTOR3 &rayDir, f
 	MeshData.pMesh->UnlockIndexBuffer();
 	MeshData.pMesh->UnlockIndexBuffer();
 
+	//Calculate Decal UV coordinates
+	CalculateDecalUV(decalMesh, hitPos, decalSize);
+
 	return decalMesh;
 }
 
@@ -787,4 +790,46 @@ BoneMesh::~BoneMesh()
 	
 	m_decals.clear();
 
+}
+
+void BoneMesh::CalculateDecalUV(ID3DXMesh* decalMesh, D3DXVECTOR3 &hitPos, float decalSize)
+{
+	DecalVertex *v = NULL;
+	decalMesh->LockVertexBuffer(0, (VOID**)&v);
+
+	//Get Hit normal (first 3 vertices make up the hit triangle)
+	DecalVertex &v1 = v[0];
+	DecalVertex &v2 = v[1];
+	DecalVertex &v3 = v[2];
+	D3DXVECTOR3 faceNormal = v1.normal + 
+		v2.normal + 
+		v3.normal;
+	D3DXVec3Normalize(&faceNormal, &faceNormal);
+
+	//Calculate Right & Up vector
+	D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
+	D3DXVECTOR3 right;
+	D3DXVec3Cross(&right, &faceNormal, &up);
+	D3DXVec3Normalize(&right, &right);
+	D3DXVec3Cross(&up, &faceNormal, &right);
+	D3DXVec3Normalize(&up, &up);
+
+	D3DXVECTOR3 decalCorner = (hitPos - right * decalSize - up * decalSize);
+
+	D3DXVECTOR3 UCompare = -right * decalSize * 2.0f;
+	D3DXVECTOR3 VCompare = -up * decalSize * 2.0f;
+
+	//Loop through all vertices in the mesh and calculate their UV coordinates
+	for(int i=0; i<(int)decalMesh->GetNumVertices(); i++)
+	{
+		D3DXVECTOR3 cornerToVertex = decalCorner - v[i].position;
+
+		float U = D3DXVec3Dot(&cornerToVertex, &UCompare) / (decalSize / 4.0f);
+		float V = D3DXVec3Dot(&cornerToVertex, &VCompare) / (decalSize / 4.0f);
+
+		//Assign new UV coordinate to the vertex
+		v[i].uv = D3DXVECTOR2(U, V);
+	}
+
+	decalMesh->UnlockVertexBuffer();
 }
