@@ -90,6 +90,18 @@ void BirdMesh::Render()
 
 		g_pEffect->SetTexture( "g_MeshTexture", m_textures[i]);
 
+		//Start Shader
+		D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("RenderSceneNoTexture");
+		g_pEffect->SetTechnique(hTech);
+		g_pEffect->Begin(NULL, NULL);
+		g_pEffect->BeginPass(0);
+
+		//Draw mesh
+		m_mesh->DrawSubset(i);
+
+		g_pEffect->EndPass();
+		g_pEffect->End();
+
 		m_mesh->DrawSubset(i);
 	}
 }

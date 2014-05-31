@@ -377,7 +377,7 @@ PS_OUTPUT RenderScenePS( VS_OUTPUT In,
     if( bTexture )
         Output.RGBColor = tex2D(MeshTextureSampler, In.TextureUV) * In.Diffuse;
     else
-        Output.RGBColor = float4(0.0f,0.0f,0.0f,0.0f);
+        Output.RGBColor = float4(0.5, 1, 0.3, 1) * In.Diffuse ;
 
     return Output;
 }

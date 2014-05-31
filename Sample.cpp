@@ -25,6 +25,7 @@
 #include "InverseKinematics.h"
 #include "WavDecoder.h"
 #include "D3D11RenderDevice.h"
+#include "Flock.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -62,6 +63,7 @@ std::vector<FaceController*> g_faceControllers;
 FaceFacory*					g_pFaceFactory = NULL;
 FaceController*				g_speakController = NULL;
 InverseKinematics*			g_ik = NULL;
+Flock*						g_Flock;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -402,7 +404,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	//_CrtSetBreakAlloc(2039);
+	//_CrtSetBreakAlloc(1976);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );
@@ -550,16 +552,19 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	// create speak face controller
 	g_speakController = new FaceController( D3DXVECTOR3(0.0f,0.0f,0.0f), g_FaceModel);
 
-	bool result = D3D11RenderDevice::Instance().CreateDevice();
-	result = D3D11RenderDevice::Instance().CheckCaps();
-	result = D3D11RenderDevice::Instance().CreateSwapChain();
-	result = D3D11RenderDevice::Instance().CreateRenderTargetView();
-	result = D3D11RenderDevice::Instance().CreateDepthStencilBuffer();
-	result = D3D11RenderDevice::Instance().BindRTAndDepthToMS();
-	assert( D3D11RenderDevice::Instance().CreateViewPort() );
-	assert( D3D11RenderDevice::Instance().ShaderParse() );
-	assert( D3D11RenderDevice::Instance().CreateVertexDecl() );
-	assert( D3D11RenderDevice::Instance().CreateGBuffer() );
+// 	bool result = D3D11RenderDevice::Instance().CreateDevice();
+// 	result = D3D11RenderDevice::Instance().CheckCaps();
+// 	result = D3D11RenderDevice::Instance().CreateSwapChain();
+// 	result = D3D11RenderDevice::Instance().CreateRenderTargetView();
+// 	result = D3D11RenderDevice::Instance().CreateDepthStencilBuffer();
+// 	result = D3D11RenderDevice::Instance().BindRTAndDepthToMS();
+// 	assert( D3D11RenderDevice::Instance().CreateViewPort() );
+// 	assert( D3D11RenderDevice::Instance().ShaderParse() );
+// 	assert( D3D11RenderDevice::Instance().CreateVertexDecl() );
+// 	assert( D3D11RenderDevice::Instance().CreateGBuffer() );
+
+	g_Flock = new Flock(50);
+
     return S_OK;
 }
 
@@ -810,8 +815,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -0.8f);
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 0.0f, 20.0f, -20.0f);
+		D3DXVECTOR3 vecAt ( 0.0f, 10.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -911,11 +916,14 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 // 		g_ComplexFace->Render(techName.c_str());
 
 // 		// Update face controllers
-		for (int i = 0; i < g_faceControllers.size(); ++i)
-		{
-			g_faceControllers[i]->Update(fElapsedTime);
-			g_faceControllers[i]->Render(techName.c_str());
-		}
+// 		for (int i = 0; i < g_faceControllers.size(); ++i)
+// 		{
+// 			g_faceControllers[i]->Update(fElapsedTime);
+// 			g_faceControllers[i]->Render(techName.c_str());
+// 		}
+
+		g_Flock->Update(fElapsedTime);
+		g_Flock->Render(false);
 
 // 		g_FaceControllerGenerate->Update(fElapsedTime);
 // 		g_FaceControllerGenerate->Render(techName.c_str());
@@ -1309,8 +1317,9 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_pFaceFactory);
 	SAFE_DELETE(g_speakController);
 	SAFE_DELETE(g_ik);
+	SAFE_DELETE(g_Flock);
 
-	assert( D3D11RenderDevice::Instance().GetReference() == 0);
+	//assert( D3D11RenderDevice::Instance().GetReference() == 0);
 
 	for (int i = 0; i < g_faceControllers.size(); ++i)
 	{
