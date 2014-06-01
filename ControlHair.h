@@ -2,6 +2,7 @@
 
 #include <d3dx9.h>
 #include <vector>
+#include "BoundingSphere.h"
 
 using namespace std;
 
@@ -25,8 +26,14 @@ public:
 	void Update(float deltaTime);
 	void Render();	
 
+	void AddPoint(D3DXVECTOR3 point);
+	void UpdateSimulation(float deltaTime, vector<BoundingSphere> &headSpheres);
+
 public:
 	std::vector<D3DXVECTOR3> m_points;
 	std::vector<D3DXVECTOR3> m_destPoints;
+
+	std::vector<D3DXVECTOR3> m_originalPoints;
+	std::vector<D3DXVECTOR3> m_velocities;
 };
 

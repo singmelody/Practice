@@ -249,6 +249,12 @@
     <ClCompile Include="ControlHair.cpp">
       <Filter>Hair</Filter>
     </ClCompile>
+    <ClCompile Include="BoundingSphere.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="DummyFace.cpp">
+      <Filter>Hair</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">
@@ -348,6 +354,12 @@
       <Filter>Hair</Filter>
     </ClInclude>
     <ClInclude Include="ControlHair.h">
+      <Filter>Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingSphere.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="DummyFace.h">
       <Filter>Hair</Filter>
     </ClInclude>
   </ItemGroup>

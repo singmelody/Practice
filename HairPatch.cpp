@@ -20,6 +20,8 @@ HairPatch::HairPatch(ControlHair* pCH1, ControlHair* pCH2, ControlHair* pCH3, Co
 	m_controlHairs[3] = pCH4;
 
 	CreateHairStrips(12, 0.15f, 0.2f);
+
+	m_center = GetBlendedPoint(D3DXVECTOR2(0.5f, 0.5f), 0.0f);
 }
 
 HairPatch::~HairPatch()
@@ -49,7 +51,7 @@ HairVertex HairPatch::GetBlendedVertex(D3DXVECTOR2 pos, float prc, bool oddVerte
 	//Set vertex data
 	hv.position = D3DXVECTOR3(pos.x, pos.y, m_controlHairs[0]->GetSegmentPercent(prc));
 	hv.normal = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	hv.uv = D3DXVECTOR2(oddVertex ? 0.0f : 1.0f, min(prc, 0.99f));
+	hv.uv = D3DXVECTOR2(oddVertex ? 0.0f : 1.0f, max(min(prc, 0.99f), 0.01f));
 
 	//Get segment indices
 	pair<int, int> indices = m_controlHairs[0]->GetBlendIndices(prc);
@@ -178,4 +180,44 @@ void HairPatch::Render()
 	{
 		m_pHairMesh->DrawSubset(0);
 	}
+}
+
+std::vector<D3DXVECTOR2> HairPatch::GetStripComplexPlacements(float sizePerHairStrip)
+{
+	//Place hair strips at random
+	vector<D3DXVECTOR2> strips;
+	for(int i=0; i<200; i++)
+	{
+		//Create random hair position
+		D3DXVECTOR2 hairPos = D3DXVECTOR2((rand()%1000) / 1000.0f,
+			(rand()%1000) / 1000.0f);
+
+		//Check that this hair isn't to close to another hair
+		bool valid = true;
+		for(int h=0; h<(int)strips.size() && valid; h++)
+		{
+			if(D3DXVec3Length(&(GetBlendedPoint(hairPos, 0.0f) - GetBlendedPoint(strips[h], 0.0f))) < sizePerHairStrip)
+				valid = false;
+		}
+
+		//Add hair if valid
+		if(valid)
+			strips.push_back(hairPos);
+	}
+
+	//order strips for correct alpha blending
+	for(int i=0; i<(int)strips.size(); i++)
+	{
+		for(int j=i+1; j<(int)strips.size(); j++)
+		{
+			if(strips[j].y > strips[i].y)
+			{
+				D3DXVECTOR2 temp = strips[i];
+				strips[i] = strips[j];
+				strips[j] = temp; 
+			}
+		}
+	}
+
+	return strips;
 }

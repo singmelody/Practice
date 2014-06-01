@@ -25,6 +25,7 @@ public:
 	HairVertex GetBlendedVertex(D3DXVECTOR2 pos, float prc, bool oddVertex);
 
 	std::vector<D3DXVECTOR2> GetStripPlacements(float sizePerHairStrip);
+	std::vector<D3DXVECTOR2> GetStripComplexPlacements(float sizePerHairStrip);
 	void CreateHairStrips(int numSegments, float sizePerHairStrip, float stripSize);
 
 	void Render();
@@ -32,5 +33,5 @@ public:
 public:
 	ID3DXMesh* m_pHairMesh;
 	ControlHair* m_controlHairs[4];
-
+	D3DXVECTOR3 m_center;
 };

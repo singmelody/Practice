@@ -802,3 +802,4 @@ technique Hair
 		PixelShader  = compile ps_2_0 RenderScenePS(true);
 	}
 }
+

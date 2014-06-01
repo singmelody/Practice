@@ -28,6 +28,7 @@
 #include "Flock.h"
 #include "Crowd.h"
 #include "Hair.h"
+#include "DummyFace.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -69,6 +70,7 @@ Flock*						g_Flock;
 Crowd*						g_Crowd;
 float						g_decalCooldown;
 Hair*						g_pHair;
+DummyFace*					g_DummyFace;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -572,7 +574,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 
 	g_Crowd = new Crowd(50);
 
-	g_pHair = new Hair();
+	//g_pHair = new Hair();
+
+	g_pHair = new Hair(true);
+
+	g_DummyFace = new DummyFace();
 
     return S_OK;
 }
@@ -824,8 +830,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( 0.0f, 6.0f, 8.0f);
-		D3DXVECTOR3 vecAt ( 0.0f, 2.0f, 0.0f );
+		D3DXVECTOR3 vecEye( -0.6f, 0.0f, -0.6f);
+		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -986,9 +992,15 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 //			RenderShadow();
 		}
 
+		// Dummy hair
+		g_DummyFace->Render();
+
+
+		g_pHair->RenderComplex(vecEye);
+
 		// Hair
-		g_pHair->Update(fElapsedTime);
-		g_pHair->Render();
+// 		g_pHair->Update(fElapsedTime);
+// 		g_pHair->Render();
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
@@ -1378,6 +1390,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_Flock);
 	SAFE_DELETE(g_Crowd);
 	SAFE_DELETE(g_pHair);
+	SAFE_DELETE(g_DummyFace);
 
 	//assert( D3D11RenderDevice::Instance().GetReference() == 0);
 
