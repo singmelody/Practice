@@ -251,4 +251,3 @@ FaceController* g_FaceControllerGenerate = NULL;
 D3DXVECTOR3		g_rayOrg;
 D3DXVECTOR3		g_rayDir;	
 FaceFacory*		g_pFaceFactory = NULL;
-CModelViewerCamera          g_Camera;

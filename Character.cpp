@@ -69,7 +69,9 @@ Character::Character(WCHAR* fileName, D3DXMATRIX &world) : RagDoll(fileName, wor
 
 Character::~Character()
 {
-
+	SAFE_DELETE(m_pFaceController);
+	SAFE_DELETE(m_pFace);
+	SAFE_DELETE(m_pIK);
 }
 
 void Character::Update(float deltaTime)
@@ -236,12 +238,7 @@ void Character::RenderFace(BoneMesh *pFacePlaceholder)
 	D3DXMatrixIdentity(&world);
 	g_pEffect->SetMatrix("g_mWorld", &world); //&pController->m_headMatrix);
 
-	D3DXMATRIXA16 mView;
-	D3DXMATRIXA16 mProj;
-	mProj = *g_Camera.GetProjMatrix();
-	mView = *g_Camera.GetViewMatrix();
-
-	g_pEffect->SetMatrix("g_mVP", &(mView * mProj));
+	g_pEffect->SetMatrix("g_mVP", &(view * proj));
 	g_pEffect->SetTexture("g_MeshTexture", m_pFace->m_faceTex);
 	g_pEffect->SetVector("weights", &m_pFaceController->m_morphWeights);
 

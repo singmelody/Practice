@@ -412,7 +412,7 @@
     <ClCompile Include="RenderStates.cpp" />
     <ClCompile Include="skinnedMesh.cpp" />
     <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="Utils.h" />
+    <ClInclude Include="Utils.h" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="WavDecoder.cpp" />
     <ClInclude Include="animation.h" />
@@ -449,12 +449,12 @@
     <ClInclude Include="skinnedMesh.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WavDecoder.h" />
-    <CustomBuild Include="Color.fx">
-      <FileType>Document</FileType>
+    <None Include="Color.fx">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">fxc.exe /Fc /Od /Zi /T fx_5_0 /Fo "%(FullPath)o" "%(FullPath)"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">fxc compile for debug: %(FullPath)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Directory)%(Filename).fxo</Outputs>
-    </CustomBuild>
+      <FileType>Document</FileType>
+    </None>
     <None Include="Basic.fx" />
     <None Include="BezierTessellation.fx" />
     <None Include="Blur.fx" />

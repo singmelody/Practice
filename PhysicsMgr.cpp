@@ -52,6 +52,9 @@ void PhysicsManager::Init()
 	// new dispatcher
 	m_dispatcher = new btCollisionDispatcher(m_config);
 
+	m_floorState = new btDefaultMotionState();
+	m_floorShape = new btStaticPlaneShape(btVector3(0,1,0), 0.0);
+
 
 	m_dynamicsWorld = NULL;
 	m_floor = NULL;
@@ -64,23 +67,18 @@ void PhysicsManager::Init()
 
 void PhysicsManager::Release()
 {
-	//ResetBase();
+	ResetBase();
 
-// 	m_ragDoll->Release();
-// 	SAFE_DELETE(m_ragDoll);
-
-	if(m_floor)
+	for(int i=0; i<(int)m_ragdolls.size(); i++)
 	{
-		btMotionState* ms = m_floor->getMotionState();
-		SAFE_DELETE(ms);
-
-		btCollisionShape* cs = m_floor->getCollisionShape();
-		SAFE_DELETE(cs);
-
-		SAFE_DELETE(m_floor);
+		SAFE_DELETE(m_ragdolls[i]);
 	}
 
-	//SAFE_DELETE(m_dynamicsWorld);
+	m_ragdolls.clear();
+
+//	SAFE_DELETE(m_floor);
+
+	SAFE_DELETE(m_dynamicsWorld);
 
 	SAFE_DELETE(m_dispatcher);
 
@@ -207,7 +205,7 @@ PhysicsManager::PhysicsManager()
 
 PhysicsManager::~PhysicsManager()
 {
-
+	Release();
 }
 
 void PhysicsManager::Update(float deltaTime)
@@ -236,50 +234,52 @@ void PhysicsManager::Render()
 	}
 }
 
-// void PhysicsManager::ResetBase()
-// {
-// 	// Reset world
-// 	if (m_dynamicsWorld != NULL)
-// 	{
-// 		// remove all render object
-// 		for (int i = 0; i < m_boxes.size(); ++i)
-// 		{
-// 			m_boxes[i]->Release();
-// 			SAFE_DELETE(m_boxes[i]);
-// 		}
-// 		m_boxes.clear();
-// 
-// 		// create all the constraint
-// 		for (int i = m_dynamicsWorld->getNumConstraints() - 1; 
-// 			i >= 0; --i)
-// 		{
-// 			btTypedConstraint* typed = m_dynamicsWorld->getConstraint(i);
-// 			m_dynamicsWorld->removeConstraint(typed);
-// 			SAFE_DELETE(typed);
-// 		}
-// 
-// 		// remove all rigid body
-// 		btCollisionObjectArray& array =  m_dynamicsWorld->getCollisionObjectArray();
-// 		int Nums = m_dynamicsWorld->getNumCollisionObjects();
-// 		for (int i = Nums - 1; i >= 0; --i)
-// 		{
-// 			btCollisionObject* obj = array[i];
-// 			btRigidBody* b = btRigidBody::upcast(obj);
-// 
-// 			btMotionState *state = b->getMotionState();
-// 			SAFE_DELETE(state);
-// 
-// 			btCollisionShape* shape = b->getCollisionShape();
-// 			SAFE_DELETE(shape);
-// 
-// 			m_dynamicsWorld->removeCollisionObject(obj);
-// 			SAFE_DELETE(obj);
-// 		}
-// 	}
-// }
+void PhysicsManager::ResetBase()
+{
+	// Reset world
+	if (m_dynamicsWorld != NULL)
+	{
+		// remove all render object
+		for (int i = 0; i < m_boxes.size(); ++i)
+		{
+			m_boxes[i]->Release();
+			SAFE_DELETE(m_boxes[i]);
+		}
+		m_boxes.clear();
+
+		// create all the constraint
+		for (int i = m_dynamicsWorld->getNumConstraints() - 1; 
+			i >= 0; --i)
+		{
+			btTypedConstraint* typed = m_dynamicsWorld->getConstraint(i);
+			m_dynamicsWorld->removeConstraint(typed);
+			SAFE_DELETE(typed);
+		}
+
+		// remove all rigid body
+		btCollisionObjectArray& array =  m_dynamicsWorld->getCollisionObjectArray();
+		int Nums = m_dynamicsWorld->getNumCollisionObjects();
+		for (int i = Nums - 1; i >= 0; --i)
+		{
+			btCollisionObject* obj = array[i];
+			btRigidBody* b = btRigidBody::upcast(obj);
+
+			btMotionState *state = b->getMotionState();
+			SAFE_DELETE(state);
+
+			btCollisionShape* shape = b->getCollisionShape();
+			SAFE_DELETE(shape);
+
+			m_dynamicsWorld->removeCollisionObject(obj);
+			SAFE_DELETE(obj);
+		}
+	}
+}
 
 void PhysicsManager::Reset()
 {
+	ResetBase();
+	
 	//Reset world
 	SAFE_DELETE(m_dynamicsWorld);
 
@@ -304,6 +304,6 @@ void PhysicsManager::Reset()
 
 	//Create dynamics world and add a floor...
 	m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
-	m_floor = new btRigidBody(0.0f, new btDefaultMotionState(), new btStaticPlaneShape(btVector3(0,1,0), 0.0));
+	m_floor = new btRigidBody(0.0f, m_floorState, m_floorShape);
 	m_dynamicsWorld->addRigidBody(m_floor);
 }

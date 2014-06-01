@@ -27,7 +27,7 @@ public:
 	void Render();
 
 	void Reset();
-// 	void ResetBase();
+ 	void ResetBase();
 // 	void ResetBox();
 // 	void ResetJoint(PHYS_CONTRAINTS c);
 // 	void ResetRagDoll();
@@ -45,6 +45,8 @@ private:
 	btDynamicsWorld*		m_dynamicsWorld;
 	btDefaultCollisionConfiguration* m_config;
 	btRigidBody*			m_floor;
+	btMotionState*			m_floorState;
+	btCollisionShape*		m_floorShape;
 
 	float					m_time;
 

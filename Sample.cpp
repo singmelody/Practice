@@ -30,6 +30,7 @@
 #include "Hair.h"
 #include "DummyFace.h"
 #include "Character.h"
+#include "animation.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -37,6 +38,7 @@
 //--------------------------------------------------------------------------------------
 // Global variables
 //--------------------------------------------------------------------------------------
+CModelViewerCamera          g_Camera;               // A model viewing camera
 ID3DXFont*                  g_pFont = NULL;         // Font for drawing text
 ID3DXSprite*                g_pSprite = NULL;       // Sprite for batching draw text calls
 bool                        g_bShowHelp = true;     // If true, it renders the UI control text
@@ -411,7 +413,7 @@ void RandomCompressedCallbackAnimations()
 HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                  void* pUserContext )
 {
-	//_CrtSetBreakAlloc(3132);
+	//_CrtSetBreakAlloc(1192);
     HRESULT hr;
 
     V_RETURN( g_DialogResourceManager.OnD3D9CreateDevice( pd3dDevice ) );

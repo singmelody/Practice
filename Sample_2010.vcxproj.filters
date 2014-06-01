@@ -147,6 +147,9 @@
     <None Include="Sample.fx">
       <Filter>FX</Filter>
     </None>
+    <None Include="Color.fx">
+      <Filter>FX</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
@@ -157,9 +160,6 @@
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils.h">
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="BoneHierarchyLoader.cpp">
@@ -368,10 +368,8 @@
     <ClInclude Include="Character.h">
       <Filter>Animation</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="Color.fx">
-      <Filter>FX</Filter>
-    </CustomBuild>
+    <ClInclude Include="Utils.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
