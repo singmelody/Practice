@@ -995,7 +995,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Dummy hair
 		g_DummyFace->Render();
 
-
+		g_pHair->UpdateComplex(fElapsedTime);
 		g_pHair->RenderComplex(vecEye);
 
 		// Hair

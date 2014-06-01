@@ -22,6 +22,7 @@ public:
 	int GetNumFaces();
 
 	void Update(float deltaTime);
+	void UpdateComplex(float deltaTime);
 	void Render();
 	void RenderComplex(D3DXVECTOR3 &camPos);
 public:

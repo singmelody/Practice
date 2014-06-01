@@ -119,6 +119,14 @@ void Hair::Update(float deltaTime)
 		m_controlHairs[i]->Update(deltaTime);
 }
 
+void Hair::UpdateComplex(float deltaTime)
+{
+	deltaTime = min(deltaTime, 0.1f);
+
+	for(int i=0; i<(int)m_controlHairs.size(); i++)
+		m_controlHairs[i]->UpdateSimulation(deltaTime, m_headSpheres);
+}
+
 void Hair::Render()
 {
 	//Render control hairs
