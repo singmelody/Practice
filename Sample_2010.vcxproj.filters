@@ -58,6 +58,9 @@
     <Filter Include="Decl">
       <UniqueIdentifier>{2a2e8976-ba72-4cf5-b37c-385f06338b32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Hair">
+      <UniqueIdentifier>{1f4f0dbb-d555-4285-bb1d-608c21e73dd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="DXUT\Optional\directx.ico">
@@ -234,6 +237,15 @@
     <ClCompile Include="CharacterDecal.cpp">
       <Filter>Decl</Filter>
     </ClCompile>
+    <ClCompile Include="Hair.cpp">
+      <Filter>Hair</Filter>
+    </ClCompile>
+    <ClCompile Include="HairPatch.cpp">
+      <Filter>Hair</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlHair.cpp">
+      <Filter>Hair</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sample.fx">
@@ -330,6 +342,15 @@
     </ClInclude>
     <ClInclude Include="CharacterDecal.h">
       <Filter>Decl</Filter>
+    </ClInclude>
+    <ClInclude Include="Hair.h">
+      <Filter>Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="HairPatch.h">
+      <Filter>Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlHair.h">
+      <Filter>Hair</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
