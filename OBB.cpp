@@ -41,6 +41,10 @@ void OBB::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXQUATERNION& rot, bool dyna
 	if(!dynamic)mass = 0.0f;
 
 	m_Body = new btRigidBody(mass, ms, cs, localInertia);
+
+	m_Body->setDamping(0.05f, 0.85f);
+	m_Body->setDeactivationTime(0.8f);
+	m_Body->setSleepingThresholds(1.6f, 2.0f);
 }
 
 
@@ -71,6 +75,8 @@ void OBB::Render(const char* tech)
 void OBB::Release()
 {
 	SAFE_RELEASE(m_pMesh);
+
+	SAFE_DELETE(m_Body);
 
 	// Rigid Body ‘› ±”…mgr Õ∑≈
 }

@@ -9,10 +9,13 @@ public:
 	RagDoll(WCHAR* fileName, D3DXMATRIX& world);
 	~RagDoll(void);
 
+	void InitRagdoll();
 	void InitBones(Bone* bone);
 	void Release();
 	void Update(float deltaTime);
 	void Render(const char* tech, bool showOBB);
+	void Render();
+
 	void UpdateSkeleton(Bone* bone);
 	OBB* CreateBoneBox(Bone* parent, Bone* bone, D3DXVECTOR3 size, D3DXQUATERNION rot);
 	void CreateHinge(Bone* parent, OBB* A, OBB* B, float upperLimit, float lowerLimit, D3DXVECTOR3& hingeAxisA, D3DXVECTOR3& hingeAxisB, bool ignoreCollisions = true);

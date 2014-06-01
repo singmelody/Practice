@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DXUT.h"
+#include "DXUTcamera.h"
 #include "skinnedMesh.h"
 #include "animation.h"
 #include <string>
@@ -36,6 +37,7 @@ class Face;
 class ComplexFace;
 class FaceModel;
 class FaceController;
+class FaceFacory;
 
 extern ID3DXEffect*		g_pEffect;       // D3DX effect interface
 extern SkinnedMesh*		g_SkinnedMesh;
@@ -53,6 +55,8 @@ extern FaceController*  g_FaceControllerGenerate;
 extern ComplexFace*		g_ComplexFace;
 extern D3DXVECTOR3		g_rayOrg;
 extern D3DXVECTOR3		g_rayDir;	
+extern FaceFacory*		g_pFaceFactory;
+
 
 enum PHYS_CONTRAINTS
 {
@@ -78,3 +82,5 @@ enum PHYS_CONTRAINTS
 #define HR(x) (x)
 #endif
 #endif 
+
+extern CModelViewerCamera          g_Camera;               // A model viewing camera

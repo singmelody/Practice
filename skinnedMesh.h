@@ -111,6 +111,7 @@ public:
 	void RenderSoft(Bone *bone, const char* animTech, const char* staticTech, bool shadow = false);
 	void RenderHAL(Bone* bone,const char* animTech, const char* staticTech, bool shadow = false);
 	void RenderSkeleton(Bone* bone, Bone *parent, D3DXMATRIX world);
+	void RenderMesh(Bone* bone);
 
 	void SetShadowMatrix(D3DXMATRIX& matrix) { m_shadow = matrix; }
 
@@ -129,7 +130,7 @@ public:
 protected:
 	D3DXFRAME *m_pRootBone;
 
-private:		
+protected:		
 	void SetupBoneMatrixPointers(Bone *bone);
 
 	LPD3DXMESH m_pSphereMesh;

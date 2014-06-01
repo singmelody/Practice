@@ -64,6 +64,49 @@ void Face::Render(const char* tech)
 	g_pEffect->End();
 }
 
+
+ComplexFace::ComplexFace()
+{
+	m_baseMesh =  NULL;
+	m_binkMesh = NULL;
+	m_FaceTexture = NULL;
+
+	//Face Vertex Format
+	D3DVERTEXELEMENT9 faceVertexDecl[] = 
+	{
+		//1st Stream: Base Mesh
+		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},	
+		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0},
+		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	
+
+		//2nd Stream
+		{1,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1},
+		{1, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   1},
+		{1, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
+
+		//3rd Stream
+		{2,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 2},
+		{2, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   2},
+		{2, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2},
+
+		//4th Stream
+		{3,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 3},
+		{3, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   3},
+		{3, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3},
+
+		//5th Stream
+		{4,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 4},
+		{4, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   4},
+		{4, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 4},
+
+		D3DDECL_END()
+	};
+
+	//Create Face Vertex Declaration
+	DXUTGetD3D9Device()->CreateVertexDeclaration(faceVertexDecl, &m_pFaceVertexDecl);
+}
+
+
 ComplexFace::ComplexFace(const std::string& filename)
 {
 	m_baseMesh = NULL;
@@ -121,8 +164,11 @@ ComplexFace::ComplexFace(const std::string& filename)
 	LoadTex( "meshes\\face.jpg", &m_FaceTexture);
 
 	//Init Eyes
-	m_eyes[0].Init(D3DXVECTOR3(-0.037f, 0.04f, -0.057f));
-	m_eyes[1].Init(D3DXVECTOR3( 0.037f, 0.04f, -0.057f));
+	int textureIndex = rand()%5;
+
+	//Init Eyes
+	m_eyes[0].Init(D3DXVECTOR3(- 0.037f,  + 0.125f, - 0.063f));
+	m_eyes[1].Init(D3DXVECTOR3( + 0.037f,  + 0.125f,- 0.063f));
 }
 
 ComplexFace::~ComplexFace()
@@ -285,6 +331,38 @@ void ComplexFace::ExtractMeshes(D3DXFRAME* frame)
 
 	ExtractMeshes(frame->pFrameFirstChild);
 	ExtractMeshes(frame->pFrameSibling);
+}
+
+void FaceModel::SetStreamSources(FaceController *pController)
+{
+	//Set streams
+	DWORD vSize = D3DXGetFVFVertexSize(m_baseMesh->GetFVF());
+	IDirect3DVertexBuffer9* baseMeshBuffer = NULL;
+	m_baseMesh->GetVertexBuffer(&baseMeshBuffer);
+	DXUTGetD3D9Device()->SetStreamSource(0, baseMeshBuffer, 0, vSize);
+
+	//Set Blink Source
+	IDirect3DVertexBuffer9* blinkBuffer = NULL;
+	m_binkMesh->GetVertexBuffer(&blinkBuffer);
+	DXUTGetD3D9Device()->SetStreamSource(1, blinkBuffer, 0, vSize);
+
+	//Set Emotion Source
+	IDirect3DVertexBuffer9* emotionBuffer = NULL;
+	m_emotionMeshes[pController->m_emotionIdx]->GetVertexBuffer(&emotionBuffer);
+	DXUTGetD3D9Device()->SetStreamSource(2, emotionBuffer, 0, vSize);
+
+	//Set Speech Sources
+	for(int i=0; i<2; i++)
+	{
+		IDirect3DVertexBuffer9* speechBuffer = NULL;
+		m_speechMeshes[pController->m_speechIndices[i]]->GetVertexBuffer(&speechBuffer);
+		DXUTGetD3D9Device()->SetStreamSource(3 + i, speechBuffer, 0, vSize);	
+	}
+
+	//Set Index buffer
+	IDirect3DIndexBuffer9* ib = NULL;
+	m_baseMesh->GetIndexBuffer(&ib);
+	DXUTGetD3D9Device()->SetIndices(ib);
 }
 
 FaceModel::FaceModel(const char* filename)

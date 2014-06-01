@@ -33,8 +33,12 @@ FaceFacory::FaceFacory(const char* fileName)
 	hierarchy.DestroyFrame(root);
 
 	//Load textures
-	std::string texNames[8] = {"meshes\\face01.jpg", "meshes\\face02.jpg", "meshes\\face03.jpg", "meshes\\face04.jpg",
-		"meshes\\face05.jpg", "meshes\\face06.jpg", "meshes\\face07.jpg", "meshes\\face08.jpg"};
+	std::string texNames[8] = {
+		"meshes\\face01.jpg", "meshes\\face02.jpg", 
+		"meshes\\face03.jpg", "meshes\\face04.jpg",
+		"meshes\\face05.jpg", "meshes\\face06.jpg", 
+		"meshes\\face07.jpg", "meshes\\face08.jpg"
+	};
 
 	for(int i=0; i<8; i++)
 	{

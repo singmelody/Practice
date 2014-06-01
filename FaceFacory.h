@@ -3,6 +3,7 @@
 #include <vector>
 
 class FaceModel;
+class ComplexFace;
 
 class FaceFacory
 {

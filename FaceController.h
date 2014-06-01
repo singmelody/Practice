@@ -15,6 +15,7 @@ public:
 	void Update(float deltaTime);
 	void SpeakUpdate(float deltaTime);
 	void Render(const char* tech);
+	void RenderEyes();
 	
 	void Speak(const std::vector<Viseme>& visemes);
 	void UpdateSpeech(float deltaTime);

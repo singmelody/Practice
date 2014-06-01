@@ -385,6 +385,7 @@
     <ClCompile Include="BlurFilter.cpp" />
     <ClCompile Include="BoneHierarchyLoader.cpp" />
     <ClCompile Include="BoundingSphere.cpp" />
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="CharacterDecal.cpp" />
     <ClCompile Include="ControlHair.cpp" />
     <ClCompile Include="Crowd.cpp" />
@@ -420,6 +421,7 @@
     <ClInclude Include="BlurFilter.h" />
     <ClInclude Include="BoneHierarchyLoader.h" />
     <ClInclude Include="BoundingSphere.h" />
+    <ClInclude Include="Character.h" />
     <ClInclude Include="CharacterDecal.h" />
     <ClInclude Include="ControlHair.h" />
     <ClInclude Include="Crowd.h" />

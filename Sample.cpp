@@ -29,6 +29,7 @@
 #include "Crowd.h"
 #include "Hair.h"
 #include "DummyFace.h"
+#include "Character.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -41,7 +42,6 @@ ID3DXSprite*                g_pSprite = NULL;       // Sprite for batching draw 
 bool                        g_bShowHelp = true;     // If true, it renders the UI control text
 bool						g_bShowSkeloton = false;
 bool						g_bAnimtion = false;
-CModelViewerCamera          g_Camera;               // A model viewing camera
 CDXUTDialogResourceManager  g_DialogResourceManager; // manager for shared resources of dialogs
 CD3DSettingsDlg             g_SettingsDlg;          // Device settings dialog
 CDXUTDialog                 g_HUD;                  // manages the 3D UI
@@ -63,7 +63,6 @@ std::vector<ID3DXAnimationController*> g_animControllers;
 float						g_showTime = 0.0f;
 bool						g_ShowOBB = false;
 std::vector<FaceController*> g_faceControllers;
-FaceFacory*					g_pFaceFactory = NULL;
 FaceController*				g_speakController = NULL;
 InverseKinematics*			g_ik = NULL;
 Flock*						g_Flock;
@@ -71,6 +70,7 @@ Crowd*						g_Crowd;
 float						g_decalCooldown;
 Hair*						g_pHair;
 DummyFace*					g_DummyFace;
+Character*					g_Character;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -520,8 +520,8 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
     V_RETURN( g_pEffect->SetValue( "g_MaterialDiffuseColor", &colorMtrlDiffuse, sizeof( D3DXCOLOR ) ) );
 
 	// create physcis
-// 	g_physicsEngine = new PhysicsManager();
-// 	g_physicsEngine->Init();
+	g_physicsEngine = new PhysicsManager();
+	g_physicsEngine->Init();
 
 	// create morph anim
 	g_Morph = new Morph();
@@ -579,6 +579,11 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 	g_pHair = new Hair(true);
 
 	g_DummyFace = new DummyFace();
+
+	//Create character
+	D3DXMATRIX world;
+	D3DXMatrixIdentity(&world);
+	g_Character = new Character(L"meshes\\soldier.x", world);
 
     return S_OK;
 }
@@ -830,8 +835,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( -0.6f, 0.0f, -0.6f);
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 0.0f, 2.0f, -2.0f);
+		D3DXVECTOR3 vecAt ( 0.0f, 1.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -983,7 +988,7 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 
 		// Physics
-// 		g_physicsEngine->Update(fElapsedTime);
+ 		g_physicsEngine->Update(fElapsedTime * 0.75f);
 // 		g_physicsEngine->Render(techName.c_str(),g_ShowOBB);
 
 
@@ -993,14 +998,21 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		}
 
 		// Dummy hair
-		g_DummyFace->Render();
-
-		g_pHair->UpdateComplex(fElapsedTime);
-		g_pHair->RenderComplex(vecEye);
+// 		g_DummyFace->Render();
+// 
+// 		g_pHair->UpdateComplex(fElapsedTime);
+// 		g_pHair->RenderComplex(vecEye);
 
 		// Hair
 // 		g_pHair->Update(fElapsedTime);
 // 		g_pHair->Render();
+
+		//Update Character
+		g_Character->Update(fElapsedTime);
+
+		//Draw Character
+		g_Character->Render();
+
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
@@ -1195,17 +1207,17 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 				}
 			case VK_NUMPAD1:
 				{
-					g_physicsEngine->ResetJoint(HINGE);
+					//g_physicsEngine->ResetJoint(HINGE);
 					break;
 				}
 			case VK_NUMPAD2:
 				{
-					g_physicsEngine->ResetJoint(TWISTCONE);
+					//g_physicsEngine->ResetJoint(TWISTCONE);
 					break;
 				}
 			case VK_NUMPAD3:
 				{
-					g_physicsEngine->ResetJoint(BALLPOINT);
+					//g_physicsEngine->ResetJoint(BALLPOINT);
 					break;
 				}
 			case VK_NUMPAD4:
@@ -1256,8 +1268,48 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 						g_SkinnedMesh->AddDecal();
 						g_decalCooldown = 0.3f;
 					}
+					break;
 				}
-
+			case VK_F4:
+				{
+					//Reset Example
+					if(g_Character->m_dead)
+					{
+						g_physicsEngine->Reset();
+						D3DXMATRIX world;
+						D3DXMatrixIdentity(&world);
+						SAFE_DELETE(g_Character);
+						g_Character = new Character(L"meshes\\soldier.x", world);
+					}
+					break;
+				}
+			case VK_F8:
+				{
+					g_Character->Kill();
+					break;
+				}
+			case VK_F5:
+				{
+					//Generate a new Random Face
+					SAFE_DELETE(g_Character->m_pFaceController);
+					SAFE_DELETE(g_Character->m_pFace);
+					g_Character->m_pFace = g_pFaceFactory->GenerateRandomFace();
+					g_Character->m_pFaceController = new FaceController(D3DXVECTOR3(0.0f, 0.0f, 0.0f), g_Character->m_pFace);
+					break;
+				}
+			case VK_F6:
+				{
+					//Set IK
+					g_Character->m_lookAtIK = !g_Character->m_lookAtIK;
+					Sleep(300);
+					break;
+				}
+			case VK_F7:
+				{
+					g_Character->m_armIK = !g_Character->m_armIK;
+					Sleep(300);
+					break;
+				}
         }
     }
 }
@@ -1391,6 +1443,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_Crowd);
 	SAFE_DELETE(g_pHair);
 	SAFE_DELETE(g_DummyFace);
+	SAFE_DELETE(g_Character);
 
 	//assert( D3D11RenderDevice::Instance().GetReference() == 0);
 

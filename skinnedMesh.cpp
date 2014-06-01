@@ -833,3 +833,76 @@ void BoneMesh::CalculateDecalUV(ID3DXMesh* decalMesh, D3DXVECTOR3 &hitPos, float
 
 	decalMesh->UnlockVertexBuffer();
 }
+
+void SkinnedMesh::RenderMesh(Bone *bone)
+{
+	if(bone == NULL)bone = (Bone*)m_pRootBone;
+
+	//If there is a mesh to render...
+	if(bone->pMeshContainer != NULL)
+	{
+		BoneMesh *boneMesh = (BoneMesh*)bone->pMeshContainer;
+
+		if (boneMesh->pSkinInfo != NULL)
+		{		
+			// set up bone transforms
+			int numBones = boneMesh->pSkinInfo->GetNumBones();
+			for(int i=0;i < numBones;i++)
+			{
+				D3DXMatrixMultiply(&boneMesh->currentBoneMatrices[i],
+								   &boneMesh->boneOffsetMatrices[i], 
+								   boneMesh->boneMatrixPtrs[i]);
+			}
+
+			D3DXMATRIX view, proj, identity;				
+			g_pEffect->SetMatrixArray("FinalTransforms", boneMesh->currentBoneMatrices, boneMesh->pSkinInfo->GetNumBones());
+			D3DXMatrixIdentity(&identity);
+
+			//Render the mesh
+			for(int i=0;i < (int)boneMesh->NumAttributeGroups;i++)
+			{
+				int mtrlIndex = boneMesh->attributeTable[i].AttribId;
+				DXUTGetD3D9Device()->SetMaterial(&(boneMesh->materials[mtrlIndex]));
+				DXUTGetD3D9Device()->SetTexture(0, boneMesh->textures[mtrlIndex]);
+				g_pEffect->SetMatrix("g_mWorld", &identity);
+
+				g_pEffect->SetTexture("g_MeshTexture", boneMesh->textures[mtrlIndex]);
+				D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("RenderSceneWithTexture1LightHAL");
+				g_pEffect->SetTechnique(hTech);
+				g_pEffect->Begin(NULL, NULL);
+				g_pEffect->BeginPass(0);
+
+				boneMesh->MeshData.pMesh->DrawSubset(mtrlIndex);
+
+				g_pEffect->EndPass();
+				g_pEffect->End();
+			}
+		}
+/*		else		//In this example we ignore the static meshes (i.e. helmet + rifle)
+		{
+			//Normal Static Mesh
+			g_pEffect->SetMatrix("matW", &bone->CombinedTransformationMatrix);
+
+			D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("Lighting");
+			g_pEffect->SetTechnique(hTech);
+
+			//Render the mesh
+			for(int i=0;i < (int)boneMesh->materials.size();i++)
+			{
+				DXUTGetD3D9Device()->SetMaterial(&boneMesh->materials[i]);
+				g_pEffect->SetTexture("texDiffuse", boneMesh->textures[i]);
+
+				g_pEffect->Begin(NULL, NULL);
+				g_pEffect->BeginPass(0);
+
+				boneMesh->OriginalMesh->DrawSubset(i);
+
+				g_pEffect->EndPass();
+				g_pEffect->End();
+			}
+		}		*/
+	}
+
+	if(bone->pFrameSibling != NULL)RenderMesh((Bone*)bone->pFrameSibling);
+	if(bone->pFrameFirstChild != NULL)RenderMesh((Bone*)bone->pFrameFirstChild);
+}

@@ -23,19 +23,23 @@ public:
 	void Init();
 	void Release();
 	void Update(float deltaTime);
-	void Render(const char* tech,bool showOBB);
+	//void Render(const char* tech,bool showOBB);
+	void Render();
 
-	void ResetBase();
-	void ResetBox();
-	void ResetJoint(PHYS_CONTRAINTS c);
-	void ResetRagDoll();
+	void Reset();
+// 	void ResetBase();
+// 	void ResetBox();
+// 	void ResetJoint(PHYS_CONTRAINTS c);
+// 	void ResetRagDoll();
 
-	OBB* CreateOBB(D3DXVECTOR3 pos, D3DXVECTOR3 size);
+	OBB* CreateOBB(D3DXVECTOR3 pos, D3DXVECTOR3 size, bool dynamic=true);
 
 	D3DXVECTOR3 RandomVector(D3DXVECTOR3 &min, D3DXVECTOR3 &max);
 	float RandomFloat();
 
 	btDynamicsWorld* GetWorld(){return m_dynamicsWorld;}
+
+	std::vector<RagDoll*>	m_ragdolls;
 private:
 	std::vector<OBB*>		m_boxes;
 	btDynamicsWorld*		m_dynamicsWorld;
@@ -44,5 +48,9 @@ private:
 
 	float					m_time;
 
-	RagDoll*				m_ragDoll;
+
+	btBroadphaseInterface* m_broadphase;
+	btCollisionDispatcher* m_dispatcher;
+	btConstraintSolver* m_solver;
+	btDefaultCollisionConfiguration* m_collisionConfiguration;
 };

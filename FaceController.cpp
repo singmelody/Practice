@@ -19,8 +19,10 @@ FaceController::FaceController(D3DXVECTOR3 pos, FaceModel *pFace)
 	D3DXMatrixTranslation(&m_headMatrix, pos.x, pos.y, pos.z);
 
 	//Init Eyes
-	m_eyes[0].Init(D3DXVECTOR3(pos.x - 0.037f, pos.y + 0.04f, pos.z - 0.057f));
-	m_eyes[1].Init(D3DXVECTOR3(pos.x + 0.037f, pos.y + 0.04f, pos.z - 0.057f));
+	int textureIndex = rand()%5;
+
+	m_eyes[0].Init(D3DXVECTOR3(pos.x - 0.037f, pos.y + 0.125f, pos.z - 0.063f), textureIndex);
+	m_eyes[1].Init(D3DXVECTOR3(pos.x + 0.037f, pos.y + 0.125f, pos.z - 0.063f), textureIndex);
 }
 
 
@@ -162,18 +164,7 @@ void FaceController::Render(const char* tech)
 	if (m_faceModel)
 	{
 		m_faceModel->Render(this);
-
-		//Render Eyes
-		D3DXHANDLE hTech = g_pEffect->GetTechniqueByName(tech);
-		g_pEffect->SetTechnique(hTech);
-		g_pEffect->Begin(NULL, NULL);
-		g_pEffect->BeginPass(0);
-
-		m_eyes[0].Render();
-		m_eyes[1].Render();
-
-		g_pEffect->EndPass();
-		g_pEffect->End();
+		RenderEyes();
 	}
 }
 
@@ -255,6 +246,21 @@ void FaceController::SpeakWav(WavDecoder& wave)
 
 	m_visemeIndex = 1;
 	m_speechTime = 0.0f;
+}
+
+void FaceController::RenderEyes()
+{
+	//Render Eyes
+	D3DXHANDLE hTech = g_pEffect->GetTechniqueByName("RenderSceneWithTexture1Light");
+	g_pEffect->SetTechnique(hTech);
+	g_pEffect->Begin(NULL, NULL);
+	g_pEffect->BeginPass(0);
+
+	m_eyes[0].Render(m_headMatrix);
+	m_eyes[1].Render(m_headMatrix);
+
+	g_pEffect->EndPass();
+	g_pEffect->End();
 }
 
 Viseme::Viseme()

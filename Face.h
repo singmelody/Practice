@@ -16,7 +16,7 @@ public:
 	void Render(const char* tech);
 	void RenderEye(const char* tech, D3DXVECTOR3 pos);
 
-private:
+public:
 	ID3DXMesh*			m_faceMesh;
 	IDirect3DTexture9*	m_faceTexture;
 
@@ -26,14 +26,14 @@ private:
 class ComplexFace
 {
 public:
+	ComplexFace();
 	ComplexFace(const std::string& filename);
 	~ComplexFace();
 
 	void Update(float deltaTime);
 	void Render(const char* tech);
 	void ExtractMeshes(D3DXFRAME* frame);
-
-private:
+public:
 	ID3DXMesh* m_baseMesh;
 	ID3DXMesh* m_binkMesh;
 	std::vector<ID3DXMesh*> m_emotionMeshes;
@@ -56,6 +56,7 @@ public:
 
 	void Render(FaceController* pController);
 	void ExtractMeshes(D3DXFRAME* frame);
+	void SetStreamSources(FaceController *pController);
 
 public:
 	void AddTangent(ID3DXMesh** pMesh);

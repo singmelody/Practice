@@ -255,6 +255,9 @@
     <ClCompile Include="DummyFace.cpp">
       <Filter>Hair</Filter>
     </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">
@@ -361,6 +364,9 @@
     </ClInclude>
     <ClInclude Include="DummyFace.h">
       <Filter>Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

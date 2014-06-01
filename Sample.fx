@@ -240,7 +240,27 @@ struct VS_INPUT
      float3 targetNorm4 : NORMAL4;
 };
 
+struct VS_BONE_MORPH_INPUT
+{ 
+     float4 pos0  : POSITION0;
+     float3 norm0 : NORMAL0;
+     float2 tex0  : TEXCOORD0;
 
+     float4 pos1  : POSITION01;
+     float3 norm1 : NORMAL1;
+
+     float4 pos2  : POSITION2;
+     float3 norm2 : NORMAL2;
+
+     float4 pos3  : POSITION3;
+     float3 norm3 : NORMAL3;
+
+     float4 pos4  : POSITION4;
+     float3 norm4 : NORMAL4;
+     
+	 float4 weights  : BLENDWEIGHT5;
+     int4   boneIndices : BLENDINDICES5;     
+};
 
 //--------------------------------------------------------------------------------------
 // This section computes standard transform and lighting and simple multi morph
@@ -532,6 +552,63 @@ float3 GetHairPos(int hair, int index1, int index2, float prc)
 		    S;	
 }
 
+VS_OUTPUT RenderFaceBoneMorph(VS_BONE_MORPH_INPUT IN,  uniform int nNumLights)
+{
+	//First Morph the mesh, then apply skinning!
+
+    VS_OUTPUT OUT = (VS_OUTPUT)0;
+
+	float4 position  = IN.pos0;
+	float3 normal = IN.norm0;
+
+	//Blend Position	
+	position += (IN.pos1 - IN.pos0) * weights.r;
+	position += (IN.pos2 - IN.pos0) * weights.g;
+	position += (IN.pos3 - IN.pos0) * weights.b;
+	position += (IN.pos4 - IN.pos0) * weights.a;
+
+	//Blend Normal	
+	normal += (IN.norm1 - IN.norm0) * weights.r;
+	normal += (IN.norm2 - IN.norm0) * weights.g;
+	normal += (IN.norm3 - IN.norm0) * weights.b;
+	normal += (IN.norm4 - IN.norm0) * weights.a;
+	
+    //getting the position of the vertex in the world
+    float4 posWorld = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float3 normWorld = float3(0.0f, 0.0f, 0.0f);
+    float lastWeight = 0.0f;
+    int n = numBoneInfluences-1;   
+    normal = normalize(normal);
+    
+    for(int i = 0; i < n; ++i)
+    {
+        lastWeight += IN.weights[i];
+	    posWorld += IN.weights[i] * mul(position, MatrixPalette[IN.boneIndices[i]]);
+	    normWorld += IN.weights[i] * mul(normal, MatrixPalette[IN.boneIndices[i]]);
+    }
+    lastWeight = 1.0f - lastWeight;
+    
+    posWorld += lastWeight * mul(position, MatrixPalette[IN.boneIndices[n]]);
+    normWorld += lastWeight * mul(normal, MatrixPalette[IN.boneIndices[n]]);   
+    posWorld.w = 1.0f;    	
+    
+    OUT.Position = mul(posWorld, g_mWorld);
+	OUT.Position = mul(OUT.Position, g_mVP);
+	
+	// Compute simple directional lighting equation
+    float3 vTotalLightDiffuse = float3(0,0,0);
+    for(int i=0; i< nNumLights; i++ )
+		vTotalLightDiffuse += g_LightDiffuse[i] * max(0.1f,dot(normWorld, (g_LightDir[i] - posWorld)));
+        
+    OUT.Diffuse.rgb = g_MaterialDiffuseColor * vTotalLightDiffuse + g_MaterialAmbientColor * g_LightAmbient;   
+    OUT.Diffuse.a = 1.0f; 
+    
+    OUT.TextureUV = IN.tex0;
+
+    return OUT;
+}
+
+
 VS_OUTPUT RenderHairVS(VS_INPUT_HAIR IN)
 {
 	VS_OUTPUT OUT = (VS_OUTPUT)0;
@@ -803,3 +880,12 @@ technique Hair
 	}
 }
 
+technique FaceBoneMorph
+{
+    pass P0
+    {
+		VertexShader = compile vs_2_0 RenderFaceBoneMorph(1);
+		PixelShader  = compile ps_2_0 RenderScenePS(true);
+        Lighting = false;
+    }
+}
