@@ -27,6 +27,7 @@
 #include "D3D11RenderDevice.h"
 #include "Flock.h"
 #include "Crowd.h"
+#include "Hair.h"
 //#define DEBUG_VS   // Uncomment this line to debug vertex shaders 
 //#define DEBUG_PS   // Uncomment this line to debug pixel shaders 
 
@@ -67,6 +68,7 @@ InverseKinematics*			g_ik = NULL;
 Flock*						g_Flock;
 Crowd*						g_Crowd;
 float						g_decalCooldown;
+Hair*						g_pHair;
 
 //--------------------------------------------------------------------------------------
 // UI control IDs
@@ -570,6 +572,8 @@ HRESULT CALLBACK OnCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_
 
 	g_Crowd = new Crowd(50);
 
+	g_pHair = new Hair();
+
     return S_OK;
 }
 
@@ -820,8 +824,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		// Setup the camera's view parameters
 //		g_Angle += fElapsedTime;
 //		D3DXVECTOR3 vecEye( cos(g_Angle) * 0.8f, 0.0f, sin(g_Angle) * 0.8f);
-		D3DXVECTOR3 vecEye( -0.5f, 1.5f, -3.0f);
-		D3DXVECTOR3 vecAt ( -0.5f, 1.0f, 0.0f );
+		D3DXVECTOR3 vecEye( 0.0f, 6.0f, 8.0f);
+		D3DXVECTOR3 vecAt ( 0.0f, 2.0f, 0.0f );
 		g_Camera.SetViewParams( &vecEye, &vecAt );
 //		g_Camera.SetRadius( g_RadiusObject * 3.0f, g_RadiusObject * 0.5f, g_RadiusObject * 10.0f );
 
@@ -936,34 +940,34 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
 		// Decals
 		//Set Ray Org & Dir	
-		POINT p;
-		GetCursorPos(&p);
-
-		float x = (p.x - 320) / 640.0f;
-		float y = (p.y - 240) / -480.0f;
-		g_rayOrg = D3DXVECTOR3(0.0f, 1.0f, -3.0f);
-		g_rayDir = D3DXVECTOR3(x, y, 1.0f);
-		D3DXVec3Normalize(&g_rayDir, &g_rayDir);
+// 		POINT p;
+// 		GetCursorPos(&p);
+// 
+// 		float x = (p.x - 320) / 640.0f;
+// 		float y = (p.y - 240) / -480.0f;
+// 		g_rayOrg = D3DXVECTOR3(0.0f, 1.0f, -3.0f);
+// 		g_rayDir = D3DXVECTOR3(x, y, 1.0f);
+// 		D3DXVec3Normalize(&g_rayDir, &g_rayDir);
 
 		//render intersection ray
-		{
-			LineVertex vert[] = {LineVertex(g_rayOrg, 0xffff0000), LineVertex(g_rayOrg + g_rayDir * 3.0f, 0xff00ff00)};
-			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
-			DXUTGetD3D9Device()->SetFVF(LineVertex::FVF);
-			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(LineVertex));
-		}
+// 		{
+// 			LineVertex vert[] = {LineVertex(g_rayOrg, 0xffff0000), LineVertex(g_rayOrg + g_rayDir * 3.0f, 0xff00ff00)};
+// 			DXUTGetD3D9Device()->SetRenderState(D3DRS_LIGHTING, false);
+// 			DXUTGetD3D9Device()->SetFVF(LineVertex::FVF);
+// 			DXUTGetD3D9Device()->DrawPrimitiveUP(D3DPT_LINESTRIP, 1, &vert[0], sizeof(LineVertex));
+// 		}
 
 		//Render Drone
-		{
-			D3DXMATRIX identity;
-			D3DXMatrixIdentity(&identity);
-			g_pEffect->SetMatrix("g_mWorld", &identity);
-			g_pEffect->SetMatrix("g_mVP", &(mView * mProj));
-
-			g_animControllers[0]->AdvanceTime(fElapsedTime, NULL);
-			g_SkinnedMesh->SetPose(identity);
-			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
-		}
+// 		{
+// 			D3DXMATRIX identity;
+// 			D3DXMatrixIdentity(&identity);
+// 			g_pEffect->SetMatrix("g_mWorld", &identity);
+// 			g_pEffect->SetMatrix("g_mVP", &(mView * mProj));
+// 
+// 			g_animControllers[0]->AdvanceTime(fElapsedTime, NULL);
+// 			g_SkinnedMesh->SetPose(identity);
+// 			g_SkinnedMesh->RenderHAL(NULL, "SkinHAL", techName.c_str());
+// 		}
 
 // 		g_FaceControllerGenerate->Update(fElapsedTime);
 // 		g_FaceControllerGenerate->Render(techName.c_str());
@@ -981,6 +985,10 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 		{
 //			RenderShadow();
 		}
+
+		// Hair
+		g_pHair->Update(fElapsedTime);
+		g_pHair->Render();
 
 		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
 		pd3dDevice->SetTransform(D3DTS_VIEW, &mView);
@@ -1005,6 +1013,8 @@ void CALLBACK OnFrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float f
 
         V( pd3dDevice->EndScene() );
     }
+
+	pd3dDevice->Present(0, 0, 0, 0);
 }
 
 std::string IntToString(int i)
@@ -1367,6 +1377,7 @@ void CALLBACK OnDestroyDevice( void* pUserContext )
 	SAFE_DELETE(g_ik);
 	SAFE_DELETE(g_Flock);
 	SAFE_DELETE(g_Crowd);
+	SAFE_DELETE(g_pHair);
 
 	//assert( D3D11RenderDevice::Instance().GetReference() == 0);
 

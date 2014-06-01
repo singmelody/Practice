@@ -483,7 +483,11 @@
     <ClCompile Include="Sample.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sample.fx" />
+    <None Include="Sample.fx">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h" />

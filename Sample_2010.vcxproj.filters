@@ -144,6 +144,9 @@
     <None Include="BezierTessellation.fx">
       <Filter>FX</Filter>
     </None>
+    <None Include="Sample.fx">
+      <Filter>FX</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sample.cpp" />
@@ -246,11 +249,6 @@
     <ClCompile Include="ControlHair.cpp">
       <Filter>Hair</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Sample.fx">
-      <Filter>FX</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="resource.h">

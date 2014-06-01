@@ -33,6 +33,10 @@ float4	 g_wrinkleWeight;
 float4x4 MatrixPalette[35]; 
 int numBoneInfluences = 2;
 
+//Control hair table
+extern float3 ControlHairTable[20];
+int numPointsPerHair = 4;
+
 //--------------------------------------------------------------------------------------
 // Texture samplers
 //--------------------------------------------------------------------------------------
@@ -267,7 +271,7 @@ VS_OUTPUT RenderMultiMorphVS(VS_INPUT IN)
     //getting to position to object space
     OUT.Position = mul(posWorld, g_mVP);
 	 
-    OUT.Diffuse = max(dot(normal, normalize(g_LightDir[0] - posWorld)), 0.2f);
+    OUT.Diffuse = max(dot(normal, normalize(g_LightDir[0] - posWorld)), 1.0f);
     
     OUT.TextureUV = IN.baseUV;
     
@@ -495,6 +499,69 @@ VS_OUTPUT_NORMAL RenderMultiMorphNormalVS(VS_INPUT_NORMAL IN)
     return OUT;
 }
 
+//Hair Vertex
+struct VS_INPUT_HAIR
+{
+     float4 position    : POSITION0;
+     float3 normal      : NORMAL;
+     float2 tex0        : TEXCOORD0;
+     int4   hairIndices : BLENDINDICES0;
+};
+
+float3 GetHairPos(int hair, int index1, int index2, float prc)
+{
+	//Calculate index 0 & 3
+	int index0 = max(index1 - 1, 0);
+	int index3 = min(index2 + 1, numPointsPerHair - 1);
+	
+	//Offset index to correct hair in ControlHairTable
+	index0 += hair * numPointsPerHair;
+	index1 += hair * numPointsPerHair;
+	index2 += hair * numPointsPerHair;
+	index3 += hair * numPointsPerHair;
+	
+	//Perform cubic interpolation
+	float3 P = (ControlHairTable[index3] - ControlHairTable[index2]) - (ControlHairTable[index0] - ControlHairTable[index1]);
+	float3 Q = (ControlHairTable[index0] - ControlHairTable[index1]) - P;
+	float3 R =  ControlHairTable[index2] - ControlHairTable[index0];
+	float3 S =  ControlHairTable[index1];
+
+	return (P * prc * prc * prc) + 
+		   (Q * prc * prc) + 
+		   (R * prc) + 
+		    S;	
+}
+
+VS_OUTPUT RenderHairVS(VS_INPUT_HAIR IN)
+{
+	VS_OUTPUT OUT = (VS_OUTPUT)0;
+
+	//Get position from the four control hairs
+	float3 ch1 = GetHairPos(0, IN.hairIndices[0], IN.hairIndices[1], IN.position.z);
+	float3 ch2 = GetHairPos(1, IN.hairIndices[0], IN.hairIndices[1], IN.position.z);
+	float3 ch3 = GetHairPos(2, IN.hairIndices[0], IN.hairIndices[1], IN.position.z);
+	float3 ch4 = GetHairPos(3, IN.hairIndices[0], IN.hairIndices[1], IN.position.z);
+	
+	//Blend linearly in 2D
+	float3 px1 = ch2 * IN.position.x + ch1 * (1.0f - IN.position.x);
+	float3 px2 = ch3 * IN.position.x + ch4 * (1.0f - IN.position.x);
+	
+	float3 pos = px2 * IN.position.y + px1 * (1.0f - IN.position.y);
+
+	//Transform to world coordinates
+    float4 posWorld = mul(float4(pos.xyz, 1), g_mWorld);
+	OUT.Position = mul(posWorld, g_mVP);
+		
+	//Copy texture coordinates
+    OUT.TextureUV = IN.tex0;  
+
+	OUT.Diffuse = float4(1.0f,1.0f,1.0f,1.0f);
+        
+    return OUT;
+}
+
+
+
 //Pixel Shader
 float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
 {
@@ -519,7 +586,7 @@ float4 RenderSceneNormalPS(VS_OUTPUT_NORMAL IN) : COLOR0
     float3 light = normalize(IN.lightVec);
 
 	//set the output color
-    float diffuse = max(saturate(dot(normal, light)), 0.2f);
+    float diffuse = max(saturate(dot(normal, light)), 1.0f);
 
 	// get specular color
 	float4 specularColor = tex2D(SpecularSampler, IN.tex0);
@@ -717,4 +784,21 @@ technique Decal
         VertexShader = compile vs_2_0 RenderSkinHALVS( 1, true, false );
         PixelShader  = compile ps_2_0 RenderDecalPS( true ); 
     }
+}
+
+technique Hair
+{
+	pass P0
+	{        
+		//FillMode = Wireframe;
+		AlphaBlendEnable = true;	
+		SrcBlend = SRCALPHA;
+		DestBlend = INVSRCALPHA;	
+		CullMode = None;	
+		AlphaOp[0] = ADD;
+		ColorOp[0] = ADD;
+		ZWriteEnable = false;	
+		VertexShader = compile vs_2_0 RenderHairVS();
+		PixelShader  = compile ps_2_0 RenderScenePS(true);
+	}
 }
