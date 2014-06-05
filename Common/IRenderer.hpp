@@ -7,9 +7,9 @@ class IRenderer
 {
 public:
 	IRenderer(void);
-	~IRenderer(void);
+	virtual ~IRenderer(void);
 
-	virtual void Init() = 0;
+	virtual bool Init(const HWND mainHwnd) = 0;
 	virtual void Destroy() = 0;
 
 	virtual void Update() = 0;
