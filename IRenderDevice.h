@@ -1,9 +1,9 @@
 #pragma once
-class IRenderDevice
+class IRenderer
 {
 public:
-	IRenderDevice(void);
-	virtual ~IRenderDevice(void);
+	IRenderer(void);
+	virtual ~IRenderer(void);
 
 	virtual bool CreateDevice() = 0;
 
