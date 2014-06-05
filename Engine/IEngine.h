@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 
+namespace Dream {
 class IRenderer;
 
 struct EngineStartupInfo
@@ -14,8 +15,21 @@ struct EngineStartupInfo
 
 class IEngine
 {
+public:
 	virtual ~IEngine() {}
+
+	virtual bool Init(IEngine** engine) = 0;
+
+	virtual void Destroy();
 
 	virtual IRenderer* GetRenderer() = 0;
 
+	virtual void Update() = 0;
 };
+
+}
+
+#define DEFINE_ENGINE_INTERFACE  Dream::IEngine*  Dream::gEngine = nullptr;
+
+#define CREATE_RENDERDRV_DLL_FUNC     "Init"
+typedef void(*Init)(Dream::IEngine**);

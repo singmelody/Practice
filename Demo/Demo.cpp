@@ -5,6 +5,7 @@
 
 #include <string>
 #include <Windows.h>
+#include <IEngine.h>
 
 namespace Dream
 {
@@ -21,16 +22,16 @@ namespace Dream
 			if (!CreateWnd("Test", 800, 600))
 				return false;
 
-// 			const char* engineDll = "Engine.dll";
-// 			m_engineDll = LoadLibrary(engineDll);
-// 			if (!m_engineDll)
-// 				return false;
+			const char* engineDll = "Engine.dll";
+			m_engineDll = LoadLibrary(engineDll);
+			if (!m_engineDll)
+				return false;
 
-// 			CreateEngineFunc func = (CreateEngineFunc)GetProcAddress( m_engineDll, CREATE_ENGINE_DLL_FUNC);
-// 			if (!func)
-// 				return false;
-// 
-// 			func(&gEngine);
+			CreateEngineFunc func = (CreateEngineFunc)GetProcAddress( m_engineDll, CREATE_ENGINE_DLL_FUNC);
+			if (!func)
+				return false;
+ 
+ 			func(&gEngine);
 
 // 			if (!gEngine)
 // 				return false;
@@ -58,8 +59,8 @@ namespace Dream
 				{
 // 					if (_currDemo)
 // 						_currDemo->OnUpdate(0.016f);
-// 
-// 					gEngine->Update(0.016f);
+
+					gEngine->Update(0.016f);
 				}
 			}
 		}

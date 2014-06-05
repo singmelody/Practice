@@ -21,6 +21,6 @@ public:
 
 	virtual bool CreateViewPort() = 0;
 
-	virtual bool ShaderParse() = 0;
+	virtual bool ShaderParse(IEngine};)
 };
 
