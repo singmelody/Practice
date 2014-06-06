@@ -5,7 +5,10 @@
 
 #include <string>
 #include <Windows.h>
-#include <IEngine.h>
+
+#include <IEngine.hpp>
+
+DEFINE_ENGINE_INTERFACE
 
 namespace Dream
 {

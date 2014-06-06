@@ -12,11 +12,11 @@ D3D9Renderer::D3D9Renderer() :
 }
 
 
-D3D9Renderer::~D3D9Renderer(void)
+D3D9Renderer::~D3D9Renderer()
 {
 }
 
-bool D3D9Renderer::Init(const HWND mainWnd)
+bool D3D9Renderer::Init(const HWND mainWnd, IRenderer** renderer)
 {
 	// Step 1: Create the IDirect3D9 object.
 	m_d3d9Object = Direct3DCreate9(D3D_SDK_VERSION);
@@ -63,7 +63,6 @@ bool D3D9Renderer::Init(const HWND mainWnd)
 	d3dParam.PresentationInterval       = D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	// Step 5: Create the device.
-
 	HR(m_d3d9Object->CreateDevice(
 		D3DADAPTER_DEFAULT, // primary adapter
 		D3DDEVTYPE_HAL,           // device type
@@ -71,6 +70,8 @@ bool D3D9Renderer::Init(const HWND mainWnd)
 		devBehaviorFlags,   // vertex processing
 		&d3dParam,            // present parameters
 		&m_d3d9Device));      // return created device
+
+	*renderer = this;
 
 	return true;
 }
@@ -96,6 +97,15 @@ void D3D9Renderer::Update()
 void D3D9Renderer::Render()
 {
 
+}
+
+//--------------------------------------------------------------------
+/// Dll Exports
+//--------------------------------------------------------------------
+extern "C" DLL_EXPORT void CreateRenderer(IRenderer** oRenderer)
+{
+	static D3D9Renderer  d3d9Renderer;
+	*oRenderer = &d3d9Renderer;
 }
 
 }

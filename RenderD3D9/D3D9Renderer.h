@@ -8,10 +8,10 @@ namespace Dream{
 class D3D9Renderer : public IRenderer
 {
 public:
-	D3D9Renderer(void);
-	virtual ~D3D9Renderer(void);
+	D3D9Renderer();
+	virtual ~D3D9Renderer();
 
-	virtual bool Init(const HWND mainHwnd);
+	virtual bool Init(const HWND mainHwnd, IRenderer** renderer);
 	virtual void Destroy();
 
 	virtual void Update();

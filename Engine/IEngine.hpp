@@ -22,14 +22,14 @@ public:
 
 	virtual void Destroy();
 
-	virtual IRenderer* GetRenderer() = 0;
-
-	virtual void Update() = 0;
+	virtual void Update(float deltaTime) = 0;
 };
+
+extern IEngine*		gEngine;
 
 }
 
-#define DEFINE_ENGINE_INTERFACE  Dream::IEngine*  Dream::gEngine = nullptr;
+#define DEFINE_ENGINE_INTERFACE  Dream::IEngine*  Dream::gEngine = NULL;
 
-#define CREATE_RENDERDRV_DLL_FUNC     "Init"
-typedef void(*Init)(Dream::IEngine**);
+#define CREATE_ENGINE_DLL_FUNC     "CreateEngine"
+typedef void(*CreateEngineFunc)(Dream::IEngine**);

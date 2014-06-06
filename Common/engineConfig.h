@@ -27,3 +27,8 @@
 #define HR(x) x;
 #endif
 #endif 
+
+#define ILINE				__forceinline
+
+#define DLL_EXPORT			__declspec(dllexport)
+#define DLL_IMPORT			__declspec(dllimport)
