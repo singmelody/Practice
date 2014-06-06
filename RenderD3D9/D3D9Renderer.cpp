@@ -69,7 +69,7 @@ bool D3D9Renderer::Init(const HWND mainWnd)
 	d3dParam.MultiSampleType            = D3DMULTISAMPLE_NONE;
 	d3dParam.MultiSampleQuality         = 0;
  	d3dParam.hDeviceWindow              = mainWnd;
-// 	d3dParam.EnableAutoDepthStencil     = true; 
+ 	d3dParam.EnableAutoDepthStencil     = true; 
 	d3dParam.AutoDepthStencilFormat     = D3DFMT_D24S8;
 	d3dParam.Flags                      = 0;
 	d3dParam.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -137,7 +137,7 @@ void D3D9Renderer::Update(float deltaTime)
 
 void D3D9Renderer::Render()
 {
-	m_d3d9Device->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB( 0, 0, 0), 1.0f, 0);
+	m_d3d9Device->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB( 0, 0, 0), 1.0f, 0);
 	m_d3d9Device->BeginScene();
 
 	m_d3d9Device->SetStreamSource( 0, m_vb, 0, sizeof( CUSTOMVERTEX ) );
