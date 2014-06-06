@@ -16,7 +16,7 @@ D3D9Renderer::~D3D9Renderer()
 {
 }
 
-bool D3D9Renderer::Init(const HWND mainWnd, IRenderer** renderer)
+bool D3D9Renderer::Init(const HWND mainWnd)
 {
 	// Step 1: Create the IDirect3D9 object.
 	m_d3d9Object = Direct3DCreate9(D3D_SDK_VERSION);
@@ -70,8 +70,6 @@ bool D3D9Renderer::Init(const HWND mainWnd, IRenderer** renderer)
 		devBehaviorFlags,   // vertex processing
 		&d3dParam,            // present parameters
 		&m_d3d9Device));      // return created device
-
-	*renderer = this;
 
 	return true;
 }

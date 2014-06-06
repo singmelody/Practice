@@ -18,9 +18,9 @@ class IEngine
 public:
 	virtual ~IEngine() {}
 
-	virtual bool Init(IEngine** engine) = 0;
+	virtual bool Init(const HWND mainWnd) = 0;
 
-	virtual void Destroy();
+	virtual void Destroy() = 0;
 
 	virtual void Update(float deltaTime) = 0;
 };

@@ -11,7 +11,7 @@ public:
 	D3D9Renderer();
 	virtual ~D3D9Renderer();
 
-	virtual bool Init(const HWND mainHwnd, IRenderer** renderer);
+	virtual bool Init(const HWND mainHwnd);
 	virtual void Destroy();
 
 	virtual void Update();

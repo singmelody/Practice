@@ -16,8 +16,8 @@ namespace Dream
 
 	}
 
-	bool EngineSystem::Init(IEngine** engine)
-	{
+	bool EngineSystem::Init(const HWND mainWnd)
+{
 		const char* rendererDll = "RenderD3D9.dll";
 		HINSTANCE instance = LoadLibrary(rendererDll);
 		if (!instance)
@@ -29,6 +29,8 @@ namespace Dream
 
 		func(&gRenderer);
 
+		gRenderer->Init(mainWnd);
+
 		return true;
 	}
 
@@ -39,9 +41,9 @@ namespace Dream
 
 	void EngineSystem::Update(float deltaTime)
 {
-// 		gRenderer->Update();
-// 
-// 		gRenderer->Render();
+		gRenderer->Update(deltaTime);
+
+		gRenderer->Render();
 	}
 
 	//--------------------------------------------------------------------

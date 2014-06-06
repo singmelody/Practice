@@ -9,10 +9,10 @@ public:
 	IRenderer(void){}
 	virtual ~IRenderer(void){}
 
-	virtual bool Init(const HWND mainHwnd, Dream::IRenderer**) = 0;
+	virtual bool Init(const HWND mainHwnd) = 0;
 	virtual void Destroy() = 0;
 
-	virtual void Update() = 0;
+	virtual void Update(float deltaTime) = 0;
 	virtual void Render() = 0;
 };
 

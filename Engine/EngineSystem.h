@@ -11,7 +11,7 @@ public:
 	EngineSystem();
 	virtual ~EngineSystem();
 
-	virtual bool Init(IEngine** engine);
+	virtual bool Init(const HWND mainWnd);
 	virtual void Destroy();
 
 	virtual void Update(float deltaTime);
