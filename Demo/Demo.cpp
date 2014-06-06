@@ -36,8 +36,10 @@ namespace Dream
  
  			func(&gEngine);
 
-// 			if (!gEngine)
-// 				return false;
+			if (!gEngine)
+				return false;
+
+			gEngine->Init(m_hwnd);
 
 // 			EngineStartupInfo info;
 // 			info.fullScreen = false;
@@ -70,7 +72,7 @@ namespace Dream
 
 		void Shutdown()
 		{
-
+			gEngine->Destroy();
 		}
 
 	private:

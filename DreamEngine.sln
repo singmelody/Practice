@@ -1,14 +1,18 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sample", "Sample_2010.vcxproj", "{D3D09101-96D0-4629-88B8-122C0256058C}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{E5A465FE-D171-C009-FA8A-AEB1E6B6F597}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderD3D9", "RenderD3D9\RenderD3D9.vcxproj", "{E320FFDC-36BC-49B6-AE5E-BC4D6A7504F9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{183A3365-67BE-4D03-B6FD-94D527C181A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E320FFDC-36BC-49B6-AE5E-BC4D6A7504F9} = {E320FFDC-36BC-49B6-AE5E-BC4D6A7504F9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo", "Demo\Demo.vcxproj", "{8F06DDAD-0FA0-4927-9DCA-0DCACE66A106}"
+	ProjectSection(ProjectDependencies) = postProject
+		{183A3365-67BE-4D03-B6FD-94D527C181A9} = {183A3365-67BE-4D03-B6FD-94D527C181A9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,18 +24,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Debug|Win32.Build.0 = Debug|Win32
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Debug|x64.ActiveCfg = Debug|x64
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Debug|x64.Build.0 = Debug|x64
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Profile|Win32.ActiveCfg = Profile|Win32
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Profile|Win32.Build.0 = Profile|Win32
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Profile|x64.ActiveCfg = Profile|x64
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Profile|x64.Build.0 = Profile|x64
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Release|Win32.ActiveCfg = Release|Win32
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Release|Win32.Build.0 = Release|Win32
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Release|x64.ActiveCfg = Release|x64
-		{D3D09101-96D0-4629-88B8-122C0256058C}.Release|x64.Build.0 = Release|x64
 		{E5A465FE-D171-C009-FA8A-AEB1E6B6F597}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E5A465FE-D171-C009-FA8A-AEB1E6B6F597}.Debug|Win32.Build.0 = Debug|Win32
 		{E5A465FE-D171-C009-FA8A-AEB1E6B6F597}.Debug|x64.ActiveCfg = Debug|Win32

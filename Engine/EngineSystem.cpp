@@ -29,14 +29,16 @@ namespace Dream
 
 		func(&gRenderer);
 
-		gRenderer->Init(mainWnd);
+		bool result = gRenderer->Init(mainWnd);
+		if(!result)
+			return false;
 
 		return true;
 	}
 
 	void EngineSystem::Destroy()
 	{
-
+		gRenderer->Destroy();
 	}
 
 	void EngineSystem::Update(float deltaTime)

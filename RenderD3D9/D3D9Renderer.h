@@ -14,12 +14,16 @@ public:
 	virtual bool Init(const HWND mainHwnd);
 	virtual void Destroy();
 
-	virtual void Update();
+	virtual void Update(float deltaTime);
 	virtual void Render();
 
 private:
+	void InitVB();
+
 	IDirect3DDevice9*	m_d3d9Device;
 	IDirect3D9*			m_d3d9Object;
+
+	IDirect3DVertexBuffer9* m_vb;
 };
 
 }
