@@ -74,7 +74,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DllHelper.h" />
-    <ClInclude Include="engineConfig.h" />
     <ClInclude Include="EngineSystem.h" />
     <ClInclude Include="IEngine.hpp" />
     <ClInclude Include="stdafx.h" />

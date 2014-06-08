@@ -20,9 +20,6 @@
     <ClInclude Include="DllHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engineConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
