@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo", "Demo\Demo.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLib", "CommonLib\CommonLib.vcxproj", "{AB6454F5-F061-4CD8-B6ED-518E06359CA6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio", "Audio\Audio.vcxproj", "{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,6 +73,15 @@ Global
 		{AB6454F5-F061-4CD8-B6ED-518E06359CA6}.Release|Win32.ActiveCfg = Release|Win32
 		{AB6454F5-F061-4CD8-B6ED-518E06359CA6}.Release|Win32.Build.0 = Release|Win32
 		{AB6454F5-F061-4CD8-B6ED-518E06359CA6}.Release|x64.ActiveCfg = Release|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Debug|Win32.Build.0 = Debug|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Debug|x64.ActiveCfg = Debug|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Profile|Win32.ActiveCfg = Release|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Profile|Win32.Build.0 = Release|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Profile|x64.ActiveCfg = Release|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Release|Win32.ActiveCfg = Release|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Release|Win32.Build.0 = Release|Win32
+		{6D0CBF56-CAE0-4259-A8FB-36C7E1A6C6FF}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
