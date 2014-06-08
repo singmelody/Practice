@@ -28,6 +28,18 @@
     <ClInclude Include="targetver.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="IAudioBuffer.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="IAudioPlayer.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="IDecoder.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioComponent.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -42,5 +54,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="AudioComponent.cpp" />
   </ItemGroup>
 </Project>

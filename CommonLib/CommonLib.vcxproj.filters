@@ -32,6 +32,18 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Serialize\rapidxml\rapidxml.hpp">
+      <Filter>Serialize\rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize\rapidxml\rapidxml_iterators.hpp">
+      <Filter>Serialize\rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize\rapidxml\rapidxml_print.hpp">
+      <Filter>Serialize\rapidxml</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize\rapidxml\rapidxml_utils.hpp">
+      <Filter>Serialize\rapidxml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

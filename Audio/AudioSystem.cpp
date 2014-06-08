@@ -13,19 +13,13 @@ AudioSystem::~AudioSystem(void)
 {
 }
 
-bool AudioSystem::Init()
-{
-	return true;
-}
-
-void AudioSystem::Destroy()
-{
-
-}
-
 void AudioSystem::Update(float deltaTime)
 {
-
+	int count = m_coms.size();
+	for (int i = 0; i < count; ++count)
+	{
+		m_coms->Update();
+	}
 }
 
 }

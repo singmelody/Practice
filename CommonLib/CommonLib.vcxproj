@@ -70,6 +70,10 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Serialize\rapidxml\rapidxml.hpp" />
+    <ClInclude Include="Serialize\rapidxml\rapidxml_iterators.hpp" />
+    <ClInclude Include="Serialize\rapidxml\rapidxml_print.hpp" />
+    <ClInclude Include="Serialize\rapidxml\rapidxml_utils.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
