@@ -21,6 +21,15 @@
     <Filter Include="Serialize\rapidxml">
       <UniqueIdentifier>{f4b59633-9161-46d7-a127-edd526ca69f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{cb86932a-4834-4e5f-b3c8-bff1e6aad147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{471782ac-a710-4928-b39a-13d3d97d9376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{ecfadaf2-4ab7-44bc-b38c-ac017700fe49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -41,7 +50,21 @@
     <ClInclude Include="Serialize\rapidxml\rapidxml_utils.hpp">
       <Filter>Serialize\rapidxml</Filter>
     </ClInclude>
-    <ClInclude Include="DllHelper.hpp" />
+    <ClInclude Include="Thread\IThread.hpp">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\Stream.hpp">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="DllHelper.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\IResourceItem.hpp">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\IResourceManager.hpp">
+      <Filter>Resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
