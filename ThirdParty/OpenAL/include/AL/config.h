@@ -1,3 +1,4 @@
+#pragma once
 /* API declaration export attribute */
 #define AL_API  //__declspec(dllexport)
 #define ALC_API //__declspec(dllexport)
@@ -24,7 +25,7 @@
 #define HAVE__ALIGNED_MALLOC
 
 /* Define if we have SSE CPU extensions */
-#define HAVE_SSE
+/* #undef HAVE_SSE */
 
 /* Define if we have ARM Neon CPU extensions */
 /* #undef HAVE_NEON */
@@ -42,13 +43,13 @@
 /* #undef HAVE_SNDIO */
 
 /* Define if we have the MMDevApi backend */
-#define HAVE_MMDEVAPI
+/* #undef HAVE_MMDEVAPI */
 
 /* Define if we have the DSound backend */
-#define HAVE_DSOUND
+/* #undef HAVE_DSOUND */
 
 /* Define if we have the Windows Multimedia backend */
-#define HAVE_WINMM
+/* #undef HAVE_WINMM */
 
 /* Define if we have the PortAudio backend */
 /* #undef HAVE_PORTAUDIO */
@@ -63,7 +64,7 @@
 /* #undef HAVE_OPENSL */
 
 /* Define if we have the Wave Writer backend */
-#define HAVE_WAVE
+/* #undef HAVE_WAVE */
 
 /* Define if we have the stat function */
 #define HAVE_STAT

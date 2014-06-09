@@ -3,6 +3,8 @@
 #include "EngineConfig.h"
 #include "al/config.h"
 #include "al/alc.h"
+#include "AL/al.h"
+#include "AL/alext.h"
 #include <stdio.h>
 
 namespace Dream
