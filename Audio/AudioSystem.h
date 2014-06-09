@@ -1,5 +1,6 @@
 #pragma once
 #include "IAudio.hpp"
+#include <vector>
 
 namespace Dream
 {

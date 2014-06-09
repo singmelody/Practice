@@ -11,7 +11,7 @@ public:
 	AudioComponent(void);
 	~AudioComponent(void);
 
-	void Update();
+	void Update(float deltaTime);
 
 private:
 	IAudioBuffer* m_buffer;

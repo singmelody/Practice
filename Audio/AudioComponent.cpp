@@ -14,4 +14,9 @@ AudioComponent::~AudioComponent(void)
 {
 }
 
+void AudioComponent::Update(float deltaTime)
+{
+
+}
+
 }
