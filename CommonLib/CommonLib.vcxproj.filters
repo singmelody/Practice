@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -44,6 +41,7 @@
     <ClInclude Include="Serialize\rapidxml\rapidxml_utils.hpp">
       <Filter>Serialize\rapidxml</Filter>
     </ClInclude>
+    <ClInclude Include="DllHelper.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

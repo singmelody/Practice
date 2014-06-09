@@ -75,18 +75,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\IAudio.hpp" />
     <ClInclude Include="AudioComponent.h" />
+    <ClInclude Include="AudioPlayerOpenAL.h" />
     <ClInclude Include="AudioSystem.h" />
     <ClInclude Include="AudioSystemOpenAL.h" />
     <ClInclude Include="IAudioBuffer.hpp" />
-    <ClInclude Include="IAudioPlayer.hpp" />
     <ClInclude Include="IDecoder.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AudioComponent.cpp" />
+    <ClCompile Include="AudioPlayerOpenAL.cpp" />
     <ClCompile Include="AudioSystem.cpp" />
     <ClCompile Include="AudioSystemOpenAL.cpp" />
     <ClCompile Include="dllmain.cpp">

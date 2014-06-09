@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "AudioSystem.h"
-#include "AudioComponent.h"
+#include "IAudioPlayer.hpp"
 
 namespace Dream
 {
@@ -16,10 +16,10 @@ AudioSystem::~AudioSystem(void)
 
 void AudioSystem::Update(float deltaTime)
 {
-	int count = m_coms.size();
+	int count = m_players.size();
 	for (int i = 0; i < count; ++i)
 	{
-		m_coms[i]->Update(deltaTime);
+		m_players[i]->Update(deltaTime);
 	}
 }
 

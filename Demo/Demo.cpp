@@ -5,9 +5,9 @@
 
 #include <string>
 #include <Windows.h>
+#include "DllHelper.hpp"
 
 #include <IEngine.hpp>
-
 DEFINE_ENGINE_INTERFACE
 
 namespace Dream
@@ -26,11 +26,11 @@ namespace Dream
 				return false;
 
 			const char* engineDll = "Engine.dll";
-			m_engineDll = LoadLibrary(engineDll);
+			m_engineDll = LoadDll(engineDll);
 			if (!m_engineDll)
 				return false;
 
-			CreateEngineFunc func = (CreateEngineFunc)GetProcAddress( m_engineDll, CREATE_ENGINE_DLL_FUNC);
+			CreateEngineFunc func = (CreateEngineFunc)GetProc( m_engineDll, CREATE_ENGINE_DLL_FUNC);
 			if (!func)
 				return false;
  
@@ -40,6 +40,8 @@ namespace Dream
 				return false;
 
 			gEngine->Init(m_hwnd);
+
+
 
 // 			EngineStartupInfo info;
 // 			info.fullScreen = false;

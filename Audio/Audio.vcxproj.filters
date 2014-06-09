@@ -8,18 +8,12 @@
     <Filter Include="OpenAL">
       <UniqueIdentifier>{5b387fca-db01-48fa-884a-f0ff3ce99654}</UniqueIdentifier>
     </Filter>
-    <Filter Include="OpenSL">
-      <UniqueIdentifier>{162b68f3-7e5d-494c-8c72-cfc78c450f1c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="AudioSystem.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\IAudio.hpp">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="AudioSystemOpenAL.h">
@@ -31,13 +25,13 @@
     <ClInclude Include="IAudioBuffer.hpp">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="IAudioPlayer.hpp">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="IDecoder.hpp">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="AudioComponent.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioPlayerOpenAL.h">
       <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -54,6 +48,8 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="AudioComponent.cpp" />
+    <ClCompile Include="AudioPlayerOpenAL.cpp">
+      <Filter>OpenAL</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #include "EngineSystem.h"
 #include "EngineConfig.h"
+#include "DllHelper.hpp"
 
+#include "IRenderer.hpp"
 DEFINE_RENDER_INTERFACE
 
 namespace Dream
@@ -19,11 +21,12 @@ namespace Dream
 	bool EngineSystem::Init(const HWND mainWnd)
 {
 		const char* rendererDll = "RenderD3D9.dll";
-		HINSTANCE instance = LoadLibrary(rendererDll);
+
+		MODULE_HANDLE instance = LoadDll(rendererDll);
 		if (!instance)
 			return false;
 
-		CreateRendererFunc func = (CreateRendererFunc)GetProcAddress( instance, CREATE_RENDERER_DLL_FUNC);
+		CreateRendererFunc func = (CreateRendererFunc)GetProc( instance, CREATE_RENDERER_DLL_FUNC);
 		if (!func)
 			return false;
 

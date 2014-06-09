@@ -14,7 +14,7 @@ namespace Dream
 		virtual void Update(float deltaTime) = 0;
 	};
 
-	extern IAudio*	gRenderer;
+	extern IAudio*	gAuido;
 }
 
 #define DEFINE_AUDIO_INTERFACE  Dream::IAudio*  Dream::gIAudio = NULL;

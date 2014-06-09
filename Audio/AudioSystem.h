@@ -5,7 +5,7 @@
 namespace Dream
 {
 
-class AudioComponent;
+class IAudioPlayer;
 
 class AudioSystem : public IAudio
 {
@@ -19,7 +19,7 @@ public:
 	virtual void Update(float deltaTime);
 
 protected:
-	std::vector<AudioComponent*> m_coms;
+	std::vector<IAudioPlayer*> m_players;
 };
 
 }

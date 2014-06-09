@@ -1,5 +1,4 @@
 #pragma once
-#include "IRenderer.hpp"
 #include "IEngine.hpp"
 
 namespace Dream
