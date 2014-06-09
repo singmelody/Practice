@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "AudioSystemOpenAL.h"
 #include "EngineConfig.h"
+#include "al/config.h"
 #include "al/alc.h"
 #include <stdio.h>
 
