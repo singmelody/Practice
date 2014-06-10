@@ -1,12 +1,13 @@
 #include "StdAfx.h"
-#include "ResourceItem.h"
+#include "IResourceItem.hpp"
+#include "IO/FileStream.h"
 
 
-ResourceItem::ResourceItem(void)
+ResourceItem::ResourceItem()
 {
 }
 
 
-ResourceItem::~ResourceItem(void)
+ResourceItem::~ResourceItem()
 {
 }

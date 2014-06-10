@@ -53,9 +53,6 @@
     <ClInclude Include="Thread\IThread.hpp">
       <Filter>Thread</Filter>
     </ClInclude>
-    <ClInclude Include="IO\Stream.hpp">
-      <Filter>IO</Filter>
-    </ClInclude>
     <ClInclude Include="DllHelper.hpp">
       <Filter>Util</Filter>
     </ClInclude>
@@ -65,10 +62,52 @@
     <ClInclude Include="Resource\IResourceManager.hpp">
       <Filter>Resource</Filter>
     </ClInclude>
+    <ClInclude Include="Serialize\ISerialize.hpp">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialize\XMLSerialize.h">
+      <Filter>Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\ResourceManager.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\FileResourceItem.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\IStream.hpp">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\FileStream.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\MemoryStream.h">
+      <Filter>IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialize\XMLSerialize.cpp">
+      <Filter>Serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource\ResourceManager.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource\FileResourceItem.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\FileStream.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\MemoryStream.cpp">
+      <Filter>IO</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -46,7 +46,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../Common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common;./</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -71,18 +71,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DllHelper.hpp" />
-    <ClInclude Include="IO\Stream.hpp" />
+    <ClInclude Include="IO\IStream.hpp" />
+    <ClInclude Include="IO\FileStream.h" />
+    <ClInclude Include="IO\MemoryStream.h" />
+    <ClInclude Include="ResourceItem.h" />
     <ClInclude Include="Resource\IResourceItem.hpp" />
     <ClInclude Include="Resource\IResourceManager.hpp" />
+    <ClInclude Include="Resource\FileResourceItem.h" />
+    <ClInclude Include="Resource\ResourceManager.h" />
+    <ClInclude Include="Serialize\ISerialize.hpp" />
     <ClInclude Include="Serialize\rapidxml\rapidxml.hpp" />
     <ClInclude Include="Serialize\rapidxml\rapidxml_iterators.hpp" />
     <ClInclude Include="Serialize\rapidxml\rapidxml_print.hpp" />
     <ClInclude Include="Serialize\rapidxml\rapidxml_utils.hpp" />
+    <ClInclude Include="Serialize\XMLSerialize.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Thread\IThread.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IO\FileStream.cpp" />
+    <ClCompile Include="IO\MemoryStream.cpp" />
+    <ClCompile Include="ResourceItem.cpp" />
+    <ClCompile Include="Resource\FileResourceItem.cpp" />
+    <ClCompile Include="Resource\ResourceManager.cpp" />
+    <ClCompile Include="Serialize\XMLSerialize.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
