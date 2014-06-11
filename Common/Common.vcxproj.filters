@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineConfig.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IAudio.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IAudioPlayer.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IEngine.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderDevice.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderer.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IResourceItem.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IResourceManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="IRenderDevice.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

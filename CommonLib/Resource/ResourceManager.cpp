@@ -3,8 +3,6 @@
 
 namespace Dream
 {
-
-
 	ResourceManager::ResourceManager()
 	{
 
@@ -17,6 +15,7 @@ namespace Dream
 
 	IResourceItem* ResourceManager::LoadRes(const char* path)
 	{
+
 		return 0;
 	}
 

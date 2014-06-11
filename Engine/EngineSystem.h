@@ -18,7 +18,6 @@ public:
 	virtual IAudio* GetIAudio();
 
 	virtual IResourceManager* GetIResourceManager();
-
 };
 
 }

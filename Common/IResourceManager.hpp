@@ -16,3 +16,5 @@ namespace Dream
 
 	extern IResourceManager*	gIResourceManager;
 }
+
+#define DEFINE_RESOURCEMGR_INTERFACE  Dream::IResourceManager*  Dream::gIResourceManager = NULL;

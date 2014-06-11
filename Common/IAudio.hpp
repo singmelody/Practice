@@ -2,6 +2,7 @@
 
 namespace Dream
 {
+	class IEngine;
 	class IAudioPlayer;
 
 	class IAudio
@@ -10,7 +11,7 @@ namespace Dream
 		IAudio(void){}
 		virtual ~IAudio(void){}
 
-		virtual bool Init() = 0;
+		virtual bool Init(IEngine* ) = 0;
 		virtual void Destroy() = 0;
 
 		virtual void Update(float deltaTime) = 0;

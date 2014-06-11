@@ -9,6 +9,9 @@ DEFINE_RENDER_INTERFACE
 #include "IAudio.hpp"
 DEFINE_AUDIO_INTERFACE
 
+#include "Resource/ResourceManager.h"
+DEFINE_RESOURCEMGR_INTERFACE
+
 namespace Dream
 {
 	EngineSystem::EngineSystem()
@@ -23,6 +26,9 @@ namespace Dream
 
 	bool EngineSystem::Init(const HWND mainWnd)
 	{
+		// Create resource manager
+		gIResourceManager = new ResourceManager();
+
 		// Load Renderer Model
 		const char* rendererDll = "RenderD3D9.dll";
 		MODULE_HANDLE instance = LoadDll(rendererDll);
@@ -51,7 +57,7 @@ namespace Dream
 
 		audioFunc(&gAudio);
 
-		result = gAudio->Init();
+		result = gAudio->Init(this);
 		if(!result)
 			return false;
 

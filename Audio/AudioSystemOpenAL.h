@@ -11,7 +11,7 @@ public:
 	AudioSystemOpenAL(void);
 	virtual ~AudioSystemOpenAL(void);
 
-	virtual bool Init();
+	virtual bool Init(IEngine* engine);
 	virtual void Destroy();
 
 	virtual IAudioPlayer* CreateAudioPlayer();

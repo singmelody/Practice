@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include "AudioPlayerOpenAL.h"
 
+#include <IEngine.hpp>
+DEFINE_ENGINE_INTERFACE
+
 namespace Dream
 {
 
@@ -19,8 +22,10 @@ AudioSystemOpenAL::~AudioSystemOpenAL(void)
 {
 }
 
-bool AudioSystemOpenAL::Init()
+bool AudioSystemOpenAL::Init(IEngine* engine)
 {
+	gEngine = engine;
+
 	ALCdevice *device;
 	ALCcontext *ctx;
 

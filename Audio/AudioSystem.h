@@ -13,7 +13,7 @@ public:
 	AudioSystem(void);
 	virtual ~AudioSystem(void);
 
-	virtual bool Init() = 0;
+	virtual bool Init(IEngine*) = 0;
 	virtual void Destroy() = 0;
 
 	virtual IAudioPlayer* CreateAudioPlayer() = 0;
