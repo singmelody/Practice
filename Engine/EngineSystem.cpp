@@ -6,6 +6,9 @@
 #include "IRenderer.hpp"
 DEFINE_RENDER_INTERFACE
 
+#include "IAudio.hpp"
+DEFINE_AUDIO_INTERFACE
+
 namespace Dream
 {
 	EngineSystem::EngineSystem()
@@ -19,9 +22,9 @@ namespace Dream
 	}
 
 	bool EngineSystem::Init(const HWND mainWnd)
-{
+	{
+		// Load Renderer Model
 		const char* rendererDll = "RenderD3D9.dll";
-
 		MODULE_HANDLE instance = LoadDll(rendererDll);
 		if (!instance)
 			return false;
@@ -36,11 +39,28 @@ namespace Dream
 		if(!result)
 			return false;
 
+		// Load Audio Model
+		const char* audioDll = "Audio.dll";
+		instance = LoadDll(audioDll);
+		if(!instance)
+			return false;
+
+		CreateAudioFunc audioFunc = (CreateAudioFunc)GetProc( instance, CREATE_AUDIO_DLL_FUNC);
+		if(!audioFunc)
+			return false;
+
+		audioFunc(&gAudio);
+
+		result = gAudio->Init();
+		if(!result)
+			return false;
+
 		return true;
 	}
 
 	void EngineSystem::Destroy()
 	{
+		gAudio->Destroy();
 		gRenderer->Destroy();
 	}
 
@@ -49,6 +69,18 @@ namespace Dream
 		gRenderer->Update(deltaTime);
 
 		gRenderer->Render();
+
+		gAudio->Update(deltaTime);
+	}
+
+	IAudio* EngineSystem::GetIAudio()
+	{
+		return gAudio;
+	}
+
+	IResourceManager* EngineSystem::GetIResourceManager()
+	{
+		return gIResourceManager;
 	}
 
 	//--------------------------------------------------------------------

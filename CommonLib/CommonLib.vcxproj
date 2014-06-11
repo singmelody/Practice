@@ -76,7 +76,6 @@
     <ClInclude Include="IO\MemoryStream.h" />
     <ClInclude Include="ResourceItem.h" />
     <ClInclude Include="Resource\IResourceItem.hpp" />
-    <ClInclude Include="Resource\IResourceManager.hpp" />
     <ClInclude Include="Resource\FileResourceItem.h" />
     <ClInclude Include="Resource\ResourceManager.h" />
     <ClInclude Include="Serialize\ISerialize.hpp" />
@@ -92,7 +91,6 @@
   <ItemGroup>
     <ClCompile Include="IO\FileStream.cpp" />
     <ClCompile Include="IO\MemoryStream.cpp" />
-    <ClCompile Include="ResourceItem.cpp" />
     <ClCompile Include="Resource\FileResourceItem.cpp" />
     <ClCompile Include="Resource\ResourceManager.cpp" />
     <ClCompile Include="Serialize\XMLSerialize.cpp" />

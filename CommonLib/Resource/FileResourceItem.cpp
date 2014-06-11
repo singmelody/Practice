@@ -1,13 +1,19 @@
 #include "StdAfx.h"
 #include "IResourceItem.hpp"
 #include "IO/FileStream.h"
+#include "FileResourceItem.h"
 
 
-ResourceItem::ResourceItem()
-{
-}
+namespace Dream{
 
+	FileResourceItem::FileResourceItem() : m_fileStream(NULL)
+	{
 
-ResourceItem::~ResourceItem()
-{
+	}
+
+	FileResourceItem::~FileResourceItem()
+	{
+
+	}
+
 }

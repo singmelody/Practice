@@ -15,7 +15,7 @@ namespace Dream
 		IStream* GetStream() { return m_fileStream; }
 	
 	protected:
-		FileStream* m_fileStream;
+		IStream* m_fileStream;
 	};
 }
 

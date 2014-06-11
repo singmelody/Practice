@@ -2,6 +2,8 @@
 
 namespace Dream
 {
+	class IAudioPlayer;
+
 	class IAudio
 	{
 	public:
@@ -12,12 +14,14 @@ namespace Dream
 		virtual void Destroy() = 0;
 
 		virtual void Update(float deltaTime) = 0;
+
+		virtual IAudioPlayer* CreateAudioPlayer() = 0;
 	};
 
-	extern IAudio*	gAuido;
+	extern IAudio*	gAudio;
 }
 
-#define DEFINE_AUDIO_INTERFACE  Dream::IAudio*  Dream::gIAudio = NULL;
+#define DEFINE_AUDIO_INTERFACE  Dream::IAudio*  Dream::gAudio = NULL;
 
 #define CREATE_AUDIO_DLL_FUNC   "CreateAudio"
 typedef void(*CreateAudioFunc)(Dream::IAudio**);

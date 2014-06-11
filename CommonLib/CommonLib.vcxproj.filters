@@ -59,9 +59,6 @@
     <ClInclude Include="Resource\IResourceItem.hpp">
       <Filter>Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Resource\IResourceManager.hpp">
-      <Filter>Resource</Filter>
-    </ClInclude>
     <ClInclude Include="Serialize\ISerialize.hpp">
       <Filter>Serialize</Filter>
     </ClInclude>
@@ -96,9 +93,6 @@
     </ClCompile>
     <ClCompile Include="Resource\ResourceManager.cpp">
       <Filter>Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceItem.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Resource\FileResourceItem.cpp">
       <Filter>Resource</Filter>

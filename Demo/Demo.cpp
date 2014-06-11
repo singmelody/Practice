@@ -10,6 +10,10 @@
 #include <IEngine.hpp>
 DEFINE_ENGINE_INTERFACE
 
+#include <IAudioPlayer.hpp>
+#include <IAudio.hpp>
+DEFINE_AUDIO_INTERFACE
+
 namespace Dream
 {
 	class DemoApp
@@ -40,9 +44,11 @@ namespace Dream
 				return false;
 
 			gEngine->Init(m_hwnd);
-
-
-
+			
+			IAudioPlayer* player = gEngine->GetIAudio()->CreateAudioPlayer();
+			player->SetName("XX");
+			player->Play();
+			
 // 			EngineStartupInfo info;
 // 			info.fullScreen = false;
 // 			info.winHandle = _hwnd;

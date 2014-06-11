@@ -10,8 +10,8 @@ namespace Dream
 		IResourceItem(){}
 		virtual ~IResourceItem(){}
 
-		void SetStream(IStream* stream) = 0;
-		IStream* GetStream() = 0;
+		virtual void SetStream(IStream* stream) = 0;
+		virtual IStream* GetStream() = 0;
 
 	};
 }

@@ -1,4 +1,5 @@
-#pragma once
+#include <stdafx.h>
+#include "ResourceManager.h"
 
 namespace Dream
 {
@@ -16,7 +17,7 @@ namespace Dream
 
 	IResourceItem* ResourceManager::LoadRes(const char* path)
 	{
-
+		return 0;
 	}
 
 	void ResourceManager::UnLoadRes()

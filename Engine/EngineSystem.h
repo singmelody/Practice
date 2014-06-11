@@ -14,6 +14,11 @@ public:
 	virtual void Destroy();
 
 	virtual void Update(float deltaTime);
+
+	virtual IAudio* GetIAudio();
+
+	virtual IResourceManager* GetIResourceManager();
+
 };
 
 }

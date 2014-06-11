@@ -6,6 +6,7 @@
 #include "AL/al.h"
 #include "AL/alext.h"
 #include <stdio.h>
+#include "AudioPlayerOpenAL.h"
 
 namespace Dream
 {
@@ -62,6 +63,17 @@ void AudioSystemOpenAL::Destroy()
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(ctx);
 	alcCloseDevice(device);
+}
+
+IAudioPlayer* AudioSystemOpenAL::CreateAudioPlayer()
+{
+	IAudioPlayer* player = new AudioPlayerOpenAL();
+	if(!player)
+		return NULL;
+
+	m_players.push_back(player);
+
+	return player;
 }
 
 //--------------------------------------------------------------------

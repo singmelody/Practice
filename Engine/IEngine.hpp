@@ -3,7 +3,10 @@
 #include <Windows.h>
 
 namespace Dream {
+
 class IRenderer;
+class IAudio;
+class IResourceManager;
 
 struct EngineStartupInfo
 {
@@ -23,6 +26,10 @@ public:
 	virtual void Destroy() = 0;
 
 	virtual void Update(float deltaTime) = 0;
+
+	virtual IAudio* GetIAudio() = 0;
+
+	virtual IResourceManager* GetIResourceManager() = 0;
 };
 
 extern IEngine*		gEngine;

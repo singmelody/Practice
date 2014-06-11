@@ -13,6 +13,8 @@ public:
 
 	virtual bool Init();
 	virtual void Destroy();
+
+	virtual IAudioPlayer* CreateAudioPlayer();
 };
 
 }

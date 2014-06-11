@@ -16,6 +16,9 @@ public:
 	virtual bool Init() = 0;
 	virtual void Destroy() = 0;
 
+	virtual IAudioPlayer* CreateAudioPlayer() = 0;
+
+
 	virtual void Update(float deltaTime);
 
 protected:
