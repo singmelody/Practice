@@ -4,7 +4,15 @@
 
 namespace Dream
 {
+	FileStream::FileStream()
+	{
 
+	}
+
+	FileStream::~FileStream()
+	{
+		SAFE_DELETE_ARRAY(m_raw);
+	}
 
 	bool FileStream::Open()
 	{
@@ -28,6 +36,21 @@ namespace Dream
 	void FileStream::Flush()
 	{
 
+	}
+
+	void FileStream::Seek(int offset, SeekOrigin orig)
+	{
+
+	}
+
+	int FileStream::Tell() const
+	{
+		return 0;
+	}
+
+	bool FileStream::Eof() const
+	{
+		return true;
 	}
 
 }

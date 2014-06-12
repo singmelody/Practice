@@ -11,7 +11,7 @@ namespace Dream
 		virtual ~IResourceManager(){}
 
 		virtual IResourceItem* LoadRes(const char* path) = 0;
-		virtual void UnLoadRes() = 0;
+		virtual void UnLoadRes(const char* str) = 0;
 	};
 
 	extern IResourceManager*	gIResourceManager;

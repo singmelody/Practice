@@ -6,8 +6,8 @@ namespace Dream
 	class FileStream : public IStream
 	{
 	public:
-		FileStream(){}
-		virtual ~FileStream(){}
+		FileStream();
+		virtual ~FileStream();
 
 		virtual bool Open();
 		virtual void Close();

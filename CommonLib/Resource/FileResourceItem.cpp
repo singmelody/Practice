@@ -13,7 +13,7 @@ namespace Dream{
 
 	FileResourceItem::~FileResourceItem()
 	{
-
+		SAFE_DELETE(m_fileStream);
 	}
 
 }
