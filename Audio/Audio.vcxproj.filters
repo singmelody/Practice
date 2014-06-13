@@ -8,6 +8,9 @@
     <Filter Include="OpenAL">
       <UniqueIdentifier>{5b387fca-db01-48fa-884a-f0ff3ce99654}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Decoder">
+      <UniqueIdentifier>{5347e77a-ae9d-4abc-8c81-c08f40a5796d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -34,6 +37,9 @@
     <ClInclude Include="AudioPlayerOpenAL.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="CWaves.h">
+      <Filter>Decoder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -50,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="AudioPlayerOpenAL.cpp">
       <Filter>OpenAL</Filter>
+    </ClCompile>
+    <ClCompile Include="CWaves.cc">
+      <Filter>Decoder</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.App", "3.App", "{309EAD89
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4.Test", "4.Test", "{1D3B6382-EAE7-4111-9235-3E1BB82560B3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WavDecoder", "ThirdParty\Decoder\WavDecoder\WavDecoder.vcxproj", "{114DF888-1BED-449D-AD29-8D27129E8242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -103,6 +105,15 @@ Global
 		{7DF8F5D2-E561-4AFD-BAD2-178D8FE10750}.Release|Win32.ActiveCfg = Release|Win32
 		{7DF8F5D2-E561-4AFD-BAD2-178D8FE10750}.Release|Win32.Build.0 = Release|Win32
 		{7DF8F5D2-E561-4AFD-BAD2-178D8FE10750}.Release|x64.ActiveCfg = Release|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Debug|Win32.ActiveCfg = Debug|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Debug|Win32.Build.0 = Debug|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Debug|x64.ActiveCfg = Debug|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Profile|Win32.ActiveCfg = Release|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Profile|Win32.Build.0 = Release|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Profile|x64.ActiveCfg = Release|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Release|Win32.ActiveCfg = Release|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Release|Win32.Build.0 = Release|Win32
+		{114DF888-1BED-449D-AD29-8D27129E8242}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
