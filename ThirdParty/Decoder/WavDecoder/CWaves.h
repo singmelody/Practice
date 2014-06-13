@@ -12,6 +12,7 @@
 typedef unsigned short ushort;
 typedef unsigned long ulong;
 typedef unsigned char uchar;
+typedef unsigned int uint;
 
 typedef struct _GUID {
 	ulong  Data1;
@@ -97,6 +98,9 @@ class CWaves
 public:
 	CWaves();
 	virtual ~CWaves();
+	
+	static bool LoadWav(const uchar* nameOrData, size_t dataSize, uint uiBufferID);
+
 
 	WaveResult LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id);
 	WaveResult GetWaveData(WAVEID id, void **ppAudioData);
@@ -107,6 +111,10 @@ public:
 	bool IsWaveID(WAVEID id);
 
 	WaveResult SetCallbacks(void * steam, wave_callbacks& call_back);
+
+	static CWaves* InstancePtr();
+protected:
+	static CWaves* m_instance;
 private:
 	WaveResult ParseData(const uchar* data, LPWAVEFILEINFO pWaveInfo);
 

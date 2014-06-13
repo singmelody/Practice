@@ -119,6 +119,12 @@ CWaves::~CWaves()
 			m_WaveIDs[lLoop] = 0;
 		}
 	}
+
+	if(m_instance)
+	{
+		delete m_instance;
+		m_instance = NULL;
+	}
 }
 
 WaveResult CWaves::LoadWaveFile(unsigned char* nameOrData, size_t dataSize, WAVEID *pWaveID)
@@ -448,3 +454,42 @@ WaveResult CWaves::SetCallbacks(void * steam, wave_callbacks& call_back)
 
 	return WR_OK;
 }
+
+bool CWaves::LoadWav(const uchar* nameOrData, size_t dataSize, uint uiBufferID)
+{
+	WAVEID			WaveID;
+	int				iDataSize, iFrequency;
+	int				eBufferFormat;
+	char			*pData;
+	bool			bReturn;
+
+	bReturn = false;
+	if (SUCCEEDED(CWaves::InstancePtr()->LoadWaveFile(nameOrData, dataSize, &WaveID)))
+	{
+		if ((SUCCEEDED(CWaves::InstancePtr()->GetWaveSize(WaveID, (unsigned long*)&iDataSize))) &&
+			(SUCCEEDED(CWaves::InstancePtr()->GetWaveData(WaveID, (void**)&pData))) &&
+			(SUCCEEDED(CWaves::InstancePtr()->GetWaveFrequency(WaveID, (unsigned long*)&iFrequency))) &&
+			(SUCCEEDED(CWaves::InstancePtr()->GetWaveALBufferFormat(WaveID, &alGetEnumValue, (unsigned long*)&eBufferFormat))))
+		{
+
+			alGetError();
+			alBufferData(uiBufferID, eBufferFormat, pData, iDataSize, iFrequency);
+			if (alGetError() == AL_NO_ERROR)
+				bReturn = true;
+
+			g_pWaveLoader->DeleteWaveFile(WaveID);
+		}
+	}
+
+	return bReturn;
+}
+
+CWaves* CWaves::InstancePtr()
+{
+	if(!m_instance)
+		m_instance = new CWaves();
+
+	return m_instance;
+}
+
+CWaves CWaves::m_instance = NULL;
