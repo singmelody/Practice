@@ -43,6 +43,8 @@ namespace Dream
 		virtual int  Tell() const = 0; 
 		virtual bool Eof() const = 0;  
 
+		virtual int GetPosition() const { return m_position; }
+		virtual void SetPosition(int pos) { m_position = pos;} 
 	protected:
 		int m_size;
 		int m_position;

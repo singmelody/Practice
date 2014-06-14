@@ -1,11 +1,11 @@
 #pragma once
 #include "IAudioPlayer.hpp"
 
-#define AUDIO_BUFF_NUM 4
+#define AUDIO_BUFF_NUM 1
 
 namespace Dream{
 
-class IStream;
+class IResourceItem;
 
 class AudioPlayerOpenAL : public IAudioPlayer
 {
@@ -21,23 +21,31 @@ public:
 
 	virtual void Stop();
 
+	virtual void SetName(const char* name);
+
 protected:
 	struct AudioInfo
 	{
 		int format;
 		int channels;
-		unsigned int rate;
+		int frequency;
 		unsigned char* m_decoderBuff;
 	};
 
 	virtual bool LoadAudioResource();
 
-	void GetAudioInfo();
+	virtual bool GetAudioInfo();
 private:
 	unsigned int m_source;
 	unsigned int m_buffers[AUDIO_BUFF_NUM];
-	IStream* m_stream;
+	IResourceItem* m_audioRes;
 	AudioInfo m_info;
+
+	// For Ogg
+	static size_t readWav(void *ptr, size_t size, void *datasource);
+	static int SeekWav(void *datasource, long offset, int whence);
+	static int CloseWav(void *datasource);
+	static long TellWav(void *datasource);
 };
 
 }

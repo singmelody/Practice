@@ -14,13 +14,15 @@ typedef unsigned long ulong;
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
+#ifndef HAS_GUID 
+#define HAS_GUID
 typedef struct _GUID {
 	ulong  Data1;
 	ushort Data2;
 	ushort Data3;
 	uchar  Data4[ 8 ];
 } GUID;
-
+#endif
 
 enum WAVEFILETYPE
 {
@@ -54,8 +56,8 @@ typedef struct tWAVEFORMATEX
 {
 	ushort    wFormatTag;
 	ushort    nChannels;
-	ulong   nSamplesPerSec;
-	ulong   nAvgBytesPerSec;
+	ulong	  nSamplesPerSec;
+	ulong     nAvgBytesPerSec;
 	ushort    nBlockAlign;
 	ushort    wBitsPerSample;
 	ushort    cbSize;
@@ -99,14 +101,12 @@ public:
 	CWaves();
 	virtual ~CWaves();
 	
-	static bool LoadWav(const uchar* nameOrData, size_t dataSize, uint uiBufferID);
+	static bool LoadWav(uchar* nameOrData, size_t dataSize, int& frequency, int& channels, wave_callbacks& callback);
 
-
-	WaveResult LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id);
+	WaveResult LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id, int& channels);
 	WaveResult GetWaveData(WAVEID id, void **ppAudioData);
 	WaveResult GetWaveSize(WAVEID id, ulong *pulDataSize);
 	WaveResult GetWaveFrequency(WAVEID id, ulong *pulFrequency);
-	WaveResult GetWaveALBufferFormat(WAVEID id, PFNALGETENUMVALUE pfnGetEnumValue, ulong *pulFormat);
 	WaveResult DeleteWaveFile(WAVEID id);
 	bool IsWaveID(WAVEID id);
 
@@ -116,7 +116,7 @@ public:
 protected:
 	static CWaves* m_instance;
 private:
-	WaveResult ParseData(const uchar* data, LPWAVEFILEINFO pWaveInfo);
+	WaveResult ParseData(const uchar* data, LPWAVEFILEINFO pWaveInfo, int& channels);
 
 	LPWAVEFILEINFO	m_WaveIDs[MAX_NUM_WAVEID];
 	wave_callbacks m_callbacks;

@@ -12,7 +12,7 @@ namespace Dream
 
 		virtual void Update(float deltaTime) = 0;
 
-		virtual void SetName(const char* name){ m_name = name; LoadAudioResource(); }
+		virtual void SetName(const char* name) = 0;
 
 		virtual const char* GetName() const { return m_name.c_str(); }
 
@@ -24,6 +24,7 @@ namespace Dream
 
 	protected:
 		virtual bool LoadAudioResource() = 0;
+		virtual bool GetAudioInfo() = 0;
 
 		std::string m_name;
 	};

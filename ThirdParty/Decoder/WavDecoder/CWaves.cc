@@ -127,7 +127,7 @@ CWaves::~CWaves()
 	}
 }
 
-WaveResult CWaves::LoadWaveFile(unsigned char* nameOrData, size_t dataSize, WAVEID *pWaveID)
+WaveResult CWaves::LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id, int& channels)
 {
 	WaveResult wr = WR_OUTOFMEMORY;
 	LPWAVEFILEINFO pWaveInfo;
@@ -137,7 +137,7 @@ WaveResult CWaves::LoadWaveFile(unsigned char* nameOrData, size_t dataSize, WAVE
 	if (pWaveInfo)
 	{
 		pWaveInfo->pData = nameOrData;
-		if (SUCCEED((wr = ParseData(nameOrData, pWaveInfo))) )
+		if (SUCCEED((wr = ParseData(nameOrData, pWaveInfo, channels))) )
 		{
 			// Allocate memory for sample data
 			pWaveInfo->pData = new uchar[pWaveInfo->ulDataSize];
@@ -156,7 +156,7 @@ WaveResult CWaves::LoadWaveFile(unsigned char* nameOrData, size_t dataSize, WAVE
 						if (!m_WaveIDs[lLoop])
 						{
 							m_WaveIDs[lLoop] = pWaveInfo;
-							*pWaveID = lLoop;
+							*id = lLoop;
 							wr = WR_OK;
 							break;
 						}
@@ -189,7 +189,7 @@ WaveResult CWaves::LoadWaveFile(unsigned char* nameOrData, size_t dataSize, WAVE
 	return wr;
 }
 
-WaveResult CWaves::ParseData( const uchar* data, LPWAVEFILEINFO pWaveInfo)
+WaveResult CWaves::ParseData( const uchar* data, LPWAVEFILEINFO pWaveInfo, int& channels)
 {
 	WAVEFILEHEADER	waveFileHeader;
 	RIFFCHUNK		riffChunk;
@@ -218,11 +218,13 @@ WaveResult CWaves::ParseData( const uchar* data, LPWAVEFILEINFO pWaveInfo)
 					{
 						pWaveInfo->wfType = WF_EX;
 						memcpy(&pWaveInfo->wfEXT.Format, &waveFmt, sizeof(PCMWAVEFORMAT));
+						channels = pWaveInfo->wfEXT.Format.nChannels;
 					}
 					else if (waveFmt.usFormatTag == WAVE_FORMAT_EXTENSIBLE)
 					{
 						pWaveInfo->wfType = WF_EXT;
 						memcpy(&pWaveInfo->wfEXT, &waveFmt, sizeof(WAVEFORMATEXTENSIBLE));
+						channels = pWaveInfo->wfEXT.Format.nChannels;
 					}
 				}
 				else
@@ -313,114 +315,6 @@ bool CWaves::IsWaveID(WAVEID WaveID)
 	return bReturn;
 }
 
-WaveResult CWaves::GetWaveALBufferFormat(WAVEID WaveID, PFNALGETENUMVALUE pfnGetEnumValue, ulong *pulFormat)
-{
-	WaveResult wr = WR_OK;
-
-	if (IsWaveID(WaveID))
-	{
-		if (pfnGetEnumValue && pulFormat)
-		{
-			*pulFormat = 0;
-
-			if (m_WaveIDs[WaveID]->wfType == WF_EX)
-			{
-				if (m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 1)
-				{
-					switch (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample)
-					{
-					case 4:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_MONO_IMA4");
-						break;
-					case 8:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_MONO8");
-						break;
-					case 16:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_MONO16");
-						break;
-					}
-				}
-				else if (m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 2)
-				{
-					switch (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample)
-					{
-					case 4:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_STEREO_IMA4");
-						break;
-					case 8:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_STEREO8");
-						break;
-					case 16:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_STEREO16");
-						break;
-					}
-				}
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 4) && (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample == 16))
-					*pulFormat = pfnGetEnumValue("AL_FORMAT_QUAD16");
-			}
-			else if (m_WaveIDs[WaveID]->wfType == WF_EXT)
-			{
-				if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 1) &&
-					((m_WaveIDs[WaveID]->wfEXT.dwChannelMask == SPEAKER_FRONT_CENTER) ||
-					(m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT)) ||
-					(m_WaveIDs[WaveID]->wfEXT.dwChannelMask == 0)))
-				{
-					switch (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample)
-					{
-					case 4:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_MONO_IMA4");
-						break;
-					case 8:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_MONO8");
-						break;
-					case 16:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_MONO16");
-						break;
-					}
-				}
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 2) && (m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT)))
-				{
-					switch (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample)
-					{
-					case 4:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_STEREO_IMA4");
-						break;
-					case 8:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_STEREO8");
-						break;
-					case 16:
-						*pulFormat = pfnGetEnumValue("AL_FORMAT_STEREO16");
-						break;
-					}
-				}
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 2) && (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample == 16) && (m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT)))
-					*pulFormat =  pfnGetEnumValue("AL_FORMAT_REAR16");
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 4) && (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample == 16) && (m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT)))
-					*pulFormat = pfnGetEnumValue("AL_FORMAT_QUAD16");
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 6) && (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample == 16) && (m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT)))
-					*pulFormat = pfnGetEnumValue("AL_FORMAT_51CHN16");
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 7) && (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample == 16) && (m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_BACK_CENTER)))
-					*pulFormat = pfnGetEnumValue("AL_FORMAT_61CHN16");
-				else if ((m_WaveIDs[WaveID]->wfEXT.Format.nChannels == 8) && (m_WaveIDs[WaveID]->wfEXT.Format.wBitsPerSample == 16) && (m_WaveIDs[WaveID]->wfEXT.dwChannelMask == (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT)))
-					*pulFormat = pfnGetEnumValue("AL_FORMAT_71CHN16");
-			}
-
-			if (*pulFormat == 0)
-				wr = WR_INVALIDWAVEFILETYPE;
-		}
-		else
-		{
-			wr = WR_INVALIDPARAM;
-		}
-	}
-	else
-	{
-		wr = WR_INVALIDWAVEID;
-	}
-
-	return wr;
-}
-
 WaveResult CWaves::DeleteWaveFile(WAVEID WaveID)
 {
 	WaveResult wr = WR_OK;
@@ -455,33 +349,27 @@ WaveResult CWaves::SetCallbacks(void * steam, wave_callbacks& call_back)
 	return WR_OK;
 }
 
-bool CWaves::LoadWav(const uchar* nameOrData, size_t dataSize, uint uiBufferID)
+bool CWaves::LoadWav(uchar* nameOrData, size_t dataSize,  int& frequency, int& channels, wave_callbacks& callback)
 {
 	WAVEID			WaveID;
 	int				iDataSize, iFrequency;
-	int				eBufferFormat;
 	char			*pData;
-	bool			bReturn;
 
-	bReturn = false;
-	if (SUCCEEDED(CWaves::InstancePtr()->LoadWaveFile(nameOrData, dataSize, &WaveID)))
+	if (SUCCEED(CWaves::InstancePtr()->LoadWaveFile(nameOrData, dataSize, &WaveID, channels)))
 	{
-		if ((SUCCEEDED(CWaves::InstancePtr()->GetWaveSize(WaveID, (unsigned long*)&iDataSize))) &&
-			(SUCCEEDED(CWaves::InstancePtr()->GetWaveData(WaveID, (void**)&pData))) &&
-			(SUCCEEDED(CWaves::InstancePtr()->GetWaveFrequency(WaveID, (unsigned long*)&iFrequency))) &&
-			(SUCCEEDED(CWaves::InstancePtr()->GetWaveALBufferFormat(WaveID, &alGetEnumValue, (unsigned long*)&eBufferFormat))))
+		if ((SUCCEED(CWaves::InstancePtr()->GetWaveSize(WaveID, (unsigned long*)&iDataSize))) &&
+			(SUCCEED(CWaves::InstancePtr()->GetWaveData(WaveID, (void**)&pData))) &&
+			(SUCCEED(CWaves::InstancePtr()->GetWaveFrequency(WaveID, (unsigned long*)&iFrequency))) ) 
 		{
-
-			alGetError();
-			alBufferData(uiBufferID, eBufferFormat, pData, iDataSize, iFrequency);
-			if (alGetError() == AL_NO_ERROR)
-				bReturn = true;
-
-			g_pWaveLoader->DeleteWaveFile(WaveID);
+			CWaves::InstancePtr()->m_callbacks = callback;
+			frequency = iFrequency;
+			return true;
 		}
+
+		CWaves::InstancePtr()->DeleteWaveFile(WaveID);
 	}
 
-	return bReturn;
+	return false;
 }
 
 CWaves* CWaves::InstancePtr()
@@ -492,4 +380,5 @@ CWaves* CWaves::InstancePtr()
 	return m_instance;
 }
 
-CWaves CWaves::m_instance = NULL;
+
+CWaves* CWaves::m_instance = NULL;

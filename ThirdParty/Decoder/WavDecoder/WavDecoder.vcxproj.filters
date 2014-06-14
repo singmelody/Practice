@@ -27,18 +27,12 @@
     <ClInclude Include="CWaves.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WavDecoder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CWaves.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WavDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
