@@ -145,10 +145,10 @@ WaveResult CWaves::LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id, 
 			{
 				// Seek to start of audio data
 				//pData->Seek(pWaveInfo->ulDataOffset, IO::Stream::Begin);
-				m_callbacks.seek_func( (void*)nameOrData, pWaveInfo->ulDataOffset, SEEK_SET);
+				m_callbacks.seek_func( m_stream, pWaveInfo->ulDataOffset, SEEK_SET);
 
 				// Read Sample Data
-				if(m_callbacks.read_func( pWaveInfo->pData, pWaveInfo->ulDataSize, (void*)nameOrData) == pWaveInfo->ulDataSize)
+				if(m_callbacks.read_func( pWaveInfo->pData, pWaveInfo->ulDataSize, m_stream) == pWaveInfo->ulDataSize)
 				{
 					long lLoop = 0;
 					for (lLoop = 0; lLoop < MAX_NUM_WAVEID; lLoop++)
@@ -202,7 +202,7 @@ WaveResult CWaves::ParseData( const uchar* data, LPWAVEFILEINFO pWaveInfo, int& 
 	memset(pWaveInfo, 0, sizeof(WAVEFILEINFO));
 
 	// Read Wave file header
-	m_callbacks.read_func( pWaveInfo, sizeof(WAVEFILEHEADER), (void*)m_stream);
+	m_callbacks.read_func( &waveFileHeader, sizeof(WAVEFILEHEADER), (void*)m_stream);
 	if (!_strnicmp(waveFileHeader.szRIFF, "RIFF", 4) && !_strnicmp(waveFileHeader.szWAVE, "WAVE", 4))
 	{
 		while( m_callbacks.read_func( &riffChunk, sizeof(RIFFCHUNK), (void*)m_stream) == sizeof(RIFFCHUNK) )
@@ -229,7 +229,7 @@ WaveResult CWaves::ParseData( const uchar* data, LPWAVEFILEINFO pWaveInfo, int& 
 				}
 				else
 				{
-					m_callbacks.seek_func( pWaveInfo->pData, riffChunk.ulChunkSize, SEEK_CUR);
+					m_callbacks.seek_func( m_stream, riffChunk.ulChunkSize, SEEK_CUR);
 				}
 			}
 			else if (!_strnicmp(riffChunk.szChunkName, "data", 4))
@@ -349,19 +349,20 @@ WaveResult CWaves::SetCallbacks(void * steam, wave_callbacks& call_back)
 	return WR_OK;
 }
 
-bool CWaves::LoadWav(uchar* nameOrData, size_t dataSize,  int& frequency, int& channels, wave_callbacks& callback)
+bool CWaves::LoadWav(uchar* nameOrData, size_t dataSize,  int& frequency, int& channels, void* data_source, wave_callbacks& callback)
 {
 	WAVEID			WaveID;
 	int				iDataSize, iFrequency;
 	char			*pData;
 
+	CWaves::InstancePtr()->m_callbacks = callback;
+	CWaves::InstancePtr()->m_stream = data_source;
 	if (SUCCEED(CWaves::InstancePtr()->LoadWaveFile(nameOrData, dataSize, &WaveID, channels)))
 	{
 		if ((SUCCEED(CWaves::InstancePtr()->GetWaveSize(WaveID, (unsigned long*)&iDataSize))) &&
 			(SUCCEED(CWaves::InstancePtr()->GetWaveData(WaveID, (void**)&pData))) &&
 			(SUCCEED(CWaves::InstancePtr()->GetWaveFrequency(WaveID, (unsigned long*)&iFrequency))) ) 
 		{
-			CWaves::InstancePtr()->m_callbacks = callback;
 			frequency = iFrequency;
 			return true;
 		}

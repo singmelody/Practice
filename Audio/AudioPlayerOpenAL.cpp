@@ -44,24 +44,24 @@ void AudioPlayerOpenAL::Update(float deltaTime)
 	alGetSourcei( m_source, AL_SOURCE_STATE, &state);
 
 	if(state != AL_PLAYING)
-		return;
+		printf("Audio Not Play now");
 
-	int processed = 0;
-	alGetSourcei( m_source, AL_BUFFERS_PROCESSED, &processed);
-
-	while(processed > 0)
-	{
-		ALuint bufid;
-		alSourceUnqueueBuffers( m_source, 1, &bufid);
-		processed--;
-	}
+// 	int processed = 0;
+// 	alGetSourcei( m_source, AL_BUFFERS_PROCESSED, &processed);
+// 
+// 	while(processed > 0)
+// 	{
+// 		ALuint bufid;
+// 		alSourceUnqueueBuffers( m_source, 1, &bufid);
+// 		processed--;
+// 	}
 }
 
 bool AudioPlayerOpenAL::Play()
 {
-	alSourceRewind(m_source);
-	alSourcei( m_source, AL_BUFFER, 0);
-
+	//alSourceRewind(m_source);
+	alSourcei( m_source, AL_BUFFER, m_buffers[0]);
+	alSourcePlay( m_source );
 
 	return true;
 }
@@ -147,13 +147,13 @@ void AudioPlayerOpenAL::SetName(const char* name)
 	call_backs.tell_func = TellWav;
 	call_backs.close_func = CloseWav;
 
-	b = CWaves::LoadWav( stream->GetRaw(), stream->GetSize(), m_info.frequency, m_info.channels, call_backs);
+	b = CWaves::LoadWav( stream->GetRaw(), stream->GetSize(), m_info.frequency, m_info.channels, stream, call_backs);
 
 	if(!b)
 		return;
 
 	GetAudioInfo(); 
-	alBufferData( m_buffers[0], m_info.format, m_info.m_decoderBuff, stream->GetSize(), m_info.frequency);
+	alBufferData( m_buffers[0], m_info.format, stream->GetRaw(), 282626, m_info.frequency);
 
 }
 

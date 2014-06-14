@@ -30,7 +30,7 @@ namespace Dream
 		if(itr != m_items.end())
 			return (*itr).second;
 
-		FILE* file = fopen( path, "r");
+		FILE* file = fopen( path, "rb");
 
 		if(!file)
 			return NULL;
@@ -42,8 +42,8 @@ namespace Dream
 		unsigned char* buffer = new unsigned char[size];
 		if( !buffer )
 			return NULL;
-
-		size_t readSize = fread( buffer, 1, size, file);
+		
+		long readSize = fread( buffer, 1, size, file);
 		if( !readSize )
 			return NULL;
 
@@ -51,6 +51,7 @@ namespace Dream
 
 		IStream* stream = new FileStream();
 		stream->SetRaw(buffer);
+		stream->SetSize(size);
 
 		IResourceItem* item = new FileResourceItem();
 		item->SetStream(stream);

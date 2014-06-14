@@ -101,7 +101,7 @@ public:
 	CWaves();
 	virtual ~CWaves();
 	
-	static bool LoadWav(uchar* nameOrData, size_t dataSize, int& frequency, int& channels, wave_callbacks& callback);
+	static bool LoadWav(uchar* nameOrData, size_t dataSize, int& frequency, int& channels,void* data_source, wave_callbacks& callback);
 
 	WaveResult LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id, int& channels);
 	WaveResult GetWaveData(WAVEID id, void **ppAudioData);
