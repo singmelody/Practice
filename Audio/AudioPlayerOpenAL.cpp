@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 
-#define HAS_GUID
-
 #include "AudioPlayerOpenAL.h"
 #include "AL/al.h"
 #include "AL/alc.h"
@@ -10,6 +8,7 @@
 #include "IEngine.hpp"
 #include "IResourceManager.hpp"
 #include "CWaves.h"
+#include "WavDecoder.h"
 
 #include <Windows.h>
 #define AL_ERROR_CHECK(state) if(alGetError() == AL_NO_ERROR) { OutputDebugString("AL state "#state" Success\n");  }else { OutputDebugString("AL state "#state" failed\n"); }
@@ -18,8 +17,7 @@ namespace Dream
 {
 
 AudioPlayerOpenAL::AudioPlayerOpenAL()
-	:	m_source(NULL),
-		m_audioRes(NULL)	
+	:	m_source(NULL)
 {
 	alGenBuffers( AUDIO_BUFF_NUM, m_buffers);
 	AL_ERROR_CHECK(alGenBuffers);
@@ -43,7 +41,7 @@ AudioPlayerOpenAL::~AudioPlayerOpenAL(void)
 	alDeleteSources( 1, &m_source);
 	alDeleteSources( AUDIO_BUFF_NUM, m_buffers);
 
-	SAFE_DELETE_ARRAY(m_info.m_decoderBuff);
+	SAFE_DELETE_ARRAY(m_info.decoderBuffer);
 }
 
 void AudioPlayerOpenAL::Update(float deltaTime)
@@ -104,7 +102,7 @@ bool AudioPlayerOpenAL::LoadAudioResource()
 	return true;
 }
 
-bool AudioPlayerOpenAL::GetAudioInfo()
+bool AudioPlayerOpenAL::GetAudioFormat()
 {
 	int bufferSize = 0;
 
@@ -144,7 +142,7 @@ bool AudioPlayerOpenAL::GetAudioInfo()
 	if(!bufferSize)
 		return false;
 
-	m_info.m_decoderBuff = new unsigned char[bufferSize];
+	m_info.decoderBuffer = new unsigned char[bufferSize];
 
 	return true;
 }
@@ -156,65 +154,12 @@ void AudioPlayerOpenAL::SetName(const char* name)
 	if(!b)
 		return; 
 
-	IStream* stream = m_audioRes->GetStream();
-
-	wave_callbacks call_backs;
-	call_backs.read_func = readWav;
-	call_backs.seek_func = SeekWav;
-	call_backs.tell_func = TellWav;
-	call_backs.close_func = CloseWav;
-
-	b = CWaves::LoadWav( stream->GetRaw(), stream->GetSize(), m_info.frequency, m_info.channels, stream, call_backs);
-
+	m_decoder = new WavDecoder(this);
+	b = m_decoder->GetInfo();
 	if(!b)
 		return;
 
-	GetAudioInfo(); 
-
-	char* mem = new char[40080000];
-	memcpy( mem, stream->GetRaw() + 44, 40080000);
-
-	alBufferData( m_buffers[0], m_info.format, mem, 40080000, m_info.frequency);
-	AL_ERROR_CHECK(alBufferData);
-}
-
-size_t AudioPlayerOpenAL::readWav(void *ptr, size_t size, void *datasource)
-{
-	IStream *pData = static_cast< IStream* >(datasource);
-	size_t ret = pData->Read( ptr, size);
-	return ret;
-}
-
-int AudioPlayerOpenAL::SeekWav(void *datasource, long offset, int whence)
-{
-	IStream *pData = static_cast< IStream* >(datasource);
-
-	switch (whence)
-	{
-	case SEEK_SET:
-		pData->Seek((int)offset, IStream::eBegin);
-		break;
-	case SEEK_CUR:
-		pData->Seek((int)offset, IStream::eCurrent);
-		break;
-	case SEEK_END:
-		pData->Seek((int)offset, IStream::eEnd);
-		break;
-	}
-
-	return NULL;
-}
-
-int AudioPlayerOpenAL::CloseWav(void *datasource)
-{
-	return NULL;
-}
-
-long AudioPlayerOpenAL::TellWav(void *datasource)
-{
-	IStream *pData = static_cast< IStream* >(datasource);
-	size_t position = pData->GetPosition();
-	return position;
+	m_decoder->Decode();
 }
 
 }

@@ -21,13 +21,10 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include "stdafx.h"
-
 #include "CWaves.h"
 
 #include <stdio.h>
 #include <memory>
-#include <string>
 
 typedef struct 
 {
@@ -91,295 +88,106 @@ typedef struct pcmwaveformat_tag {
 #define SPEAKER_TOP_BACK_CENTER         0x10000
 #define SPEAKER_TOP_BACK_RIGHT          0x20000
 
-#define SUCCEED(hr) hr >= 0
+#define SUCCEED(hr) (hr) >= 0
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
-CWaves::CWaves()
+bool wave_open(LPWAVEFILEINFO& handle, wave_callbacks& callbacks, void* datasource)
 {
-	m_stream = NULL;
-	memset(&m_callbacks, 0, sizeof(wave_callbacks));
-	memset(&m_WaveIDs, 0, sizeof(m_WaveIDs));
-}
+	handle = new WAVEFILEINFO;
+	if(!handle)
+		return false;
 
-CWaves::~CWaves()
-{
-	long lLoop;
+	memset( handle, 0, sizeof(WAVEFILEINFO));
+	handle->datasource = datasource;
+	handle->callbacks = callbacks;
 
-	for (lLoop = 0; lLoop < MAX_NUM_WAVEID; lLoop++)
+	if( parse_waveData( handle ) != WR_OK)
 	{
-		if (m_WaveIDs[lLoop])
-		{
-			if (m_WaveIDs[lLoop]->pData)
-				delete m_WaveIDs[lLoop]->pData;
-
-			delete m_WaveIDs[lLoop];
-			m_WaveIDs[lLoop] = 0;
-		}
+		delete handle;
+		handle = NULL;
+		return false;
 	}
 
-	if(m_instance)
+	return true;
+}
+
+void wave_close(LPWAVEFILEINFO& handle)
+{
+	if(handle)
 	{
-		delete m_instance;
-		m_instance = NULL;
+		delete handle;
+		handle = NULL;
 	}
 }
 
-WaveResult CWaves::LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id, int& channels)
+WaveResult load_wavfile(LPWAVEFILEINFO handle)
 {
-	WaveResult wr = WR_OUTOFMEMORY;
-	LPWAVEFILEINFO pWaveInfo;
+	if (SUCCEED(parse_waveData(handle)))
+		return WR_OK;
 
-	pWaveInfo = new WAVEFILEINFO;
-	memset( pWaveInfo, 0, sizeof(WAVEFILEINFO));
-	if (pWaveInfo)
-	{
-		pWaveInfo->pData = nameOrData;
-		if (SUCCEED((wr = ParseData(nameOrData, pWaveInfo, channels))) )
-		{
-			// Allocate memory for sample data
-			pWaveInfo->pData = new uchar[pWaveInfo->ulDataSize];
-			if (pWaveInfo->pData)
-			{
-				// Seek to start of audio data
-				//pData->Seek(pWaveInfo->ulDataOffset, IO::Stream::Begin);
-				m_callbacks.seek_func( m_stream, pWaveInfo->ulDataOffset, SEEK_SET);
-
-				// Read Sample Data
-				if(m_callbacks.read_func( pWaveInfo->pData, pWaveInfo->ulDataSize, m_stream) == pWaveInfo->ulDataSize)
-				{
-					long lLoop = 0;
-					for (lLoop = 0; lLoop < MAX_NUM_WAVEID; lLoop++)
-					{
-						if (!m_WaveIDs[lLoop])
-						{
-							m_WaveIDs[lLoop] = pWaveInfo;
-							*id = lLoop;
-							wr = WR_OK;
-							break;
-						}
-					}
-
-					if (lLoop == MAX_NUM_WAVEID)
-					{
-						delete pWaveInfo->pData;
-						wr = WR_OUTOFMEMORY;
-					}
-				}
-				else
-				{
-					delete pWaveInfo->pData;
-					wr = WR_BADWAVEFILE;
-				}
-			}
-			else
-			{
-				wr = WR_OUTOFMEMORY;
-			}
-
-			m_callbacks.close_func((void*)nameOrData);
-		}
-		
-		if (wr != WR_OK)
-			delete pWaveInfo;
-	}
-
-	return wr;
+	return WR_BADWAVEFILE;
 }
 
-WaveResult CWaves::ParseData( const uchar* data, LPWAVEFILEINFO pWaveInfo, int& channels)
+WaveResult parse_waveData(LPWAVEFILEINFO handle)
 {
 	WAVEFILEHEADER	waveFileHeader;
 	RIFFCHUNK		riffChunk;
 	WAVEFMT			waveFmt;
 	WaveResult		wr = WR_BADWAVEFILE;
 
-	if (!data || !pWaveInfo)
+	if ( !handle )
 		return WR_INVALIDPARAM;
 
-	memset(pWaveInfo, 0, sizeof(WAVEFILEINFO));
-
 	// Read Wave file header
-	m_callbacks.read_func( &waveFileHeader, sizeof(WAVEFILEHEADER), (void*)m_stream);
+	handle->callbacks.read_func( &waveFileHeader, sizeof(WAVEFILEHEADER), handle->datasource);
 	if (!_strnicmp(waveFileHeader.szRIFF, "RIFF", 4) && !_strnicmp(waveFileHeader.szWAVE, "WAVE", 4))
 	{
-		while( m_callbacks.read_func( &riffChunk, sizeof(RIFFCHUNK), (void*)m_stream) == sizeof(RIFFCHUNK) )
+		while( handle->callbacks.read_func( &riffChunk, sizeof(RIFFCHUNK), handle->datasource) == sizeof(RIFFCHUNK) )
 		{
 			if (!_strnicmp(riffChunk.szChunkName, "fmt ", 4))
 			{
 				if (riffChunk.ulChunkSize <= sizeof(WAVEFMT))
 				{
-					m_callbacks.read_func( &waveFmt, riffChunk.ulChunkSize, (void*)m_stream);
+					handle->callbacks.read_func( &waveFmt, riffChunk.ulChunkSize, handle->datasource);
 
 					// Determine if this is a WAVEFORMATEX or WAVEFORMATEXTENSIBLE wave file
 					if (waveFmt.usFormatTag == WAVE_FORMAT_PCM)
 					{
-						pWaveInfo->wfType = WF_EX;
-						memcpy(&pWaveInfo->wfEXT.Format, &waveFmt, sizeof(PCMWAVEFORMAT));
-						channels = pWaveInfo->wfEXT.Format.nChannels;
+						handle->wfType = WF_EX;
+						memcpy(&handle->wfEXT.Format, &waveFmt, sizeof(PCMWAVEFORMAT));
 					}
 					else if (waveFmt.usFormatTag == WAVE_FORMAT_EXTENSIBLE)
 					{
-						pWaveInfo->wfType = WF_EXT;
-						memcpy(&pWaveInfo->wfEXT, &waveFmt, sizeof(WAVEFORMATEXTENSIBLE));
-						channels = pWaveInfo->wfEXT.Format.nChannels;
+						handle->wfType = WF_EXT;
+						memcpy(&handle->wfEXT, &waveFmt, sizeof(WAVEFORMATEXTENSIBLE));
 					}
 				}
 				else
 				{
-					m_callbacks.seek_func( m_stream, riffChunk.ulChunkSize, SEEK_CUR);
+					handle->callbacks.seek_func( handle->datasource, riffChunk.ulChunkSize, SEEK_CUR);
 				}
 			}
 			else if (!_strnicmp(riffChunk.szChunkName, "data", 4))
 			{
-				pWaveInfo->ulDataSize = riffChunk.ulChunkSize;
-				pWaveInfo->ulDataOffset = m_callbacks.tell_func(m_stream);
-				m_callbacks.seek_func( m_stream, riffChunk.ulChunkSize, SEEK_CUR);
+				handle->datasize = riffChunk.ulChunkSize;
+				handle->dataoffset = handle->callbacks.tell_func(handle->datasource);
+				handle->callbacks.seek_func( handle->datasource, riffChunk.ulChunkSize, SEEK_CUR);
 			}
 			else
 			{
-				m_callbacks.seek_func( m_stream, riffChunk.ulChunkSize, SEEK_CUR);
+				handle->callbacks.seek_func( handle->datasource, riffChunk.ulChunkSize, SEEK_CUR);
 			}
 
 			// Ensure that we are correctly aligned for next chunk
 			if (riffChunk.ulChunkSize & 1)
-				m_callbacks.seek_func( m_stream, 1, SEEK_CUR);
+				handle->callbacks.seek_func( handle->datasource, 1, SEEK_CUR);
 		}
 
-		if (pWaveInfo->ulDataSize && pWaveInfo->ulDataOffset && ((pWaveInfo->wfType == WF_EX) || (pWaveInfo->wfType == WF_EXT)))
+		if (handle->datasize && handle->dataoffset && ((handle->wfType == WF_EX) || (handle->wfType == WF_EXT)))
 			wr = WR_OK;
 		else
-			m_callbacks.close_func(m_stream);
+			handle->callbacks.close_func(handle->datasource);
 	}
 
 	return wr;
 }
-
-WaveResult CWaves::GetWaveData(WAVEID WaveID, void **lplpAudioData)
-{
-	if (!IsWaveID(WaveID))
-		return WR_INVALIDWAVEID;
-
-	if (!lplpAudioData)
-		return WR_INVALIDPARAM;
-
-	*lplpAudioData = m_WaveIDs[WaveID]->pData;
-
-	return WR_OK;
-}
-
-WaveResult CWaves::GetWaveSize(WAVEID WaveID, ulong *size)
-{
-	if (!IsWaveID(WaveID))
-		return WR_INVALIDWAVEID;
-
-	if (!size)
-		return WR_INVALIDPARAM;
-
-	*size = m_WaveIDs[WaveID]->ulDataSize;
-
-	return WR_OK;
-}
-
-
-WaveResult CWaves::GetWaveFrequency(WAVEID WaveID, ulong *pulFrequency)
-{
-	WaveResult wr = WR_OK;
-
-	if (IsWaveID(WaveID))
-	{
-		if (pulFrequency)
-			*pulFrequency = m_WaveIDs[WaveID]->wfEXT.Format.nSamplesPerSec;
-		else
-			wr = WR_INVALIDPARAM;
-	}
-	else
-	{
-		wr = WR_INVALIDWAVEID;
-	}
-
-	return wr;
-}
-bool CWaves::IsWaveID(WAVEID WaveID)
-{
-	bool bReturn = false;
-
-	if ((WaveID >= 0) && (WaveID < MAX_NUM_WAVEID))
-	{
-		if (m_WaveIDs[WaveID])
-			bReturn = true;
-	}
-
-	return bReturn;
-}
-
-WaveResult CWaves::DeleteWaveFile(WAVEID WaveID)
-{
-	WaveResult wr = WR_OK;
-
-	if (IsWaveID(WaveID))
-	{
-		if (m_WaveIDs[WaveID]->pData)
-			delete[] m_WaveIDs[WaveID]->pData;
-
-		delete m_WaveIDs[WaveID];
-		m_WaveIDs[WaveID] = 0;
-	}
-	else
-	{
-		wr = WR_INVALIDWAVEID;
-	}
-
-	return wr;
-}
-
-WaveResult CWaves::SetCallbacks(void * steam, wave_callbacks& call_back)
-{
-	if(!m_stream || (!m_callbacks.read_func &&
-		!m_callbacks.seek_func && !m_callbacks.tell_func && !m_callbacks.close_func) )
-	{
-		return WR_INVALIDPARAM;
-	}
-
-	m_stream = steam;
-	m_callbacks = call_back;
-
-	return WR_OK;
-}
-
-bool CWaves::LoadWav(uchar* nameOrData, size_t dataSize,  int& frequency, int& channels, void* data_source, wave_callbacks& callback)
-{
-	WAVEID			WaveID;
-	int				iDataSize, iFrequency;
-	char			*pData;
-
-	CWaves::InstancePtr()->m_callbacks = callback;
-	CWaves::InstancePtr()->m_stream = data_source;
-	if (SUCCEED(CWaves::InstancePtr()->LoadWaveFile(nameOrData, dataSize, &WaveID, channels)))
-	{
-		if ((SUCCEED(CWaves::InstancePtr()->GetWaveSize(WaveID, (unsigned long*)&iDataSize))) &&
-			(SUCCEED(CWaves::InstancePtr()->GetWaveData(WaveID, (void**)&pData))) &&
-			(SUCCEED(CWaves::InstancePtr()->GetWaveFrequency(WaveID, (unsigned long*)&iFrequency))) ) 
-		{
-			frequency = iFrequency;
-			return true;
-		}
-
-		CWaves::InstancePtr()->DeleteWaveFile(WaveID);
-	}
-
-	return false;
-}
-
-CWaves* CWaves::InstancePtr()
-{
-	if(!m_instance)
-		m_instance = new CWaves();
-
-	return m_instance;
-}
-
-
-CWaves* CWaves::m_instance = NULL;

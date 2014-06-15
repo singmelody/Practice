@@ -8,7 +8,7 @@ namespace Dream
 	{
 	public:
 		IDecoder(IAudioPlayer* player){ m_player = player; }
-		virtual ~IDecoder() { m_player = NULL; }
+		virtual ~IDecoder() { m_player = 0; }
 
 		virtual bool Decode() = 0;
 		virtual bool GetInfo() = 0;

@@ -5,8 +5,6 @@
 #ifndef _CWAVES_H_
 #define _CWAVES_H_
 
-#include <stdio.h>
-
 #define MAX_NUM_WAVEID			1024
 
 typedef unsigned short ushort;
@@ -52,6 +50,14 @@ enum WaveResult
 	WR_NOTWAVEFORMATEXTENSIBLEFORMAT	= -17
 };
 
+typedef struct  
+{
+	size_t (*read_func)  (void *ptr, size_t size, void *datasource);
+	int    (*seek_func)  (void *datasource, long offset, int whence);
+	int    (*close_func) (void *datasource);
+	long   (*tell_func)  (void *datasource);
+}wave_callbacks;
+
 typedef struct tWAVEFORMATEX
 {
 	ushort    wFormatTag;
@@ -75,52 +81,22 @@ typedef struct {
 	GUID            SubFormat;
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 
+
 typedef struct
 {
 	WAVEFILETYPE	wfType;
 	WAVEFORMATEXTENSIBLE wfEXT;		// For non-WAVEFORMATEXTENSIBLE wavefiles, the header is stored in the Format member of wfEXT
-	uchar			*pData;
-	ulong			ulDataSize;
-	ulong			ulDataOffset;
+	ulong			datasize;
+	ulong			dataoffset;
+	void*			datasource;
+	wave_callbacks	callbacks;
 } WAVEFILEINFO, *LPWAVEFILEINFO;
 
-typedef int (__cdecl *PFNALGETENUMVALUE)( const char *szEnumName );
-typedef int	WAVEID;
 
-typedef struct  
-{
-	size_t (*read_func)  (void *ptr, size_t size, void *datasource);
-	int    (*seek_func)  (void *datasource, long offset, int whence);
-	int    (*close_func) (void *datasource);
-	long   (*tell_func)  (void *datasource);
-}wave_callbacks;
 
-class CWaves  
-{
-public:
-	CWaves();
-	virtual ~CWaves();
-	
-	static bool LoadWav(uchar* nameOrData, size_t dataSize, int& frequency, int& channels,void* data_source, wave_callbacks& callback);
-
-	WaveResult LoadWaveFile(uchar* nameOrData, size_t dataSize, WAVEID *id, int& channels);
-	WaveResult GetWaveData(WAVEID id, void **ppAudioData);
-	WaveResult GetWaveSize(WAVEID id, ulong *pulDataSize);
-	WaveResult GetWaveFrequency(WAVEID id, ulong *pulFrequency);
-	WaveResult DeleteWaveFile(WAVEID id);
-	bool IsWaveID(WAVEID id);
-
-	WaveResult SetCallbacks(void * steam, wave_callbacks& call_back);
-
-	static CWaves* InstancePtr();
-protected:
-	static CWaves* m_instance;
-private:
-	WaveResult ParseData(const uchar* data, LPWAVEFILEINFO pWaveInfo, int& channels);
-
-	LPWAVEFILEINFO	m_WaveIDs[MAX_NUM_WAVEID];
-	wave_callbacks m_callbacks;
-	void* m_stream;
-};
+bool wave_open( LPWAVEFILEINFO& handle, wave_callbacks& callbacks, void* datasource);
+void wave_close( LPWAVEFILEINFO& handle);
+WaveResult load_wavfile(LPWAVEFILEINFO handle);
+WaveResult parse_waveData(LPWAVEFILEINFO handle);
 
 #endif // _CWAVES_H_
