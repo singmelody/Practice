@@ -1,7 +1,6 @@
 #pragma once
 #include "IAudioPlayer.hpp"
 
-#define AUDIO_BUFF_NUM 1
 
 namespace Dream{
 
@@ -25,7 +24,7 @@ public:
 protected:
 	virtual bool LoadAudioResource();
 	virtual bool GetAudioFormat();
-	virtual void* GetBuffer() { return m_buffers; }
+	virtual void* GetParam(PLAYERPARAM param);
 private:
 	unsigned int m_source;
 	unsigned int m_buffers[AUDIO_BUFF_NUM];

@@ -184,10 +184,25 @@ WaveResult parse_waveData(LPWAVEFILEINFO handle)
 		}
 
 		if (handle->datasize && handle->dataoffset && ((handle->wfType == WF_EX) || (handle->wfType == WF_EXT)))
+		{
+			handle->callbacks.seek_func( handle->datasource, handle->dataoffset, SEEK_SET);
 			wr = WR_OK;
+		}
+
 		else
 			handle->callbacks.close_func(handle->datasource);
 	}
 
 	return wr;
+}
+
+WaveResult wave_read(LPWAVEFILEINFO handle, uchar* buffer, int buffersize, int& writeSize)
+{
+	writeSize = handle->callbacks.read_func( buffer, buffersize, handle->datasource);
+	
+	if( !writeSize )
+		return WR_BADWAVEFILE;
+
+	handle->dataoffset += writeSize;
+	return WR_OK;
 }

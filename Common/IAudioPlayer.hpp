@@ -2,6 +2,8 @@
 
 #include <string>
 
+#define AUDIO_BUFF_NUM 4
+
 namespace Dream
 {
 	class IDecoder;
@@ -15,7 +17,14 @@ namespace Dream
 			int format;
 			int channels;
 			int frequency;
+			int buffersize;
 			unsigned char* decoderBuffer;
+		};
+
+		enum PLAYERPARAM
+		{
+			eBuffer,
+			eSource,
 		};
 
 		IAudioPlayer(){ memset( &m_info, 0, sizeof(AudioInfo)); }
@@ -33,7 +42,7 @@ namespace Dream
 	protected:
 		virtual bool LoadAudioResource() = 0;
 		virtual bool GetAudioFormat() = 0;
-		virtual void* GetBuffer() = 0;
+		virtual void* GetParam(PLAYERPARAM param) = 0;
 
 		std::string		m_name;
 		IDecoder*		m_decoder;

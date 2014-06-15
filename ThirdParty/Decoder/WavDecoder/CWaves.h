@@ -98,5 +98,5 @@ bool wave_open( LPWAVEFILEINFO& handle, wave_callbacks& callbacks, void* datasou
 void wave_close( LPWAVEFILEINFO& handle);
 WaveResult load_wavfile(LPWAVEFILEINFO handle);
 WaveResult parse_waveData(LPWAVEFILEINFO handle);
-
+WaveResult wave_read( LPWAVEFILEINFO handle, uchar* buffer, int buffersize, int& writeSize);
 #endif // _CWAVES_H_

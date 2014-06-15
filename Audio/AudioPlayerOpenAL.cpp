@@ -10,7 +10,6 @@
 #include "CWaves.h"
 #include "WavDecoder.h"
 
-#include <Windows.h>
 #define AL_ERROR_CHECK(state) if(alGetError() == AL_NO_ERROR) { OutputDebugString("AL state "#state" Success\n");  }else { OutputDebugString("AL state "#state" failed\n"); }
 
 namespace Dream
@@ -40,14 +39,10 @@ AudioPlayerOpenAL::~AudioPlayerOpenAL(void)
 	alSourceStop(m_source);
 	alDeleteSources( 1, &m_source);
 	alDeleteSources( AUDIO_BUFF_NUM, m_buffers);
-
-	SAFE_DELETE_ARRAY(m_info.decoderBuffer);
 }
 
 void AudioPlayerOpenAL::Update(float deltaTime)
 {
-	Sleep(100);
-
 	ALint state;
 	alGetSourcei( m_source, AL_SOURCE_STATE, &state);
 
@@ -57,16 +52,8 @@ void AudioPlayerOpenAL::Update(float deltaTime)
 		OutputDebugString("Audio Not Play now\n");
 		return;
 	}
-
-// 	int processed = 0;
-// 	alGetSourcei( m_source, AL_BUFFERS_PROCESSED, &processed);
-// 
-// 	while(processed > 0)
-// 	{
-// 		ALuint bufid;
-// 		alSourceUnqueueBuffers( m_source, 1, &bufid);
-// 		processed--;
-// 	}
+	
+	m_decoder->Decode();
 }
 
 bool AudioPlayerOpenAL::Play()
@@ -104,45 +91,41 @@ bool AudioPlayerOpenAL::LoadAudioResource()
 
 bool AudioPlayerOpenAL::GetAudioFormat()
 {
-	int bufferSize = 0;
-
 	if (m_info.channels == 1)
 	{
 		m_info.format = AL_FORMAT_MONO16;
 		// Set BufferSize to 250ms (Frequency * 2 (16bit) divided by 4 (quarter of a second))
-		bufferSize = m_info.frequency >> 1;
+		m_info.buffersize = m_info.frequency >> 1;
 		// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
-		bufferSize -= (bufferSize % 2);
+		m_info.buffersize -= (m_info.buffersize % 2);
 	}
 	else if (m_info.channels == 2)
 	{
 		m_info.format = AL_FORMAT_STEREO16;
 		// Set BufferSize to 250ms (Frequency * 4 (16bit stereo) divided by 4 (quarter of a second))
-		bufferSize = m_info.frequency;
+		m_info.buffersize = m_info.frequency;
 		// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
-		bufferSize -= (bufferSize % 4);
+		m_info.buffersize -= (m_info.buffersize % 4);
 	}
 	else if (m_info.channels == 4)
 	{
 		m_info.format = alGetEnumValue("AL_FORMAT_QUAD16");
 		// Set BufferSize to 250ms (Frequency * 8 (16bit 4-channel) divided by 4 (quarter of a second))
-		bufferSize = m_info.frequency * 2;
+		m_info.buffersize = m_info.frequency * 2;
 		// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
-		bufferSize -= (bufferSize % 8);
+		m_info.buffersize -= (m_info.buffersize % 8);
 	}
 	else if (m_info.channels == 6)
 	{
 		m_info.format = alGetEnumValue("AL_FORMAT_51CHN16");
 		// Set BufferSize to 250ms (Frequency * 12 (16bit 6-channel) divided by 4 (quarter of a second))
-		bufferSize = m_info.frequency * 3;
+		m_info.buffersize = m_info.frequency * 3;
 		// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
-		bufferSize -= (bufferSize % 12);
+		m_info.buffersize -= (m_info.buffersize % 12);
 	}
 
-	if(!bufferSize)
+	if(!m_info.buffersize)
 		return false;
-
-	m_info.decoderBuffer = new unsigned char[bufferSize];
 
 	return true;
 }
@@ -160,6 +143,19 @@ void AudioPlayerOpenAL::SetName(const char* name)
 		return;
 
 	m_decoder->Decode();
+}
+
+void* AudioPlayerOpenAL::GetParam(PLAYERPARAM param)
+{
+	switch(param)
+	{
+	case eBuffer:
+		return m_buffers;
+	case eSource:
+		return &m_source;
+	}
+
+	return NULL;
 }
 
 }
