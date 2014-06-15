@@ -56,7 +56,7 @@ void AudioPlayerOpenAL::Update(float deltaTime)
 
 	if(state != AL_PLAYING)
 	{
-		OutputDebugString("Audio Not Play now");
+		OutputDebugString("Audio Not Play now\n");
 		return;
 	}
 
@@ -171,10 +171,10 @@ void AudioPlayerOpenAL::SetName(const char* name)
 
 	GetAudioInfo(); 
 
-	char* mem = new char[282626];
-	memcpy( mem, stream->GetRaw() + 44, 282626);
+	char* mem = new char[40080000];
+	memcpy( mem, stream->GetRaw() + 44, 40080000);
 
-	alBufferData( m_buffers[0], m_info.format, mem, 282626, m_info.frequency);
+	alBufferData( m_buffers[0], m_info.format, mem, 40080000, m_info.frequency);
 	AL_ERROR_CHECK(alBufferData);
 }
 

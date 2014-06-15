@@ -46,7 +46,7 @@ namespace Dream
 			gEngine->Init(m_hwnd);
 			
 			IAudioPlayer* player = gEngine->GetIAudio()->CreateAudioPlayer();
-			player->SetName("../Media/audio/Footsteps.wav");
+			player->SetName("../Media/audio/let_it_go.wav");
 			player->Play();
 			
 // 			EngineStartupInfo info;
