@@ -24,14 +24,6 @@ public:
 	virtual void SetName(const char* name);
 
 protected:
-	struct AudioInfo
-	{
-		int format;
-		int channels;
-		int frequency;
-		unsigned char* m_decoderBuff;
-	};
-
 	virtual bool LoadAudioResource();
 
 	virtual bool GetAudioInfo();

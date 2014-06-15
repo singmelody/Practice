@@ -34,6 +34,15 @@
     <ClInclude Include="AudioPlayerOpenAL.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="WavDecoder.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MP3Decoder.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="OggDecoder.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,5 +60,8 @@
     <ClCompile Include="AudioPlayerOpenAL.cpp">
       <Filter>OpenAL</Filter>
     </ClCompile>
+    <ClCompile Include="WavDecoder.cpp" />
+    <ClCompile Include="MP3Decoder.cpp" />
+    <ClCompile Include="OggDecoder.cpp" />
   </ItemGroup>
 </Project>

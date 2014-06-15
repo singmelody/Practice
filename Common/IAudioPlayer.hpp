@@ -22,6 +22,13 @@ namespace Dream
 
 		virtual void Stop() = 0;
 
+		struct AudioInfo
+		{
+			int format;
+			int channels;
+			int frequency;
+		};
+
 	protected:
 		virtual bool LoadAudioResource() = 0;
 		virtual bool GetAudioInfo() = 0;

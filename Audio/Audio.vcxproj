@@ -81,8 +81,11 @@
     <ClInclude Include="AudioSystemOpenAL.h" />
     <ClInclude Include="IAudioBuffer.hpp" />
     <ClInclude Include="IDecoder.hpp" />
+    <ClInclude Include="MP3Decoder.h" />
+    <ClInclude Include="OggDecoder.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="WavDecoder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioPlayerOpenAL.cpp" />
@@ -96,10 +99,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MP3Decoder.cpp" />
+    <ClCompile Include="OggDecoder.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WavDecoder.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
