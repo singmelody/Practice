@@ -11,6 +11,9 @@
 #include "IResourceManager.hpp"
 #include "CWaves.h"
 
+#include <Windows.h>
+#define AL_ERROR_CHECK(state) if(alGetError() == AL_NO_ERROR) { OutputDebugString("AL state "#state" Success\n");  }else { OutputDebugString("AL state "#state" failed\n"); }
+
 namespace Dream
 {
 
@@ -19,12 +22,16 @@ AudioPlayerOpenAL::AudioPlayerOpenAL()
 		m_audioRes(NULL)	
 {
 	alGenBuffers( AUDIO_BUFF_NUM, m_buffers);
+	AL_ERROR_CHECK(alGenBuffers);
 
 	alGenSources( 1, &m_source);
+	AL_ERROR_CHECK(alGenSources);
 
 	alSource3i( m_source, AL_POSITION, 0, 0, -1);
+	AL_ERROR_CHECK(AL_POSITION);
+
 	alSourcei( m_source, AL_SOURCE_RELATIVE, AL_TRUE);
-	alSourcei( m_source, AL_ROLLOFF_FACTOR, 0);
+	AL_ERROR_CHECK(AL_SOURCE_RELATIVE);
 }
 
 
@@ -32,6 +39,7 @@ AudioPlayerOpenAL::~AudioPlayerOpenAL(void)
 {
 	gEngine->GetIResourceManager()->UnLoadRes(m_name.c_str());
 
+	alSourceStop(m_source);
 	alDeleteSources( 1, &m_source);
 	alDeleteSources( AUDIO_BUFF_NUM, m_buffers);
 
@@ -40,11 +48,17 @@ AudioPlayerOpenAL::~AudioPlayerOpenAL(void)
 
 void AudioPlayerOpenAL::Update(float deltaTime)
 {
+	Sleep(100);
+
 	ALint state;
 	alGetSourcei( m_source, AL_SOURCE_STATE, &state);
 
+
 	if(state != AL_PLAYING)
-		printf("Audio Not Play now");
+	{
+		OutputDebugString("Audio Not Play now");
+		return;
+	}
 
 // 	int processed = 0;
 // 	alGetSourcei( m_source, AL_BUFFERS_PROCESSED, &processed);
@@ -61,7 +75,10 @@ bool AudioPlayerOpenAL::Play()
 {
 	//alSourceRewind(m_source);
 	alSourcei( m_source, AL_BUFFER, m_buffers[0]);
+	AL_ERROR_CHECK(alSourcei);
+
 	alSourcePlay( m_source );
+	AL_ERROR_CHECK(alSourcePlay);
 
 	return true;
 }
@@ -153,8 +170,12 @@ void AudioPlayerOpenAL::SetName(const char* name)
 		return;
 
 	GetAudioInfo(); 
-	alBufferData( m_buffers[0], m_info.format, stream->GetRaw(), 282626, m_info.frequency);
 
+	char* mem = new char[282626];
+	memcpy( mem, stream->GetRaw() + 44, 282626);
+
+	alBufferData( m_buffers[0], m_info.format, mem, 282626, m_info.frequency);
+	AL_ERROR_CHECK(alBufferData);
 }
 
 size_t AudioPlayerOpenAL::readWav(void *ptr, size_t size, void *datasource)
