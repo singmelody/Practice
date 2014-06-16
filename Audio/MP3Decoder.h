@@ -1,6 +1,6 @@
 #pragma once
 #include "IDecoder.hpp"
-
+#include "mpg123.h"
 namespace Dream{
 
 class MP3Decoder : public IDecoder

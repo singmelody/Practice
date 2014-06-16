@@ -1,5 +1,9 @@
 #include "StdAfx.h"
 #include "MP3Decoder.h"
+#include "IO/IStream.hpp"
+#include "IResourceItem.hpp"
+#include "IAudioPlayer.hpp"
+#include "AL/al.h"
 
 namespace Dream{
 
