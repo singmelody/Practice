@@ -6,14 +6,18 @@ namespace Dream{
 class MP3Decoder : public IDecoder
 {
 public:
-	MP3Decoder(IAudioPlayer* player) : IDecoder(player) {}
+	MP3Decoder(IAudioPlayer* player);
 	virtual ~MP3Decoder(void);
 
 	virtual bool Decode();
 	virtual bool GetInfo();
 
 protected:
-	unsigned char* m_decoderBuffer;
+	mpg123_handle*	m_handle;
+
+	static ssize_t ReadMp3(void *handle, void *buf, size_t sz);
+	static off_t SeekMp3(void *handle, off_t offset, int whence);
+	static void CloseMp3(void *handle);
 };
 
 }

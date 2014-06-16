@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "EngineSystem.h"
 #include "EngineConfig.h"
-#include "DllHelper.hpp"
+#include "Util/DllHelper.hpp"
 
 #include "IRenderer.hpp"
 DEFINE_RENDER_INTERFACE

@@ -70,7 +70,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DllHelper.hpp" />
     <ClInclude Include="IO\IStream.hpp" />
     <ClInclude Include="IO\FileStream.h" />
     <ClInclude Include="IO\MemoryStream.h" />
@@ -87,6 +86,8 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Thread\IThread.hpp" />
+    <ClInclude Include="Util\DllHelper.hpp" />
+    <ClInclude Include="Util\StringHelper.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IO\FileStream.cpp" />

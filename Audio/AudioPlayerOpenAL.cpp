@@ -10,6 +10,8 @@
 #include "CWaves.h"
 #include "WavDecoder.h"
 #include "OggDecoder.h"
+#include "MP3Decoder.h"
+#include "Util/StringHelper.hpp"
 
 #define AL_ERROR_CHECK(state) if(alGetError() == AL_NO_ERROR) { OutputDebugString("AL state "#state" Success\n");  }else { OutputDebugString("AL state "#state" failed\n"); }
 
@@ -46,7 +48,6 @@ void AudioPlayerOpenAL::Update(float deltaTime)
 {
 	ALint state;
 	alGetSourcei( m_source, AL_SOURCE_STATE, &state);
-
 
 	if(state != AL_PLAYING)
 	{
@@ -136,8 +137,21 @@ void AudioPlayerOpenAL::SetName(const char* name)
 	bool b = LoadAudioResource(); 
 	if(!b)
 		return; 
+	
+	std::string ext = GetExtension(name);
 
-	m_decoder = new OggDecoder(this);
+	if(ext == "wav")
+		m_decoder = new WavDecoder(this);
+	else if( ext == "mp3")
+		m_decoder = new MP3Decoder(this);
+	else if( ext == "ogg" )
+		m_decoder = new OggDecoder(this);
+	else
+	{
+		OutputDebugString("invalid file extension\n");
+		return;
+	}
+
 	b = m_decoder->GetInfo();
 	if(!b)
 		return;

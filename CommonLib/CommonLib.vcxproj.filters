@@ -53,9 +53,6 @@
     <ClInclude Include="Thread\IThread.hpp">
       <Filter>Thread</Filter>
     </ClInclude>
-    <ClInclude Include="DllHelper.hpp">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="Resource\IResourceItem.hpp">
       <Filter>Resource</Filter>
     </ClInclude>
@@ -82,6 +79,12 @@
     </ClInclude>
     <ClInclude Include="IO\MemoryStream.h">
       <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\DllHelper.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\StringHelper.hpp">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

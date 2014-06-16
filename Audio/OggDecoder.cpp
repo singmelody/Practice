@@ -57,6 +57,11 @@ namespace Dream
 
 	bool OggDecoder::GetInfo()
 	{
+		unsigned int* buffers = (unsigned int*)m_player->GetParam(IAudioPlayer::eBuffer);
+		unsigned int* sources = (unsigned int*)m_player->GetParam(IAudioPlayer::eSource);
+		if(!buffers || !sources)
+			return false;
+
 		// get stream
 		IResourceItem* item = m_player->m_audioRes;
 		IStream* stream = item->GetStream();
@@ -68,18 +73,12 @@ namespace Dream
 		callbacks.tell_func = TellOgg;
 		callbacks.close_func= CloseOgg;
 
-		unsigned int* buffers = (unsigned int*)m_player->GetParam(IAudioPlayer::eBuffer);
-		unsigned int* sources = (unsigned int*)m_player->GetParam(IAudioPlayer::eSource);
-		if(!buffers || !sources)
-			return false;
-
 		// fill handle
 		if (ov_open_callbacks( stream, m_handle, NULL, NULL, callbacks))
 		{
 			OGG_CLEAN(m_handle);
 			return false;
 		}
-
 
 		// fill info
 		vorbis_info* oggInfo = NULL;
@@ -98,6 +97,11 @@ namespace Dream
 		m_player->GetAudioFormat();
 
 		info.decodeBuffer = new unsigned char[info.buffersize];
+		if(!info.decodeBuffer)
+		{
+			OGG_CLEAN(m_handle);
+			return false;
+		}
 
 		for (int i = 0; i < AUDIO_BUFF_NUM; ++i)
 		{
