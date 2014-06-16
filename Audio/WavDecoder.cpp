@@ -19,7 +19,7 @@ WavDecoder::~WavDecoder()
 	wave_close(m_handle);
 	m_handle = NULL;
 
-	SAFE_DELETE_ARRAY(m_player->m_info.decoderBuffer);
+	SAFE_DELETE_ARRAY(m_player->m_info.decodeBuffer);
 }
 
 bool WavDecoder::Decode()
@@ -55,12 +55,12 @@ bool WavDecoder::Decode()
 		alSourceUnqueueBuffers( *sources, 1, &bufID);
 
 		int writeSize = 0;
-		WaveResult result = wave_read( m_handle, info.decoderBuffer, info.buffersize, writeSize);
+		WaveResult result = wave_read( m_handle, info.decodeBuffer, info.buffersize, writeSize);
 		if (result != WR_OK)
 			return false;
 
-		alBufferData( buffers[0], info.format, info.decoderBuffer, writeSize, info.frequency);
-		alSourceQueueBuffers( *sources, 1, &buffers[0]);
+		alBufferData( bufID, info.format, info.decodeBuffer, writeSize, info.frequency);
+		alSourceQueueBuffers( *sources, 1, &bufID);
 		processed--;
 	}
 
@@ -102,16 +102,18 @@ bool WavDecoder::GetInfo()
 	// wav data is pcm so don't need to malloc decode buffer or for stream
 	m_player->GetAudioFormat();
 
-	info.decoderBuffer = new unsigned char[info.buffersize];
+	info.decodeBuffer = new unsigned char[info.buffersize];
 
 	for (int i = 0; i < AUDIO_BUFF_NUM; ++i)
 	{
 		int writeSize = 0;
-		WaveResult result = wave_read( m_handle, info.decoderBuffer, info.buffersize, writeSize);
+		WaveResult result = wave_read( m_handle, info.decodeBuffer, info.buffersize, writeSize);
 		if (result != WR_OK)
 			break;
 
-		alBufferData( buffers[i], info.format, info.decoderBuffer, writeSize, info.frequency);
+		alBufferData( buffers[i], info.format, info.decodeBuffer, writeSize, info.frequency);
+		if(alGetError() != AL_NO_ERROR)
+			OutputDebugString("alBufferData failed\n");
 		alSourceQueueBuffers( *sources, 1, &buffers[i]);
 	}
 

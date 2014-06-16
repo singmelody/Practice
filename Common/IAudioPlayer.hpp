@@ -18,7 +18,7 @@ namespace Dream
 			int channels;
 			int frequency;
 			int buffersize;
-			unsigned char* decoderBuffer;
+			unsigned char* decodeBuffer;
 		};
 
 		enum PLAYERPARAM

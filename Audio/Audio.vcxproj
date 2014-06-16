@@ -50,13 +50,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;AUDIO_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../Common;../CommonLib;../ThirdParty/OpenAL/include;../ThirdParty/Decoder/WavDecoder</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common;../CommonLib;../ThirdParty/OpenAL/include;../ThirdParty/Decoder/WavDecoder;../ThirdParty/Decoder/OggDecoder/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ThirdParty/OpenAL/Lib;G:\Animation\Sample\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>WavDecoder.lib;OpenAL.lib;winmm.lib;Shell32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../ThirdParty/OpenAL/Lib;../Debug;../ThirdParty/Decoder/OggDecoder/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WavDecoder.lib;OpenAL.lib;winmm.lib;Shell32.lib;libOgg.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

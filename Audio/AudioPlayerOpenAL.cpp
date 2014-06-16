@@ -9,6 +9,7 @@
 #include "IResourceManager.hpp"
 #include "CWaves.h"
 #include "WavDecoder.h"
+#include "OggDecoder.h"
 
 #define AL_ERROR_CHECK(state) if(alGetError() == AL_NO_ERROR) { OutputDebugString("AL state "#state" Success\n");  }else { OutputDebugString("AL state "#state" failed\n"); }
 
@@ -58,9 +59,8 @@ void AudioPlayerOpenAL::Update(float deltaTime)
 
 bool AudioPlayerOpenAL::Play()
 {
-	//alSourceRewind(m_source);
-	alSourcei( m_source, AL_BUFFER, m_buffers[0]);
-	AL_ERROR_CHECK(alSourcei);
+	alSourceRewind(m_source);
+	AL_ERROR_CHECK(alSourceRewind);
 
 	alSourcePlay( m_source );
 	AL_ERROR_CHECK(alSourcePlay);
@@ -137,7 +137,7 @@ void AudioPlayerOpenAL::SetName(const char* name)
 	if(!b)
 		return; 
 
-	m_decoder = new WavDecoder(this);
+	m_decoder = new OggDecoder(this);
 	b = m_decoder->GetInfo();
 	if(!b)
 		return;
