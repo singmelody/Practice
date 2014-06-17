@@ -83,7 +83,6 @@ namespace Dream
 			gEngine->Destroy();
 		}
 
-	private:
 		bool CreateWnd(const char* winName, int width, int height)
 		{
 			m_winName = winName;
@@ -123,7 +122,7 @@ namespace Dream
 
 			return true;
 		}
-
+	private:
 		static  LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			static DemoApp*  demoApp = nullptr;

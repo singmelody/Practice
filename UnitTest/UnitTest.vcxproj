@@ -45,8 +45,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\Bin\Debug\</OutDir>
-    <IntDir>..\..\Intermediate\Debug\UnitTest\</IntDir>
+    <OutDir>..\Debug\</OutDir>
+    <IntDir>..\Intermediate\Debug\UnitTest\</IntDir>
     <TargetName>UnitTest</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
@@ -62,7 +62,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Engine;..\CommonLib;..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ProgramDataBaseFileName>$(OutDir)UnitTest.pdb</ProgramDataBaseFileName>
       <Optimization>Disabled</Optimization>
