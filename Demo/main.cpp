@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Demo.h"
+#include "Demo.hpp"
 
 
 int _tmain(int argc, _TCHAR* argv[])

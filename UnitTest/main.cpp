@@ -92,7 +92,7 @@ TEST( AUDIO_TEST, AUDIO_PLAYER_MP3)
 TEST( AUDIO_TEST, AUDIO_PLAYER_INVALID)
 {
 	IAudioPlayer* player = gEngine->GetIAudio()->CreateAudioPlayer();
-	EXPECT_EQ( player != NULL, true);
+	EXPECT_EQ( player != NULL, true); xz
 
 	// test invalid
 	player = gEngine->GetIAudio()->CreateAudioPlayer();

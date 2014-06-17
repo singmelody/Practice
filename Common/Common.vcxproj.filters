@@ -31,6 +31,9 @@
     <ClInclude Include="IResourceManager.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="ISprite2D.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IRenderDevice.cpp">
