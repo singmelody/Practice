@@ -1,7 +1,4 @@
-// Demo.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
+#pragma once
 
 #include <string>
 #include <Windows.h>
@@ -122,7 +119,10 @@ namespace Dream
 
 			return true;
 		}
+
+		HWND GetWnd() { return m_hwnd; }
 	private:
+
 		static  LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			static DemoApp*  demoApp = nullptr;
@@ -182,15 +182,3 @@ namespace Dream
 		bool m_isRunning;
 	};
 }
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-	Dream::DemoApp app;
-	if(app.Startup())
-	{
-		app.Run();
-		app.Shutdown();
-	}
-	return 0;
-}
-
