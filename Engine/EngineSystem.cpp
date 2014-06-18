@@ -72,9 +72,9 @@ namespace Dream
 
 	void EngineSystem::Update(float deltaTime)
 {
-// 		gRenderer->Update(deltaTime);
-// 
-// 		gRenderer->Render();
+		gRenderer->Update(deltaTime);
+
+		gRenderer->Render();
 
 		gAudio->Update(deltaTime);
 	}

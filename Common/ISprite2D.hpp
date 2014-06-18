@@ -15,8 +15,10 @@ namespace Dream
 		virtual void Destroy() = 0;
 
 		virtual void Update(float deltaTime) = 0;
+		virtual void Render() = 0;
 
 		virtual Sprite* CreateSprite() = 0;
+
 	};
 
 	extern ISprite2D*	gSprite2D;

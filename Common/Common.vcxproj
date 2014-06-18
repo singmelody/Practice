@@ -78,6 +78,7 @@
     <ClInclude Include="IAudio.hpp" />
     <ClInclude Include="IAudioPlayer.hpp" />
     <ClInclude Include="IEngine.hpp" />
+    <ClInclude Include="IRenderCommand.hpp" />
     <ClInclude Include="IRenderDevice.h" />
     <ClInclude Include="IRenderer.hpp" />
     <ClInclude Include="IResourceItem.hpp" />
