@@ -75,9 +75,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DllHelper.h" />
     <ClInclude Include="EngineSystem.h" />
-    <ClInclude Include="IEngine.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

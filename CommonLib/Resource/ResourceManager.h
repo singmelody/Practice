@@ -15,7 +15,6 @@ namespace Dream
 
 	private:
 		typedef std::hash_map<int,IResourceItem*> HashMap;
-		size_t HashCode(const char* str);
 
 		HashMap m_items;
 	};

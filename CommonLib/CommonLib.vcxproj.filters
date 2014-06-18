@@ -30,6 +30,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{ecfadaf2-4ab7-44bc-b38c-ac017700fe49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{65c3a08b-aa01-403a-9348-c3017c2ab366}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -86,6 +89,12 @@
     <ClInclude Include="Util\StringHelper.hpp">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\Texture2D.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\TextureManager.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -105,6 +114,12 @@
     </ClCompile>
     <ClCompile Include="IO\MemoryStream.cpp">
       <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\Texture2D.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\TextureManager.cpp">
+      <Filter>Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

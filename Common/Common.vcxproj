@@ -84,6 +84,8 @@
     <ClInclude Include="IResourceItem.hpp" />
     <ClInclude Include="IResourceManager.hpp" />
     <ClInclude Include="ISprite2D.hpp" />
+    <ClInclude Include="ITexture.hpp" />
+    <ClInclude Include="ITextureManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IRenderDevice.cpp" />

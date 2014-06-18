@@ -37,6 +37,12 @@
     <ClInclude Include="IRenderCommand.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="ITexture.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ITextureManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IRenderDevice.cpp">

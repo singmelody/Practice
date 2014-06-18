@@ -85,6 +85,8 @@
     <ClInclude Include="Serialize\XMLSerialize.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Texture\Texture2D.h" />
+    <ClInclude Include="Texture\TextureManager.h" />
     <ClInclude Include="Thread\IThread.hpp" />
     <ClInclude Include="Util\DllHelper.hpp" />
     <ClInclude Include="Util\StringHelper.hpp" />
@@ -99,6 +101,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Texture\Texture2D.cpp" />
+    <ClCompile Include="Texture\TextureManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

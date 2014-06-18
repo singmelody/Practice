@@ -3,7 +3,7 @@
 #include "EngineConfig.h"
 #include "FileResourceItem.h"
 #include "IO/FileStream.h"
-
+#include "Util/StringHelper.hpp"
 namespace Dream
 {
 	ResourceManager::ResourceManager()
@@ -73,24 +73,6 @@ namespace Dream
 		SAFE_DELETE((*itr).second);
 		m_items.erase(itr);
 
-	}
-
-	size_t ResourceManager::HashCode(const char* str)
-	{
-		size_t hash = 0;
-		size_t len = strlen(str);
-		size_t i;
-		for (i = 0; i < len; i++)
-		{
-			hash += str[i];
-			hash += hash << 10;
-			hash ^= hash >>  6;
-		}
-		hash += hash << 3;
-		hash ^= hash >> 11;
-		hash += hash << 15;
-		hash &= ~(1<<31);       // don't return a negative number (in case IndexT is defined signed)
-		return hash;
 	}
 
 }
