@@ -12,6 +12,9 @@ DEFINE_AUDIO_INTERFACE
 #include "Resource/ResourceManager.h"
 DEFINE_RESOURCEMGR_INTERFACE
 
+#include "Texture/TextureManager.h"
+DEFINE_TEXTUREMGR_INTERFACE
+
 namespace Dream
 {
 	EngineSystem::EngineSystem()
@@ -28,6 +31,9 @@ namespace Dream
 	{
 		// Create resource manager
 		gIResourceManager = new ResourceManager();
+
+		// Create texture manager
+
 
 		// Load Renderer Model
 		const char* rendererDll = "RenderD3D9.dll";
@@ -87,6 +93,11 @@ namespace Dream
 	IResourceManager* EngineSystem::GetIResourceManager()
 	{
 		return gIResourceManager;
+	}
+
+	ITextureManager* EngineSystem::GetTextureManager()
+	{
+		return gTextureManager;
 	}
 
 	//--------------------------------------------------------------------

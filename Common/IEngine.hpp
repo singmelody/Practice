@@ -7,6 +7,7 @@ namespace Dream {
 class IRenderer;
 class IAudio;
 class IResourceManager;
+class ITextureManager;
 
 struct EngineStartupInfo
 {
@@ -30,6 +31,8 @@ public:
 	virtual IAudio* GetIAudio() = 0;
 
 	virtual IResourceManager* GetIResourceManager() = 0;
+	virtual ITextureManager* GetITextureManager() = 0;
+	virtual IRenderer* GetIRenderer() = 0;
 };
 
 extern IEngine*		gEngine;

@@ -1,4 +1,8 @@
 #pragma once
+
+namespace Dream
+{
+
 class IRenderDevice
 {
 public:
@@ -24,3 +28,4 @@ public:
 	virtual bool ShaderParse() = 0;
 };
 
+}

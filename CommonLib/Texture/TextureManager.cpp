@@ -5,8 +5,8 @@ namespace Dream
 {
 	ITexture* TextureManager::CreateTexture(const char* name)
 	{
-		return 0;
-
+		IRenderer* renderer = gEngine->GetIRenderer();
+		D3DXCreateTextureFromFile( renderer, str, tex);
 	}
 
 }

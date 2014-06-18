@@ -38,7 +38,7 @@ TEST( ENGINE_TEST, ENGINE_CREATE_WINDOW)
 	ASSERT_TRUE( wnd != NULL);
 
 	result = gEngine->Init(wnd);
-
+	ASSERT_TRUE( result != NULL);
 }
 //--------------------Engine Test End---------------------
 
@@ -92,7 +92,7 @@ TEST( AUDIO_TEST, AUDIO_PLAYER_MP3)
 TEST( AUDIO_TEST, AUDIO_PLAYER_INVALID)
 {
 	IAudioPlayer* player = gEngine->GetIAudio()->CreateAudioPlayer();
-	EXPECT_EQ( player != NULL, true); xz
+	EXPECT_EQ( player != NULL, true); 
 
 	// test invalid
 	player = gEngine->GetIAudio()->CreateAudioPlayer();
@@ -103,6 +103,15 @@ TEST( AUDIO_TEST, AUDIO_PLAYER_INVALID)
 	EXPECT_EQ( result, true);
 }
 //--------------------Audio Test End---------------------
+
+
+//--------------------TexMgr Test Begin---------------------
+TEST( TEXMGR_TEST, TEXMGR_INIT)
+{
+	ITextureManager* texMgr = gEngine->GetTextureManager();
+	ASSERT_TRUE( texMgr != NULL );
+}
+//--------------------TexMgr Test End---------------------
 
 int main(int argc, char** argv)
 {

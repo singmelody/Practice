@@ -18,6 +18,9 @@ public:
 	virtual IAudio* GetIAudio();
 
 	virtual IResourceManager* GetIResourceManager();
+	virtual ITextureManager* GetITextureManager();
+	virtual IRenderer* GetIRenderer();
+
 };
 
 }

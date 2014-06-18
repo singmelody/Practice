@@ -7,6 +7,7 @@
 namespace Dream
 {
 // declaration
+class IRenderDevice;
 class IRenderCommand;
 
 // helper
@@ -29,15 +30,15 @@ public:
 
 	IRenderCommand* operator[](size_t index) const
 	{
-		if( index < m_queueNegZ.size() )
-			return m_queueNegZ[index];
-
-		if( index < m_queue0.size() )
-			return m_queue0[index];
-
-		index -= m_queue0.size();
-
-		if( index < )
+// 		if( index < m_queueNegZ.size() )
+// 			return m_queueNegZ[index];
+// 
+// 		if( index < m_queue0.size() )
+// 			return m_queue0[index];
+// 
+// 		index -= m_queue0.size();
+// 
+// 		if( index < )
 	}
 
 	void clear()
@@ -68,6 +69,7 @@ public:
 	virtual void addCommand(IRenderCommand* command);
 	virtual void addCommand(IRenderCommand* command, int renderQueue);
 
+	virtual IRenderDevice* GetIRenderDevice() = 0;
 protected:
 	std::vector<RenderQueue> m_renderGroups;
 	std::vector<IRenderCommand*> m_batchedCommands;

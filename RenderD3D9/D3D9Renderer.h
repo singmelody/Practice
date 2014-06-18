@@ -17,6 +17,7 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Render();
 
+	virtual IRenderDevice* GetIRenderDevice();
 private:
 	void InitCube();
 
