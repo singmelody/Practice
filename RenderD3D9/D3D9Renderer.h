@@ -26,8 +26,6 @@ private:
 	void InitCube();
 
 	IRenderDevice*	m_device;
-// 	IDirect3DDevice9*	m_d3d9Device;
-// 	IDirect3D9*			m_d3d9Object;
 
 	IVertexBuffer*	m_vb;
 	IIndexBuffer*	m_ib;

@@ -4,6 +4,9 @@ namespace Dream
 {
 	class IVertexBuffer
 	{
+	public:
+		IVertexBuffer(){}
+		virtual ~IVertexBuffer(){}
 	protected:
 
 	};
