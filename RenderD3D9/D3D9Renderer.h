@@ -5,6 +5,10 @@
 
 namespace Dream{
 
+class IRenderDevice;
+class IVertexBuffer;
+class IIndexBuffer;
+
 class D3D9Renderer : public IRenderer
 {
 public:
@@ -21,11 +25,14 @@ public:
 private:
 	void InitCube();
 
-	IDirect3DDevice9*	m_d3d9Device;
-	IDirect3D9*			m_d3d9Object;
+	IRenderDevice*	m_device;
+// 	IDirect3DDevice9*	m_d3d9Device;
+// 	IDirect3D9*			m_d3d9Object;
 
-	IDirect3DVertexBuffer9* m_vb;
-	IDirect3DIndexBuffer9*	m_ib;
+	IVertexBuffer*	m_vb;
+	IIndexBuffer*	m_ib;
+// 	IDirect3DVertexBuffer9* m_vb;
+// 	IDirect3DIndexBuffer9*	m_ib;
 
 };
 

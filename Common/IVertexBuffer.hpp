@@ -2,9 +2,9 @@
 
 namespace Dream
 {
-	class ITexture
+	class IVertexBuffer
 	{
 	protected:
-		
+
 	};
 }
