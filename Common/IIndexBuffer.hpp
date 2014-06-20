@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 namespace Dream
 {
@@ -7,7 +8,10 @@ namespace Dream
 	public:
 		IIndexBuffer(){}
 		virtual ~IIndexBuffer(){}
-	protected:
 
+// 		virtual void addIndex(unsigned int idx) { m_index.push_back(idx); }
+// 
+// 	protected:
+// 		std::vector<unsigned int> m_index;
 	};
 }

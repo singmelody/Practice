@@ -78,12 +78,14 @@
   <ItemGroup>
     <ClInclude Include="D3D9RenderDevice.h" />
     <ClInclude Include="D3D9Renderer.h" />
+    <ClInclude Include="D3D9Texture.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D9RenderDevice.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />
+    <ClCompile Include="D3D9Texture.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

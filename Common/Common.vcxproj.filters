@@ -19,9 +19,6 @@
     <ClInclude Include="IEngine.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="IRenderDevice.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="IRenderer.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
@@ -43,10 +40,14 @@
     <ClInclude Include="ITextureManager.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="IRenderDevice.cpp">
+    <ClInclude Include="IIndexBuffer.hpp">
       <Filter>Interface</Filter>
-    </ClCompile>
+    </ClInclude>
+    <ClInclude Include="IVertexBuffer.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderDevice.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

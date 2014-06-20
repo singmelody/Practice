@@ -2,20 +2,21 @@
 
 namespace Dream
 {
+class ITexture;
 
 class IRenderDevice
 {
 public:
-	IRenderDevice(void);
-	virtual ~IRenderDevice(void);
+	IRenderDevice(){}
+	virtual ~IRenderDevice(){}
 
-	virtual bool CreateDevice() = 0;
+	virtual bool CreateDevice(const void* mainWnd) = 0;
 
 	virtual bool CheckCaps() = 0;
 
 	virtual bool CreateSwapChain() = 0;
 
-	virtual UINT GetReference() = 0;
+	virtual int GetReference() = 0;
 
 	virtual bool CreateRenderTargetView() = 0;
 
@@ -26,6 +27,8 @@ public:
 	virtual bool CreateViewPort() = 0;
 
 	virtual bool ShaderParse() = 0;
+
+	virtual ITexture* CreateTexture(const char* name) = 0;
 
 };
 

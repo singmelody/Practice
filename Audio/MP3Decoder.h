@@ -12,7 +12,7 @@ public:
 	virtual bool Decode();
 	virtual bool GetInfo();
 
-protected:
+public:
 	mpg123_handle*	m_handle;
 
 	static ssize_t ReadMp3(void *handle, void *buf, size_t sz);

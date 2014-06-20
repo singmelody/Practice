@@ -11,11 +11,17 @@ DEFINE_ENGINE_INTERFACE
 #include <IAudio.hpp>
 DEFINE_AUDIO_INTERFACE
 
+#include <ITexture.hpp>
+#include <ITextureManager.hpp>
+
+
 namespace Dream
 {
 	class DemoApp
 	{
 	public:
+		IAudioPlayer* m_player;
+
 		DemoApp() : m_isRunning(false)
 		{
 
@@ -42,9 +48,9 @@ namespace Dream
 
 			gEngine->Init(m_hwnd);
 			
-			IAudioPlayer* player = gEngine->GetIAudio()->CreateAudioPlayer();
-			player->SetName("../Media/audio/let_it_go.wav");
-			player->Play();
+			m_player = gEngine->GetIAudio()->CreateAudioPlayer();
+			m_player->SetName("../Media/audio/let_it_go.mp3");
+			m_player->Play();
 			
 // 			EngineStartupInfo info;
 // 			info.fullScreen = false;
@@ -148,6 +154,9 @@ namespace Dream
 				m_isRunning = false;
 				PostQuitMessage(0);
 				break;
+			case WM_KEYDOWN:
+				m_player->Stop();
+				return MA_ACTIVATE;
 			}
 
 			return DefWindowProc(hwnd, message, wParam, lParam);

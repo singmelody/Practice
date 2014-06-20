@@ -108,8 +108,11 @@ TEST( AUDIO_TEST, AUDIO_PLAYER_INVALID)
 //--------------------TexMgr Test Begin---------------------
 TEST( TEXMGR_TEST, TEXMGR_INIT)
 {
-	ITextureManager* texMgr = gEngine->GetTextureManager();
+	ITextureManager* texMgr = gEngine->GetITextureManager();
 	ASSERT_TRUE( texMgr != NULL );
+
+	ITexture* tex = texMgr->GetTexture("../meshes/brick01.dds");
+	ASSERT_TRUE( tex != NULL);
 }
 //--------------------TexMgr Test End---------------------
 

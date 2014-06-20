@@ -76,7 +76,8 @@ void AudioPlayerOpenAL::Pause()
 
 void AudioPlayerOpenAL::Stop()
 {
-
+	 MP3Decoder* decoder = dynamic_cast<MP3Decoder*>(m_decoder);
+	 m_audioRes->GetStream()->SetPosition(0);
 }
 
 bool AudioPlayerOpenAL::LoadAudioResource()

@@ -78,17 +78,16 @@
     <ClInclude Include="IAudio.hpp" />
     <ClInclude Include="IAudioPlayer.hpp" />
     <ClInclude Include="IEngine.hpp" />
+    <ClInclude Include="IIndexBuffer.hpp" />
     <ClInclude Include="IRenderCommand.hpp" />
-    <ClInclude Include="IRenderDevice.h" />
+    <ClInclude Include="IRenderDevice.hpp" />
     <ClInclude Include="IRenderer.hpp" />
     <ClInclude Include="IResourceItem.hpp" />
     <ClInclude Include="IResourceManager.hpp" />
     <ClInclude Include="ISprite2D.hpp" />
     <ClInclude Include="ITexture.hpp" />
     <ClInclude Include="ITextureManager.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="IRenderDevice.cpp" />
+    <ClInclude Include="IVertexBuffer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,7 @@
 #pragma once
 
+/*#include "*/
+
 namespace Dream
 {
 	class IVertexBuffer
@@ -7,7 +9,9 @@ namespace Dream
 	public:
 		IVertexBuffer(){}
 		virtual ~IVertexBuffer(){}
-	protected:
 
+// 		virtual void addVertex() = 0;
+// 	protected:
+		
 	};
 }

@@ -29,12 +29,6 @@ namespace Dream
 
 	bool EngineSystem::Init(const HWND mainWnd)
 	{
-		// Create resource manager
-		gIResourceManager = new ResourceManager();
-
-		// Create texture manager
-
-
 		// Load Renderer Model
 		const char* rendererDll = "RenderD3D9.dll";
 		MODULE_HANDLE instance = LoadDll(rendererDll);
@@ -67,6 +61,13 @@ namespace Dream
 		if(!result)
 			return false;
 
+		// Create resource manager
+		gIResourceManager = new ResourceManager();
+
+		// Create texture manager
+		gTextureManager = new TextureManager();
+		gTextureManager->Init(this);
+
 		return true;
 	}
 
@@ -95,9 +96,14 @@ namespace Dream
 		return gIResourceManager;
 	}
 
-	ITextureManager* EngineSystem::GetTextureManager()
+	ITextureManager* EngineSystem::GetITextureManager()
 	{
 		return gTextureManager;
+	}
+
+	IRenderer* EngineSystem::GetIRenderer()
+	{
+		return gRenderer;
 	}
 
 	//--------------------------------------------------------------------

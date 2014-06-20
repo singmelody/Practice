@@ -1,11 +1,11 @@
 #pragma once
 
 #include "ITextureManager.hpp"
-#include "IEngine.hpp"
 
 namespace Dream
 {
 	class ITexture;
+	class IEngine;
 
 	class TextureManager : public ITextureManager
 	{
@@ -13,7 +13,7 @@ namespace Dream
 		TextureManager(){}
 		virtual ~TextureManager(){}
 
-		virtual bool Init(IEngine* ){ return gEngine; }
+		virtual bool Init(IEngine* );
 		virtual void Destroy(){}
 
 		virtual ITexture* CreateTexture(const char* name);

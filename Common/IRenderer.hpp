@@ -2,7 +2,8 @@
 
 #include <vector>
 #include <algorithm>
-#include <IRenderCommand.hpp>
+#include "IRenderCommand.hpp"
+#include <Windows.h>
 
 namespace Dream
 {
@@ -57,8 +58,8 @@ protected:
 class IRenderer
 {
 public:
-	IRenderer(void){}
-	virtual ~IRenderer(void){}
+	IRenderer() : m_device(NULL) {}
+	virtual ~IRenderer(){}
 
 	virtual bool Init(const HWND mainHwnd) = 0;
 	virtual void Destroy() = 0;
@@ -66,13 +67,15 @@ public:
 	virtual void Update(float deltaTime) = 0;
 	virtual void Render() = 0;
 
-	virtual void addCommand(IRenderCommand* command);
-	virtual void addCommand(IRenderCommand* command, int renderQueue);
+	virtual void addCommand(IRenderCommand* command){}
+	virtual void addCommand(IRenderCommand* command, int renderQueue) {}
 
-	virtual IRenderDevice* GetIRenderDevice() = 0;
+	virtual IRenderDevice* GetIRenderDevice() { return m_device;}
 protected:
 	std::vector<RenderQueue> m_renderGroups;
 	std::vector<IRenderCommand*> m_batchedCommands;
+
+	IRenderDevice*	m_device;
 };
 
    extern IRenderer*	gRenderer;

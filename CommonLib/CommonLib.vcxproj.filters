@@ -89,9 +89,6 @@
     <ClInclude Include="Util\StringHelper.hpp">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Texture\Texture2D.h">
-      <Filter>Texture</Filter>
-    </ClInclude>
     <ClInclude Include="Texture\TextureManager.h">
       <Filter>Texture</Filter>
     </ClInclude>
@@ -114,9 +111,6 @@
     </ClCompile>
     <ClCompile Include="IO\MemoryStream.cpp">
       <Filter>IO</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture\Texture2D.cpp">
-      <Filter>Texture</Filter>
     </ClCompile>
     <ClCompile Include="Texture\TextureManager.cpp">
       <Filter>Texture</Filter>
