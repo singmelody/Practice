@@ -20,18 +20,26 @@ namespace Dream
 		virtual bool BeginScene();
 		virtual void EndScene();
 
-		virtual void Present(const void* mainWnd);
+		virtual void Draw(size_t startVertex,size_t vertexCount,size_t startIdx,size_t idxCount);
 
-		virtual void SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx) = 0;
-		virtual void SetIndexBuffer(const IIndexBuffer* ib) = 0;
+		virtual void Present();
+
+		virtual void SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx);
+		virtual void SetIndexBuffer(const IIndexBuffer* ib);
 
 		virtual ITexture* CreateTexture(const char* path);
 
 		// D3D9 section
+		bool CreateVertexBuffer(UINT length,DWORD usage,DWORD fvf,D3DPOOL pool,IDirect3DVertexBuffer9** vertexBuffer,HANDLE* sharedHandle);
+		bool CreateIndexBuffer(UINT length,DWORD usage,D3DFORMAT format,D3DPOOL pool,IDirect3DIndexBuffer9** indexBuffer,HANDLE* sharedHandle);
+		bool CreateVertexDeclaration(D3DVERTEXELEMENT9* pVertexElements,IDirect3DVertexDeclaration9** ppDecl);
+		
+
+
 		bool Clear( DWORD Count, const D3DRECT *pRects, DWORD Flags, D3DCOLOR Color,float Z, DWORD Stencil );
 
 
-	private:
+	protected:
 		HWND				m_hwnd;
 		DWORD				m_devBehaviorFlags;
 

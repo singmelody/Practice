@@ -20,6 +20,8 @@ public:
 
 	virtual bool BeginScene() = 0;
 	virtual void EndScene() = 0;
+	
+	virtual void Draw(size_t startVertex,size_t vertexCount,size_t startIdx,size_t idxCount) = 0;
 
 	virtual void Present() = 0;
 

@@ -3,7 +3,7 @@
 
 namespace Dream
 {
-	class VertexLayout;
+	class IVertexLayout;
 
 	class IVertexBuffer
 	{
@@ -11,10 +11,11 @@ namespace Dream
 		IVertexBuffer(){}
 		virtual ~IVertexBuffer(){}
 
-		/// get the vertex layout
-		const VertexLayout* GetVertexLayout() const { return m_vertexLayout; }
+		// get the vertex layout
+		IVertexLayout* GetIVertexLayout() const { return m_vertexLayout; }
+		void SetIVertexLayout(IVertexLayout* layout) { m_vertexLayout = layout; }
 
 	protected:
-		VertexLayout* vertexLayout;
+		IVertexLayout* m_vertexLayout;
 	};
 }

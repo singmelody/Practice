@@ -10,6 +10,9 @@
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 #endif
 
+#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+
 #if defined(DEBUG) | defined(_DEBUG)
 #ifndef HR
 #define HR(x)                                      \

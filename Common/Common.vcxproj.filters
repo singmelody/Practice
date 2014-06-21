@@ -49,5 +49,8 @@
     <ClInclude Include="IRenderDevice.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="IVertexLayout.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -94,15 +94,16 @@ void D3D9Renderer::Render()
 
 	m_device->BeginScene();
 
-	m_d3d9Device->SetFVF( D3DFVF_CUSTOMVERTEX );
-
-	m_device->SetVertexBuffer( 0, m_vb, 0);
-	m_d3d9Device->SetIndices(m_ib);
-	m_d3d9Device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 8, 0, 36);
+// 	m_d3d9Device->SetFVF( D3DFVF_CUSTOMVERTEX );
+// 
+// 	m_device->SetVertexBuffer( 0, m_vb, 0);
+// 	m_device->SetIndexBuffer( m_ib );
+// 	m_device->Draw()
+// 	m_d3d9Device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 8, 0, 36);
 
 	m_device->EndScene();
 
-	m_d3d9Device->Present();
+	m_device->Present();
 }
 
 //-- temp code---
@@ -130,6 +131,7 @@ void D3D9Renderer::InitCube()
 	// Create the vertex buffer. Here we are allocating enough memory
 	// (from the default pool) to hold all our 3 custom Vertices. We also
 	// specify the FVF, so the vertex buffer knows what data it contains.
+
 	if( FAILED(m_d3d9Device->CreateVertexBuffer( sizeof( Vertices ),
 		0, D3DFVF_CUSTOMVERTEX,
 		D3DPOOL_DEFAULT, &m_vb, NULL )) )
@@ -164,6 +166,16 @@ void D3D9Renderer::InitCube()
 		6,4,5,
 		7,4,6,
 	};
+
+	IDirect3DIndexBuffer9* ib;
+	bool result = m_device->CreateIndexBuffer(
+		sizeof(indices), 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &ib, NULL);
+
+	IVertexBuffer* vb = new D3D9VertexBuffer(ib);
+
+	if(!result)
+		return;
+
 
 	if( FAILED(m_d3d9Device->CreateIndexBuffer( 
 		sizeof(indices), 0, 

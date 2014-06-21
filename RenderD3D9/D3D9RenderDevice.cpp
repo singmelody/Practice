@@ -1,13 +1,16 @@
 #include "StdAfx.h"
 #include "D3D9RenderDevice.h"
 #include "D3D9Texture.h"
+#include "D3D9IndexBuffer.h"
+#include "D3D9VertexBuffer.h"
+#include "D3D9VertexLayout.h"
 #include <assert.h>
 #include <EngineConfig.h>
 
 namespace Dream
 {
 	#define CAST(type, ptr)  static_cast<type*>(ptr); 
-	#define CONST_CAST(type, ptr)  static_cast<type*>(ptr); 
+	#define CONST_CAST(type, ptr)  static_cast<const type*>(ptr); 
 
 	D3D9RenderDevice::D3D9RenderDevice() : IRenderDevice()
 		,m_devBehaviorFlags(0)
@@ -151,28 +154,73 @@ namespace Dream
 	void D3D9RenderDevice::EndScene()
 	{
 		HRESULT hr = m_d3d9Device->EndScene();
-		assert( FAILED(hr) != true );
-
+		assert( SUCCEEDED(hr) );
 	}
 
-	void D3D9RenderDevice::Present(const void* mainWnd)
+	void D3D9RenderDevice::Draw(size_t startVertex,size_t vertexCount,size_t startIdx,size_t idxCount)
 	{
-		HWND* hwnd = (HWND*)mainWnd;
+		// only support tranglist now
+		HRESULT hr = m_d3d9Device->DrawIndexedPrimitive( 
+			D3DPT_TRIANGLELIST, 0, startVertex, vertexCount, startIdx, idxCount/3);
+		
+		assert( SUCCEEDED(hr) );
+	}
 
-		m_d3d9Device->Present( NULL,NULL, *hwnd, NULL);
+	void D3D9RenderDevice::Present()
+	{
+		m_d3d9Device->Present( NULL,NULL, m_hwnd, NULL);
 	}
 
 	void D3D9RenderDevice::SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx)
 	{
-		const D3D9VertexBuffer* d3dVB = CAST( D3D9VertexBuffer, vb);
-		IDirect3DVertexBuffer9* buffer = d3dVB->GetD3D9VertexBuffer();
+		const D3D9VertexBuffer* d3dVB = CONST_CAST( D3D9VertexBuffer, vb);
+		IDirect3DVertexBuffer9* d3d9VertexBuffer = d3dVB->GetD3D9VertexBuffer();
+		DWORD vertexSize = d3dVB->GetIVertexLayout()->GetVertexSize();
+		DWORD vertexOffset = offsetIdx * vertexSize;
 
-		m_d3d9Device->SetStreamSource( streamIndex, buffer, vertexOffset, vertexByteSize);
+		HRESULT hr = m_d3d9Device->SetStreamSource( streamIndex, d3d9VertexBuffer, vertexSize, vertexSize);
+		assert( SUCCEEDED(hr) );
 	}
 
 	void D3D9RenderDevice::SetIndexBuffer(const IIndexBuffer* ib)
 	{
+		const D3D9IndexBuffer* d3d9IB = CONST_CAST( D3D9IndexBuffer, ib);
+		IDirect3DIndexBuffer9* d3d9IndexBuffer = d3d9IB->GetD3D9IndexBuffer();
 
+		HRESULT hr = m_d3d9Device->SetIndices(d3d9IndexBuffer);
+		assert( SUCCEEDED(hr) );
 	}
+
+	bool D3D9RenderDevice::CreateVertexBuffer(UINT length,DWORD usage,DWORD fvf,D3DPOOL pool,IDirect3DVertexBuffer9** vertexBuffer,HANDLE* sharedHandle)
+	{
+		HRESULT hr = m_d3d9Device->CreateVertexBuffer( length, usage, fvf, pool, vertexBuffer, sharedHandle);
+
+		if(FAILED(hr))
+			return false;
+
+		return true;
+	}
+
+	bool D3D9RenderDevice::CreateIndexBuffer(UINT length,DWORD usage,D3DFORMAT format,D3DPOOL pool,IDirect3DIndexBuffer9** indexBuffer,HANDLE* sharedHandle)
+	{
+		HRESULT hr = m_d3d9Device->CreateIndexBuffer( length, usage, format, pool, indexBuffer, sharedHandle);
+
+		if(FAILED(hr))
+			return false;
+
+		return true;
+	}
+
+	bool D3D9RenderDevice::CreateVertexDeclaration(D3DVERTEXELEMENT9* pVertexElements,IDirect3DVertexDeclaration9** ppDecl)
+	{
+		HRESULT hr = m_d3d9Device->CreateVertexDeclaration( pVertexElements, ppDecl);
+
+		if(FAILED(hr))
+			return false;
+
+		return true;
+	}
+
+
 
 }
