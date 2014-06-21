@@ -29,39 +29,37 @@ D3D9Renderer::~D3D9Renderer()
 	SAFE_DELETE(m_device);
 }
 
-bool D3D9Renderer::Init(const HWND mainWnd)
+bool D3D9Renderer::Init(const void* wnd)
 {
+	HWND* hwnd = (HWND*)wnd;
+	if(!hwnd)
+		return false;
+	
+	// device init
+	m_device->Init(wnd);
+
 	// Step 1: check hardware caps to create property device
 	bool result = false; 
 	result = m_device->CheckCaps();
 	if(!result)
-		return true;
+		return false;
 
 	// Step 2: Create Device
-	result = m_device->CreateDevice(mainWnd);
+	result = m_device->CreateDevice();
 	if(!result)
-		return true;
+		return false;
 
-	//InitCube();
+	InitCube();
 
 	return true;
 }
 
 void D3D9Renderer::Destroy()
 {
-	SAFE_RELEASE(m_ib);
-	SAFE_RELEASE(m_vb);
+	SAFE_DELETE(m_ib);
+	SAFE_DELETE(m_vb);
 
-// 	if(m_d3d9Device)
-// 	{
-// 		size_t refCount = m_d3d9Device->Release();
-// 		assert( refCount == 0 );
-// 		m_d3d9Device = NULL;
-// 	}
-
-
-
-	SAFE_RELEASE(m_d3d9Object);
+	SAFE_DELETE(m_device);
 }
 
 #include <mmsystem.h>
@@ -92,16 +90,19 @@ void D3D9Renderer::Update(float deltaTime)
 
 void D3D9Renderer::Render()
 {
-	m_d3d9Device->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB( 0, 0, 0), 1.0f, 0);
-	m_d3d9Device->BeginScene();
+	m_device->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB( 0, 0, 0), 1.0f, 0);
+
+	m_device->BeginScene();
 
 	m_d3d9Device->SetFVF( D3DFVF_CUSTOMVERTEX );
-	m_d3d9Device->SetStreamSource( 0, m_vb, 0, sizeof( CUSTOMVERTEX ) );
+
+	m_device->SetVertexBuffer( 0, m_vb, 0);
 	m_d3d9Device->SetIndices(m_ib);
 	m_d3d9Device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 8, 0, 36);
 
-	m_d3d9Device->EndScene();
-	m_d3d9Device->Present( NULL, NULL, NULL, NULL);
+	m_device->EndScene();
+
+	m_d3d9Device->Present();
 }
 
 //-- temp code---

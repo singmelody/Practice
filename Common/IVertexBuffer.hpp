@@ -1,17 +1,20 @@
 #pragma once
-
-/*#include "*/
+#include <d3dx9.h>
 
 namespace Dream
 {
+	class VertexLayout;
+
 	class IVertexBuffer
 	{
 	public:
 		IVertexBuffer(){}
 		virtual ~IVertexBuffer(){}
 
-// 		virtual void addVertex() = 0;
-// 	protected:
-		
+		/// get the vertex layout
+		const VertexLayout* GetVertexLayout() const { return m_vertexLayout; }
+
+	protected:
+		VertexLayout* vertexLayout;
 	};
 }

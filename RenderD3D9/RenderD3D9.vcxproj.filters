@@ -31,6 +31,12 @@
     <ClInclude Include="D3D9Texture.h">
       <Filter>D3D9Resource</Filter>
     </ClInclude>
+    <ClInclude Include="D3D9VertexBuffer.h">
+      <Filter>D3D9Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D9IndexBuffer.h">
+      <Filter>D3D9Resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D9Renderer.cpp">
@@ -49,6 +55,12 @@
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="D3D9Texture.cpp">
+      <Filter>D3D9Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D9VertexBuffer.cpp">
+      <Filter>D3D9Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D9IndexBuffer.cpp">
       <Filter>D3D9Resource</Filter>
     </ClCompile>
   </ItemGroup>

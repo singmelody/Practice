@@ -1,13 +1,18 @@
 #include "StdAfx.h"
 #include "D3D9RenderDevice.h"
 #include "D3D9Texture.h"
+#include <assert.h>
+#include <EngineConfig.h>
 
 namespace Dream
 {
+	#define CAST(type, ptr)  static_cast<type*>(ptr); 
+	#define CONST_CAST(type, ptr)  static_cast<type*>(ptr); 
+
 	D3D9RenderDevice::D3D9RenderDevice() : IRenderDevice()
 		,m_devBehaviorFlags(0)
 	{
-		m_d3d9Object = Direct3DCreate9(D3D_SDK_VERSION);
+
 	}
 
 
@@ -15,10 +20,9 @@ namespace Dream
 	{
 	}
 
-	bool D3D9RenderDevice::CreateDevice(const void* mainWnd)
+	bool D3D9RenderDevice::CreateDevice()
 	{
-		HWND* wnd = (HWND*)mainWnd;
-		if(!m_d3d9Object || !wnd)
+		if(!m_d3d9Object)
 			return false;
 
 		// Step 4: Fill out the D3DPRESENT_PARAMETERS structure.
@@ -33,7 +37,7 @@ namespace Dream
 		d3dParam.BackBufferCount            = 0;
 		d3dParam.MultiSampleType            = D3DMULTISAMPLE_NONE;
 		d3dParam.MultiSampleQuality         = 0;
-		d3dParam.hDeviceWindow              = *wnd;
+		d3dParam.hDeviceWindow              = m_hwnd;
 		d3dParam.EnableAutoDepthStencil     = true; 
 		d3dParam.AutoDepthStencilFormat     = D3DFMT_D24S8;
 		d3dParam.Flags                      = 0;
@@ -44,17 +48,16 @@ namespace Dream
 		HRESULT hr = m_d3d9Object->CreateDevice(
 			D3DADAPTER_DEFAULT,			// primary adapter
 			D3DDEVTYPE_HAL,				// device type
-			*wnd,						// window associated with device
+			m_hwnd,						// window associated with device
 			m_devBehaviorFlags,			// vertex processing
 			&d3dParam,					// present parameters
-			&m_d3d9Device);			// return created device
+			&m_d3d9Device);				// return created device
 
 		if(FAILED(hr))
 			return false;
 
 		return true;
 	}
-
 
 	bool D3D9RenderDevice::CheckCaps()
 	{
@@ -89,7 +92,6 @@ namespace Dream
 		return true;
 	}
 
-
 	ITexture* D3D9RenderDevice::CreateTexture(const char* path)
 	{
 		IDirect3DTexture9* d3d9Tex;
@@ -101,4 +103,76 @@ namespace Dream
 
 		return tex;
 	}
+
+	bool D3D9RenderDevice::Init(const void* wnd)
+	{
+		HWND* hwnd = (HWND*)wnd;
+		if(!hwnd)
+			return false;
+		
+		m_hwnd = *hwnd;
+
+		m_d3d9Object = Direct3DCreate9(D3D_SDK_VERSION);
+		if(!m_d3d9Object)
+			return false;
+
+		return true;
+	}
+
+	void D3D9RenderDevice::Destroy()
+	{
+		if(m_d3d9Device)
+		{
+			size_t reference = m_d3d9Device->Release();
+			assert( reference == 0 );
+		}
+
+		SAFE_RELEASE(m_d3d9Object);
+	}
+
+	bool D3D9RenderDevice::Clear(DWORD Count, const D3DRECT *pRects, DWORD Flags, D3DCOLOR Color,float Z, DWORD Stencil)
+	{
+		HRESULT result = m_d3d9Device->Clear(Count,pRects,Flags,Color,Z,Stencil);
+		if(FAILED(result))
+			return false;
+
+		return true;
+	}
+
+	bool D3D9RenderDevice::BeginScene()
+	{
+		HRESULT hr = m_d3d9Device->BeginScene();
+		if(FAILED(hr))
+			return false;
+
+		return true;
+	}
+
+	void D3D9RenderDevice::EndScene()
+	{
+		HRESULT hr = m_d3d9Device->EndScene();
+		assert( FAILED(hr) != true );
+
+	}
+
+	void D3D9RenderDevice::Present(const void* mainWnd)
+	{
+		HWND* hwnd = (HWND*)mainWnd;
+
+		m_d3d9Device->Present( NULL,NULL, *hwnd, NULL);
+	}
+
+	void D3D9RenderDevice::SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx)
+	{
+		const D3D9VertexBuffer* d3dVB = CAST( D3D9VertexBuffer, vb);
+		IDirect3DVertexBuffer9* buffer = d3dVB->GetD3D9VertexBuffer();
+
+		m_d3d9Device->SetStreamSource( streamIndex, buffer, vertexOffset, vertexByteSize);
+	}
+
+	void D3D9RenderDevice::SetIndexBuffer(const IIndexBuffer* ib)
+	{
+
+	}
+
 }

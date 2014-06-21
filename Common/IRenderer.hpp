@@ -58,11 +58,13 @@ protected:
 class IRenderer
 {
 public:
-	IRenderer() : m_device(NULL) {}
+	IRenderer() {}
 	virtual ~IRenderer(){}
 
-	virtual bool Init(const HWND mainHwnd) = 0;
+	virtual bool Init(const void* wnd) = 0;
 	virtual void Destroy() = 0;
+
+	virtual IRenderDevice* GetIRenderDevice() = 0;
 
 	virtual void Update(float deltaTime) = 0;
 	virtual void Render() = 0;
@@ -70,12 +72,9 @@ public:
 	virtual void addCommand(IRenderCommand* command){}
 	virtual void addCommand(IRenderCommand* command, int renderQueue) {}
 
-	virtual IRenderDevice* GetIRenderDevice() { return m_device;}
 protected:
 	std::vector<RenderQueue> m_renderGroups;
 	std::vector<IRenderCommand*> m_batchedCommands;
-
-	IRenderDevice*	m_device;
 };
 
    extern IRenderer*	gRenderer;

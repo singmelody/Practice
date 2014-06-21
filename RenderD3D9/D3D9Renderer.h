@@ -6,6 +6,7 @@
 namespace Dream{
 
 class IRenderDevice;
+class D3D9RenderDevice;
 class IVertexBuffer;
 class IIndexBuffer;
 
@@ -15,7 +16,7 @@ public:
 	D3D9Renderer();
 	virtual ~D3D9Renderer();
 
-	virtual bool Init(const HWND mainHwnd);
+	virtual bool Init(const void* wnd);
 	virtual void Destroy();
 
 	virtual void Update(float deltaTime);
@@ -23,18 +24,13 @@ public:
 
 	virtual IRenderDevice* GetIRenderDevice();
 private:
+
 	void InitCube();
 
+	D3D9RenderDevice* m_device;
 
 	IVertexBuffer*	m_vb;
 	IIndexBuffer*	m_ib;
-
-// 	IDirect3DDevice9*	m_d3d9Device;
-// 	IDirect3D9*			m_d3d9Object;
-// 
-// 	IDirect3DVertexBuffer9* m_vb;
-// 	IDirect3DIndexBuffer9*	m_ib;
-
 };
 
 }
