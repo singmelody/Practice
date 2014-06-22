@@ -2,6 +2,7 @@
 #include "EngineConfig.h"
 #include "D3D9Renderer.h"
 #include "D3D9RenderDevice.h"
+#include "D3D9IndexBuffer.h"
 #include <assert.h>
 
 namespace Dream{
@@ -171,23 +172,15 @@ void D3D9Renderer::InitCube()
 	bool result = m_device->CreateIndexBuffer(
 		sizeof(indices), 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &ib, NULL);
 
-	IVertexBuffer* vb = new D3D9VertexBuffer(ib);
-
 	if(!result)
 		return;
 
-
-	if( FAILED(m_d3d9Device->CreateIndexBuffer( 
-		sizeof(indices), 0, 
-		D3DFMT_INDEX16, D3DPOOL_DEFAULT, &m_ib, NULL) ))
+	IIndexBuffer* d3d9IB = new D3D9IndexBuffer(ib);
+	if(!d3d9IB)
 		return;
 
-	void* pIndices;
-	m_ib->Lock(0,sizeof(indices),(void**)&pIndices,0);
-
-	memcpy(pIndices,indices,sizeof(indices));
-
-	m_ib->Unlock();
+	
+	d3d9IB->Fill(indices, sizeof(indices));
 
 	return;
 }
