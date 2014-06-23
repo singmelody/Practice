@@ -15,6 +15,8 @@ namespace Dream
 		IVertexLayout* GetIVertexLayout() const { return m_vertexLayout; }
 		void SetIVertexLayout(IVertexLayout* layout) { m_vertexLayout = layout; }
 
+		// fill
+		virtual bool Fill(const void* ptr, int size) = 0;
 	protected:
 		IVertexLayout* m_vertexLayout;
 	};

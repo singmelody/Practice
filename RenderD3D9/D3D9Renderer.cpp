@@ -3,6 +3,7 @@
 #include "D3D9Renderer.h"
 #include "D3D9RenderDevice.h"
 #include "D3D9IndexBuffer.h"
+#include "D3D9VertexBuffer.h"
 #include <assert.h>
 
 namespace Dream{
@@ -117,7 +118,7 @@ void D3D9Renderer::InitCube()
  	m_d3d9Device->SetRenderState( D3DRS_LIGHTING, FALSE );
 
 	// Initialize three Vertices for rendering a triangle
-	CUSTOMVERTEX Vertices[] =
+	CUSTOMVERTEX pVertex[] =
 	{
 		{ -1.0f, 1.0f, -1.0f, 0x0000ffff, },
 		{  1.0f, 1.0f, -1.0f, 0x00ff00ff, },
@@ -129,23 +130,18 @@ void D3D9Renderer::InitCube()
 		{ -1.0f, -1.0f, 1.0f, 0x000000ff, },
 	};
 
-	// Create the vertex buffer. Here we are allocating enough memory
-	// (from the default pool) to hold all our 3 custom Vertices. We also
-	// specify the FVF, so the vertex buffer knows what data it contains.
-
-	if( FAILED(m_d3d9Device->CreateVertexBuffer( sizeof( Vertices ),
+	IDirect3DVertexBuffer9* vb;
+	if( FAILED(m_device->CreateVertexBuffer( sizeof( pVertex ),
 		0, D3DFVF_CUSTOMVERTEX,
-		D3DPOOL_DEFAULT, &m_vb, NULL )) )
+		D3DPOOL_DEFAULT, &vb, NULL )) )
 		return;
 
-	// Now we fill the vertex buffer. To do this, we need to Lock() the VB to
-	// gain access to the Vertices. This mechanism is required becuase vertex
-	// buffers may be in device memory.
-	VOID* pVertices;
-	if( FAILED( m_vb->Lock( 0, sizeof( Vertices ), ( void** )&pVertices, 0 ) ) )
+	IVertexBuffer* d3d9VB = new D3D9VertexBuffer(vb);
+	if(!d3d9VB)
 		return;
-	memcpy( pVertices, Vertices, sizeof( Vertices ) );
-	m_vb->Unlock();
+
+	d3d9VB->Fill((void*)pVertex);
+
 
 	WORD indices[] =
 	{

@@ -10,6 +10,8 @@ public:
 
 	IDirect3DVertexBuffer9*	GetD3D9VertexBuffer() const { return m_vb; }
 
+	// fill
+	virtual bool Fill(const void* ptr, int size);
 protected:
 	IDirect3DVertexBuffer9* m_vb;
 };

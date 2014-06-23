@@ -12,7 +12,7 @@ public:
 
 	IDirect3DIndexBuffer9* GetD3D9IndexBuffer() const { return m_ib; }
 
-	virtual void Fill(const void* ptr, int size);
+	virtual bool Fill(const void* ptr, int size);
 protected:
 	IDirect3DIndexBuffer9* m_ib;
 };
