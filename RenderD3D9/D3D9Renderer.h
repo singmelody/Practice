@@ -23,6 +23,12 @@ public:
 	virtual void Render();
 
 	virtual IRenderDevice* GetIRenderDevice();
+
+	int m_firstVertex;
+	int m_vertexCount;
+	int m_firstIdx;
+	int m_idxCount;
+
 private:
 
 	void InitCube();

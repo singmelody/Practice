@@ -96,12 +96,12 @@ void D3D9Renderer::Render()
 
 	m_device->BeginScene();
 
-// 	m_d3d9Device->SetFVF( D3DFVF_CUSTOMVERTEX );
-// 
-// 	m_device->SetVertexBuffer( 0, m_vb, 0);
-// 	m_device->SetIndexBuffer( m_ib );
-// 	m_device->Draw()
-// 	m_d3d9Device->DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, 8, 0, 36);
+	m_d3d9Device->SetFVF( D3DFVF_CUSTOMVERTEX );
+
+	m_device->SetVertexBuffer( 0, m_vb, 0);
+	m_device->SetIndexBuffer( m_ib );
+
+	m_device->Draw( m_firstVertex, m_vertexCount, m_firstIdx, m_idxCount);
 
 	m_device->EndScene();
 
