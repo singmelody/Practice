@@ -95,10 +95,10 @@ void D3D9Renderer::Render()
 	m_device->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB( 0, 0, 0), 1.0f, 0);
 
 	m_device->BeginScene();
-
-	m_d3d9Device->SetFVF( D3DFVF_CUSTOMVERTEX );
-
+	
+	// layout is in the vertex buffer
 	m_device->SetVertexBuffer( 0, m_vb, 0);
+	
 	m_device->SetIndexBuffer( m_ib );
 
 	m_device->Draw( m_firstVertex, m_vertexCount, m_firstIdx, m_idxCount);

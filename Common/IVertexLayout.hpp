@@ -8,6 +8,8 @@ namespace Dream
 		IVertexLayout(){}
 		virtual ~IVertexLayout(){}
 
+		virtual BuildSignature() = 0;
+
 		virtual int GetVertexSize() const { return m_vertexByteSize; }
 
 	protected:
