@@ -31,6 +31,8 @@ namespace Dream
 
 		virtual void AddSignature(WORD streamIdx, WORD Offset, BYTE type, BYTE method, BYTE usage, BYTE usageIdx) = 0;
 
+		virtual void Build() = 0;
+
 		virtual int GetVertexSize() const { return m_vertexByteSize; }
 
 	protected:
