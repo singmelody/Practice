@@ -21,6 +21,7 @@ struct CUSTOMVERTEX
 D3D9Renderer::D3D9Renderer() : IRenderer()
 	,m_ib(NULL)
 	,m_vb(NULL)
+	,m_curShader(NULL)
 {
 	m_device = new D3D9RenderDevice();
 }
@@ -28,6 +29,7 @@ D3D9Renderer::D3D9Renderer() : IRenderer()
 
 D3D9Renderer::~D3D9Renderer()
 {
+	SAFE_DELETE(m_curShader);
 	SAFE_DELETE(m_device);
 }
 
@@ -77,7 +79,6 @@ void D3D9Renderer::Update(float deltaTime)
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
-	IShader* m_curShader = ;
 	m_curShader->SetShaderParam( D3DTS_WORLD, &matWorld, type);
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );

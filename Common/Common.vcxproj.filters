@@ -52,5 +52,8 @@
     <ClInclude Include="IVertexLayout.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="IShader.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

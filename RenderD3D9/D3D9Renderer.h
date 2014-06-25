@@ -9,6 +9,7 @@ class IRenderDevice;
 class D3D9RenderDevice;
 class IVertexBuffer;
 class IIndexBuffer;
+class IShader;
 
 class D3D9Renderer : public IRenderer
 {
@@ -33,7 +34,9 @@ private:
 
 	void InitCube();
 
+	IShader*		  m_curShader;
 	D3D9RenderDevice* m_device;
+
 
 	IVertexBuffer*	m_vb;
 	IIndexBuffer*	m_ib;
