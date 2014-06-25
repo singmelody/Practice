@@ -9,16 +9,6 @@ namespace Dream
 	class IVertexLayout
 	{
 	public:
-		enum VERTEXUSAGE
-		{
-			POSITION,
-			COLOR,
-			WEIGHT,
-			SIZE,
-
-			USAGE_COUNT
-		};
-
 		enum DATATYPE
 		{
 			FLOAT3,
@@ -26,10 +16,26 @@ namespace Dream
 			DWORD
 		};
 
+		enum VERTEXUSAGE
+		{
+			POSITION,
+			TEXCOORD,
+			COLOR,
+			WEIGHT,
+			SIZE,
+
+			USAGE_COUNT
+		};
+
+		enum METHOD
+		{
+			DEFAULT
+		};
+
 		IVertexLayout(){}
 		virtual ~IVertexLayout(){}
 
-		virtual void AddSignature(WORD streamIdx, WORD Offset, BYTE type, BYTE method, BYTE usage, BYTE usageIdx) = 0;
+		virtual void AddSignature(WORD streamIdx, WORD Offset, DATATYPE type, METHOD method, VERTEXUSAGE usage, BYTE usageIdx) = 0;
 
 		virtual void Build() = 0;
 

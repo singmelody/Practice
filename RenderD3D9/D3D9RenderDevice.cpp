@@ -171,6 +171,17 @@ namespace Dream
 		m_d3d9Device->Present( NULL,NULL, m_hwnd, NULL);
 	}
 
+
+
+	void D3D9RenderDevice::SetVertexLayout(const IVertexLayout* layout)
+	{
+		const D3D9VertexLayout* d3d9Layout = CONST_CAST( D3D9VertexLayout, layout);
+
+		IDirect3DVertexDeclaration9* decl = d3d9Layout->GetD3D9VertexDeclaration();
+		HRESULT hr =  m_d3d9Device->SetVertexDeclaration(decl);
+		assert( SUCCEEDED(hr) );
+	}
+
 	void D3D9RenderDevice::SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx)
 	{
 		const D3D9VertexBuffer* d3dVB = CONST_CAST( D3D9VertexBuffer, vb);
@@ -220,6 +231,8 @@ namespace Dream
 
 		return true;
 	}
+
+
 
 
 

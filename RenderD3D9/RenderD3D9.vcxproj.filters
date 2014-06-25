@@ -14,6 +14,9 @@
     <Filter Include="D3D9Resource">
       <UniqueIdentifier>{a328fa82-473b-4179-995e-c765b4cc6dba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fx">
+      <UniqueIdentifier>{f6990ec4-0159-4d43-a451-510b314a4a91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D9Renderer.h">
@@ -69,5 +72,13 @@
     <ClCompile Include="D3D9VertexLayout.cpp">
       <Filter>D3D9Resource</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Media\fx\simple.fx">
+      <Filter>Fx</Filter>
+    </None>
+    <None Include="..\Media\fx\common.fx">
+      <Filter>Fx</Filter>
+    </None>
   </ItemGroup>
 </Project>

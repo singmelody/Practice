@@ -76,7 +76,9 @@ void D3D9Renderer::Update(float deltaTime)
 	UINT iTime = timeGetTime() % 1000;
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
-	m_d3d9Device->SetTransform( D3DTS_WORLD, &matWorld );
+
+	IShader* m_curShader = ;
+	m_curShader->SetShaderParam( D3DTS_WORLD, &matWorld, type);
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
