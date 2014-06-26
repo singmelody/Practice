@@ -77,6 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="D3D9IndexBuffer.h" />
+    <ClInclude Include="D3D9Shader.h" />
     <ClInclude Include="D3D9VertexLayout.h" />
     <ClInclude Include="D3D9RenderDevice.h" />
     <ClInclude Include="D3D9Renderer.h" />
@@ -87,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D9IndexBuffer.cpp" />
+    <ClCompile Include="D3D9Shader.cpp" />
     <ClCompile Include="D3D9VertexLayout.cpp" />
     <ClCompile Include="D3D9RenderDevice.cpp" />
     <ClCompile Include="D3D9Renderer.cpp" />

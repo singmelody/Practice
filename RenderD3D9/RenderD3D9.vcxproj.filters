@@ -43,6 +43,9 @@
     <ClInclude Include="D3D9VertexLayout.h">
       <Filter>D3D9Resource</Filter>
     </ClInclude>
+    <ClInclude Include="D3D9Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D9Renderer.cpp">
@@ -72,6 +75,7 @@
     <ClCompile Include="D3D9VertexLayout.cpp">
       <Filter>D3D9Resource</Filter>
     </ClCompile>
+    <ClCompile Include="D3D9Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Media\fx\simple.fx">

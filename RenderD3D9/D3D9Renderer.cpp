@@ -4,6 +4,7 @@
 #include "D3D9RenderDevice.h"
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexBuffer.h"
+#include "D3D9VertexLayout.h"
 #include <assert.h>
 
 namespace Dream{
@@ -15,7 +16,7 @@ struct CUSTOMVERTEX
 	DWORD color;        // The vertex color
 };
 
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZ|D3DFVF_DIFFUSE)
+
 //--------------------
 
 D3D9Renderer::D3D9Renderer() : IRenderer()
@@ -79,7 +80,7 @@ void D3D9Renderer::Update(float deltaTime)
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
-	m_curShader->SetShaderParam( D3DTS_WORLD, &matWorld, type);
+	m_curShader->SetShaderParam( D3DTS_WORLD, &matWorld);
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
@@ -115,10 +116,10 @@ void D3D9Renderer::Render()
 void D3D9Renderer::InitCube()
 {
 // 	// Turn off culling, so we see the front and back of the triangle
- 	m_d3d9Device->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+ 	m_device->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 // 
 // 	// Turn off D3D lighting, since we are providing our own vertex colors
- 	m_d3d9Device->SetRenderState( D3DRS_LIGHTING, FALSE );
+ 	m_device->SetRenderState( D3DRS_LIGHTING, FALSE );
 
 	// Initialize three Vertices for rendering a triangle
 	CUSTOMVERTEX pVertex[] =
@@ -133,9 +134,16 @@ void D3D9Renderer::InitCube()
 		{ -1.0f, -1.0f, 1.0f, 0x000000ff, },
 	};
 
+	IVertexLayout* layout = new D3D9VertexLayout();
+	layout->AddSignature( 0, 0, IVertexLayout::FLOAT3, IVertexLayout::DEFAULT, IVertexLayout::POSITION, 0);
+	layout->AddSignature( 0, 12, IVertexLayout::DWORD, IVertexLayout::DEFAULT, IVertexLayout::COLOR, 0);
+	layout->Build();
+
+	m_vb->SetIVertexLayout(layout);
+
 	IDirect3DVertexBuffer9* vb;
 	if( FAILED(m_device->CreateVertexBuffer( sizeof( pVertex ),
-		0, D3DFVF_CUSTOMVERTEX,
+		NULL, NULL,
 		D3DPOOL_DEFAULT, &vb, NULL )) )
 		return;
 

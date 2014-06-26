@@ -55,5 +55,11 @@
     <ClInclude Include="IShader.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="IPass.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ITechnique.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

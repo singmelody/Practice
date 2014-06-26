@@ -79,6 +79,7 @@
     <ClInclude Include="IAudioPlayer.hpp" />
     <ClInclude Include="IEngine.hpp" />
     <ClInclude Include="IIndexBuffer.hpp" />
+    <ClInclude Include="IPass.hpp" />
     <ClInclude Include="IRenderCommand.hpp" />
     <ClInclude Include="IRenderDevice.hpp" />
     <ClInclude Include="IRenderer.hpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="IResourceManager.hpp" />
     <ClInclude Include="IShader.hpp" />
     <ClInclude Include="ISprite2D.hpp" />
+    <ClInclude Include="ITechnique.hpp" />
     <ClInclude Include="ITexture.hpp" />
     <ClInclude Include="ITextureManager.hpp" />
     <ClInclude Include="IVertexBuffer.hpp" />

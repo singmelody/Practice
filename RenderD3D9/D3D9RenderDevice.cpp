@@ -232,6 +232,11 @@ namespace Dream
 		return true;
 	}
 
+	void D3D9RenderDevice::SetRenderState(D3DRENDERSTATETYPE renderStateType, DWORD value)
+	{
+		m_d3d9Device->SetRenderState( renderStateType, value);
+	}
+
 
 
 

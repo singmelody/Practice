@@ -35,6 +35,8 @@ namespace Dream
 		bool CreateVertexBuffer(UINT length,DWORD usage,DWORD fvf,D3DPOOL pool,IDirect3DVertexBuffer9** vertexBuffer,HANDLE* sharedHandle);
 		bool CreateIndexBuffer(UINT length,DWORD usage,D3DFORMAT format,D3DPOOL pool,IDirect3DIndexBuffer9** indexBuffer,HANDLE* sharedHandle);
 		bool CreateVertexDeclaration(D3DVERTEXELEMENT9* pVertexElements,IDirect3DVertexDeclaration9** ppDecl);
+
+		void SetRenderState(D3DRENDERSTATETYPE renderStateType, DWORD value);
 		
 
 
