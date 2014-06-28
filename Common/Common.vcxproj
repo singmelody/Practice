@@ -86,6 +86,7 @@
     <ClInclude Include="IResourceItem.hpp" />
     <ClInclude Include="IResourceManager.hpp" />
     <ClInclude Include="IShader.hpp" />
+    <ClInclude Include="IShaderManager.hpp" />
     <ClInclude Include="ISprite2D.hpp" />
     <ClInclude Include="ITechnique.hpp" />
     <ClInclude Include="ITexture.hpp" />

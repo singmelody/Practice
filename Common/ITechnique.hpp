@@ -10,7 +10,7 @@ namespace Dream{
 		ITechnique(){}
 		virtual ~ITechnique(){
 
-			for (int i = 0; i < m_passes.size(); ++i)
+			for (size_t i = 0; i < m_passes.size(); ++i)
 			{
 				if(m_passes[i] != NULL)
 				{
@@ -20,6 +20,12 @@ namespace Dream{
 			}
 
 		}
+		IPass* GetPass(const char * name)
+		{
+			 return NULL;
+		}
+
+
 	protected:
 		std::vector<IPass*> m_passes;
 	};

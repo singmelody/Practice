@@ -61,5 +61,8 @@
     <ClInclude Include="ITechnique.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="IShaderManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

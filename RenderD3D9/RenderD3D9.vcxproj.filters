@@ -46,6 +46,12 @@
     <ClInclude Include="D3D9Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D3D9Technique.h">
+      <Filter>D3D9Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D9Pass.h">
+      <Filter>D3D9Resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D9Renderer.cpp">
@@ -76,6 +82,12 @@
       <Filter>D3D9Resource</Filter>
     </ClCompile>
     <ClCompile Include="D3D9Shader.cpp" />
+    <ClCompile Include="D3D9Technique.cpp">
+      <Filter>D3D9Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D9Pass.cpp">
+      <Filter>D3D9Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Media\fx\simple.fx">

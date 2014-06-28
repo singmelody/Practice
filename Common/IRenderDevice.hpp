@@ -4,6 +4,7 @@ namespace Dream
 {
 class IIndexBuffer;
 class IVertexBuffer;
+class IShader;
 class ITexture;
 class IVertexLayout;
 
@@ -39,6 +40,7 @@ public:
 	virtual void SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx) = 0;
 	virtual void SetIndexBuffer(const IIndexBuffer* ib) = 0;
 
+	virtual IShader*  CreateShader(const char* name);
 	virtual ITexture* CreateTexture(const char* name) = 0;
 };
 

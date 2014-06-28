@@ -83,6 +83,7 @@
     <ClInclude Include="Serialize\rapidxml\rapidxml_print.hpp" />
     <ClInclude Include="Serialize\rapidxml\rapidxml_utils.hpp" />
     <ClInclude Include="Serialize\XMLSerialize.h" />
+    <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Texture\TextureManager.h" />
@@ -96,6 +97,7 @@
     <ClCompile Include="Resource\FileResourceItem.cpp" />
     <ClCompile Include="Resource\ResourceManager.cpp" />
     <ClCompile Include="Serialize\XMLSerialize.cpp" />
+    <ClCompile Include="Shader\ShaderManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
