@@ -23,9 +23,7 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Render();
 
-	virtual IRenderDevice* GetIRenderDevice();
-
-	virtual void SetCurShader(IShader* shader) ;
+	virtual void SetCurrentShader(IShader* shader) ;
 
 	int m_firstVertex;
 	int m_vertexCount;

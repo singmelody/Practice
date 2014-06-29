@@ -34,10 +34,13 @@ D3D9Renderer::~D3D9Renderer()
 	SAFE_DELETE(m_device);
 }
 
-bool D3D9Renderer::Init(const void* wnd)
+bool D3D9Renderer::Init(const void* wnd, IEngine* gEngine)
 {
 	HWND* hwnd = (HWND*)wnd;
 	if(!hwnd)
+		return false;
+
+	if(!gEngine)
 		return false;
 	
 	// device init
@@ -80,7 +83,8 @@ void D3D9Renderer::Update(float deltaTime)
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
-	SetCurShader();
+	IShader* cubeShader = gEngine->GetShaderManager()->CreateShader("simple.fx");
+	SetCurrentShader(cubeShader);
 	m_curShader->SetShaderParam( D3DTS_WORLD, &matWorld);
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
@@ -198,7 +202,7 @@ IRenderDevice* D3D9Renderer::GetIRenderDevice()
 	return m_device;
 }
 
-void D3D9Renderer::SetCurShader(IShader* shader)
+void D3D9Renderer::SetCurrentShader(IShader* shader)
 {
 	m_curShader = shader;
 }

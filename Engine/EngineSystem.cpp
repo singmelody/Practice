@@ -106,6 +106,11 @@ namespace Dream
 		return gRenderer;
 	}
 
+	IShaderManager* EngineSystem::GetShaderManager()
+	{
+		return gShaderManager;
+	}
+
 	//--------------------------------------------------------------------
 	/// Dll Exports
 	//--------------------------------------------------------------------
