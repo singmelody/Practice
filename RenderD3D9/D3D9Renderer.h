@@ -25,6 +25,8 @@ public:
 
 	virtual IRenderDevice* GetIRenderDevice();
 
+	virtual void SetCurShader(IShader* shader) ;
+
 	int m_firstVertex;
 	int m_vertexCount;
 	int m_firstIdx;

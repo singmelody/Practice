@@ -7,7 +7,7 @@ DEFINE_ENGINE_INTERFACE
 
 namespace Dream
 {
-	ITexture* ShaderManager::CreateTexture(const char* name)
+	IShader* ShaderManager::CreateShader(const char* name)
 	{
 		IRenderer* renderer = gEngine->GetIRenderer();
 		IRenderDevice* device = renderer->GetIRenderDevice();
