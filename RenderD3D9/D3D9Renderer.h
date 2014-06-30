@@ -17,7 +17,7 @@ public:
 	D3D9Renderer();
 	virtual ~D3D9Renderer();
 
-	virtual bool Init(const void* wnd);
+	virtual bool Init(const void* wnd, IEngine* engine);
 	virtual void Destroy();
 
 	virtual void Update(float deltaTime);

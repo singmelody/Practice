@@ -15,6 +15,9 @@ DEFINE_RESOURCEMGR_INTERFACE
 #include "Texture/TextureManager.h"
 DEFINE_TEXTUREMGR_INTERFACE
 
+#include "Shader/ShaderManager.h"
+DEFINE_SHADERMGR_INTERFACE
+
 namespace Dream
 {
 	EngineSystem::EngineSystem()

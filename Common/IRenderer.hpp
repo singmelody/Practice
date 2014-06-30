@@ -8,6 +8,7 @@
 namespace Dream
 {
 // declaration
+class IEngine;
 class IRenderDevice;
 class IRenderCommand;
 class IShader;
@@ -62,7 +63,7 @@ public:
 	IRenderer() {}
 	virtual ~IRenderer(){}
 
-	virtual bool Init(const void* wnd) = 0;
+	virtual bool Init(const void* wnd, IEngine* engine) = 0;
 	virtual void Destroy() = 0;
 
 	virtual IRenderDevice* GetIRenderDevice() = 0;

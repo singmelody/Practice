@@ -5,6 +5,9 @@
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexLayout.h"
+#include "D3D9Shader.h"
+#include "IEngine.hpp"
+#include "IShaderManager.hpp"
 #include <assert.h>
 
 namespace Dream{
@@ -34,12 +37,13 @@ D3D9Renderer::~D3D9Renderer()
 	SAFE_DELETE(m_device);
 }
 
-bool D3D9Renderer::Init(const void* wnd, IEngine* gEngine)
+bool D3D9Renderer::Init(const void* wnd, IEngine* engine)
 {
 	HWND* hwnd = (HWND*)wnd;
 	if(!hwnd)
 		return false;
 
+	gEngine = engine;
 	if(!gEngine)
 		return false;
 	

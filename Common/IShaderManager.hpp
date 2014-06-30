@@ -49,13 +49,13 @@ namespace Dream
 
 		}
 
-	protected:
 		virtual IShader* CreateShader(const char* name) = 0;
+	protected:
 
 		ShaderDic m_shaderDic;
 	};
 
-	extern IShaderManager*	gTextureManager;
+	extern IShaderManager*	gShaderManager;
 }
 
-#define DEFINE_TEXTUREMGR_INTERFACE  Dream::ITextureManager*  Dream::gTextureManager = NULL;
+#define DEFINE_SHADERMGR_INTERFACE  Dream::IShaderManager*  Dream::gShaderManager = NULL;
