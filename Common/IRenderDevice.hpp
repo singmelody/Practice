@@ -35,7 +35,6 @@ public:
 
 	virtual void Present() = 0;
 
-	virtual void SetShaderParam(const char* name, void* data, SHADERPARAM type) = 0;
 	virtual void SetVertexLayout(const IVertexLayout* layout) = 0;
 	virtual void SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx) = 0;
 	virtual void SetIndexBuffer(const IIndexBuffer* ib) = 0;

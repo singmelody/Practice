@@ -89,18 +89,18 @@ void D3D9Renderer::Update(float deltaTime)
 
 	IShader* cubeShader = gEngine->GetShaderManager()->CreateShader("simple.fx");
 	SetCurrentShader(cubeShader);
-	m_curShader->SetShaderParam( D3DTS_WORLD, &matWorld);
+	m_curShader->SetShaderParam( "g_World", &matWorld);
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vUpVec( 0.0f, 1.0f, 0.0f );
 	D3DXMATRIXA16 matView;
 	D3DXMatrixLookAtLH( &matView, &vEyePt, &vLookatPt, &vUpVec );
-	m_d3d9Device->SetShaderParam( D3DTS_VIEW, &matView );
+	m_curShader->SetShaderParam( "g_View", &matView );
 
 	D3DXMATRIXA16 matProj;
 	D3DXMatrixPerspectiveFovLH( &matProj, D3DX_PI / 4, 800.0f/600.0f, 1.0f, 100.0f );
-	m_d3d9Device->SetTransform( D3DTS_PROJECTION, &matProj );
+	m_curShader->SetShaderParam( "g_Proj", &matProj );
 }
 
 void D3D9Renderer::Render()

@@ -11,6 +11,8 @@ public:
 	virtual ~D3D9Shader();
 
 	ITechnique* GetTechnique(const char * name);
+
+	virtual void SetShaderParam(const char* varName, void* data, PARAMTYPE type);
 protected:
 	ID3DXEffect*	m_effect;
 };

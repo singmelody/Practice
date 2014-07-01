@@ -24,7 +24,6 @@ namespace Dream
 
 		virtual void Present();
 
-		virtual void SetShaderParam(const char* name, void* data, SHADERPARAM type);
 		virtual void SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx);
 		virtual void SetIndexBuffer(const IIndexBuffer* ib);
 		virtual void SetVertexLayout(const IVertexLayout* layout);
