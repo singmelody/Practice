@@ -9,8 +9,11 @@ class IPass;
 class D3D9Technique : public ITechnique
 {
 public:
-	D3D9Technique();
+	D3D9Technique(D3DXHANDLE handle)
 	virtual ~D3D9Technique();
+
+protected:
+	D3DXHANDLE	m_handle;
 
 };
 

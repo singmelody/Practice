@@ -27,6 +27,7 @@ namespace Dream{
 
 
 	protected:
+
 		std::vector<IPass*> m_passes;
 	};
 }

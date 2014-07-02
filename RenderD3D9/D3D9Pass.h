@@ -14,6 +14,10 @@ public:
 
 	//IPass* GetPass(int idx);
 	RenderStateDesc*	GetStateDesc();
+
+	virtual void BeginRender(void *handle, int i);
+	virtual void EndRender(void *handle);
+
 protected:
 	D3DXHANDLE	m_pass;
 };

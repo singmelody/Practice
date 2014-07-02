@@ -5,7 +5,8 @@
 namespace Dream
 {
 
-D3D9Technique::D3D9Technique() : ITechnique()
+D3D9Technique::D3D9Technique(D3DXHANDLE handle) : ITechnique()
+	,m_handle(handle)
 {
 
 }

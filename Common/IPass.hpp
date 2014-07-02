@@ -7,6 +7,10 @@ namespace Dream{
 	public:
 		IPass(){}
 		virtual ~IPass(){}
+
+		virtual void BeginRender(void *handle, int i) = 0;
+		virtual void EndRender(void *handle) = 0;
+
 	protected:
 	};
 }
