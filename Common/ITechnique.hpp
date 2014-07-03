@@ -20,10 +20,14 @@ namespace Dream{
 			}
 
 		}
-		IPass* GetPass(const char * name)
+
+		IPass* GetPass(const char * name, int i)
 		{
-			 return NULL;
+
+			 return m_passes[i];
 		}
+
+		virtual void Render(const char* techName) = 0;
 
 
 	protected:

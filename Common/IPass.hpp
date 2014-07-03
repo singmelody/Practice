@@ -9,6 +9,7 @@ namespace Dream{
 		virtual ~IPass(){}
 
 		virtual void BeginRender(void *handle, int i) = 0;
+		virtual void Render(void *handle) = 0;
 		virtual void EndRender(void *handle) = 0;
 
 	protected:

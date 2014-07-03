@@ -12,6 +12,7 @@ public:
 	D3D9Technique(D3DXHANDLE handle)
 	virtual ~D3D9Technique();
 
+	virtual void Render(const char* techName);
 protected:
 	D3DXHANDLE	m_handle;
 

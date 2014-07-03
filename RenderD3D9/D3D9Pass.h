@@ -16,6 +16,7 @@ public:
 	RenderStateDesc*	GetStateDesc();
 
 	virtual void BeginRender(void *handle, int i);
+	virtual void Render(void *handle);
 	virtual void EndRender(void *handle);
 
 protected:
