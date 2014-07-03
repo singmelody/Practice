@@ -79,6 +79,7 @@
     <ClInclude Include="IAudioPlayer.hpp" />
     <ClInclude Include="IEngine.hpp" />
     <ClInclude Include="IIndexBuffer.hpp" />
+    <ClInclude Include="IMaterial.hpp" />
     <ClInclude Include="IPass.hpp" />
     <ClInclude Include="IRenderCommand.hpp" />
     <ClInclude Include="IRenderDevice.hpp" />

@@ -64,5 +64,8 @@
     <ClInclude Include="IShaderManager.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
+    <ClInclude Include="IMaterial.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

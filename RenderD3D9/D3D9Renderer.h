@@ -22,6 +22,7 @@ public:
 
 	virtual void Update(float deltaTime);
 	virtual void Render();
+	virtual void RenderCallBack();
 
 	virtual void SetCurrentShader(IShader* shader) ;
 

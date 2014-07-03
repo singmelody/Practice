@@ -33,7 +33,7 @@
     <Filter Include="Texture">
       <UniqueIdentifier>{65c3a08b-aa01-403a-9348-c3017c2ab366}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader">
+    <Filter Include="Material">
       <UniqueIdentifier>{0f692000-ed22-4dd4-9806-8b9130d2a47e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -96,7 +96,7 @@
       <Filter>Texture</Filter>
     </ClInclude>
     <ClInclude Include="Shader\ShaderManager.h">
-      <Filter>Shader</Filter>
+      <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +122,7 @@
       <Filter>Texture</Filter>
     </ClCompile>
     <ClCompile Include="Shader\ShaderManager.cpp">
-      <Filter>Shader</Filter>
+      <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

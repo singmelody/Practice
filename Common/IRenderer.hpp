@@ -70,6 +70,7 @@ public:
 
 	virtual void Update(float deltaTime) = 0;
 	virtual void Render() = 0;
+	virtual void RenderCallBack() = 0;
 
 	virtual void SetCurShader(IShader* shader) = 0;
 

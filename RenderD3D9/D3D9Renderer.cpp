@@ -109,12 +109,12 @@ void D3D9Renderer::Render()
 
 	m_device->BeginScene();
 	
-	// layout is in the vertex buffer
+	// set declaration & vertexbuffer
 	m_device->SetVertexBuffer( 0, m_vb, 0);
 	
 	m_device->SetIndexBuffer( m_ib );
 
-	m_device->Draw( m_firstVertex, m_vertexCount, m_firstIdx, m_idxCount);
+	SetMaterial(m_curMaterial);
 
 	m_device->EndScene();
 
@@ -209,6 +209,11 @@ IRenderDevice* D3D9Renderer::GetIRenderDevice()
 void D3D9Renderer::SetCurrentShader(IShader* shader)
 {
 	m_curShader = shader;
+}
+
+void D3D9Renderer::RenderCallBack()
+{
+	m_device->Draw( m_firstVertex, m_vertexCount, m_firstIdx, m_idxCount);
 }
 
 //--------------------------------------------------------------------
