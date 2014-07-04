@@ -95,7 +95,10 @@
     <ClInclude Include="Texture\TextureManager.h">
       <Filter>Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Shader\ShaderManager.h">
+    <ClInclude Include="Material\MaterialManager.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Material\ShaderManager.h">
       <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
@@ -121,7 +124,10 @@
     <ClCompile Include="Texture\TextureManager.cpp">
       <Filter>Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Shader\ShaderManager.cpp">
+    <ClCompile Include="Material\MaterialManager.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Material\ShaderManager.cpp">
       <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>

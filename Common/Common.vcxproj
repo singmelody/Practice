@@ -80,6 +80,7 @@
     <ClInclude Include="IEngine.hpp" />
     <ClInclude Include="IIndexBuffer.hpp" />
     <ClInclude Include="IMaterial.hpp" />
+    <ClInclude Include="IMaterialManager.hpp" />
     <ClInclude Include="IPass.hpp" />
     <ClInclude Include="IRenderCommand.hpp" />
     <ClInclude Include="IRenderDevice.hpp" />
@@ -87,7 +88,6 @@
     <ClInclude Include="IResourceItem.hpp" />
     <ClInclude Include="IResourceManager.hpp" />
     <ClInclude Include="IShader.hpp" />
-    <ClInclude Include="IShaderManager.hpp" />
     <ClInclude Include="ISprite2D.hpp" />
     <ClInclude Include="ITechnique.hpp" />
     <ClInclude Include="ITexture.hpp" />

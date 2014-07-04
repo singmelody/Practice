@@ -61,10 +61,10 @@
     <ClInclude Include="ITechnique.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="IShaderManager.hpp">
+    <ClInclude Include="IMaterial.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="IMaterial.hpp">
+    <ClInclude Include="IMaterialManager.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
   </ItemGroup>

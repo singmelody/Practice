@@ -39,7 +39,8 @@ public:
 	virtual void SetVertexBuffer(int streamIndex, const IVertexBuffer* vb, int offsetIdx) = 0;
 	virtual void SetIndexBuffer(const IIndexBuffer* ib) = 0;
 
-	virtual IShader*  CreateShader(const char* name);
+	virtual IShader*  CreateShader(const char* name) = 0;
+	virtual IMaterial*  CreateMaterial(const char* name) = 0;
 	virtual ITexture* CreateTexture(const char* name) = 0;
 };
 
