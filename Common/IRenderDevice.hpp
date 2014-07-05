@@ -7,6 +7,7 @@ class IVertexBuffer;
 class IShader;
 class ITexture;
 class IVertexLayout;
+class IMaterial;
 
 
 class IRenderDevice

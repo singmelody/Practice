@@ -35,7 +35,7 @@ private:
 
 	void InitCube();
 
-	IShader*		  m_curShader;
+	IMaterial*		  m_curMaterial;
 	D3D9RenderDevice* m_device;
 
 
