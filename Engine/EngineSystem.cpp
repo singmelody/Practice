@@ -15,8 +15,8 @@ DEFINE_RESOURCEMGR_INTERFACE
 #include "Texture/TextureManager.h"
 DEFINE_TEXTUREMGR_INTERFACE
 
-#include "Shader/ShaderManager.h"
-DEFINE_SHADERMGR_INTERFACE
+#include "Material/MaterialManager.h"
+DEFINE_MATERIALMGR_INTERFACE
 
 namespace Dream
 {
@@ -44,7 +44,7 @@ namespace Dream
 
 		func(&gRenderer);
 
-		bool result = gRenderer->Init(mainWnd);
+		bool result = gRenderer->Init(mainWnd, this);
 		if(!result)
 			return false;
 
@@ -109,9 +109,9 @@ namespace Dream
 		return gRenderer;
 	}
 
-	IShaderManager* EngineSystem::GetShaderManager()
+	IMaterialManager* EngineSystem::GetMaterialManager()
 	{
-		return gShaderManager;
+		return gMaterialManager;
 	}
 
 	//--------------------------------------------------------------------

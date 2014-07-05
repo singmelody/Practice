@@ -19,7 +19,8 @@ public:
 
 	virtual IResourceManager* GetIResourceManager();
 	virtual ITextureManager* GetITextureManager();
-	virtual IShaderManager* GetShaderManager();
+	virtual IMaterialManager* GetMaterialManager();
+
 	virtual IRenderer* GetIRenderer();
 
 

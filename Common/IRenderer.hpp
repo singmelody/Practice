@@ -12,6 +12,7 @@ class IEngine;
 class IRenderDevice;
 class IRenderCommand;
 class IShader;
+class IMaterial;
 
 // helper
 static bool compareRenderCommand(IRenderCommand* a, IRenderCommand* b)
@@ -72,7 +73,7 @@ public:
 	virtual void Render() = 0;
 	virtual void RenderCallBack() = 0;
 
-	virtual void SetCurShader(IShader* shader) = 0;
+	virtual void SetMaterial(IMaterial* material) = 0;
 
 protected:
 	std::vector<RenderQueue> m_renderGroups;

@@ -7,7 +7,7 @@
 #include "D3D9VertexLayout.h"
 #include "D3D9Shader.h"
 #include "IEngine.hpp"
-#include "IShaderManager.hpp"
+#include "IMaterialManager.hpp"
 #include <assert.h>
 
 namespace Dream{
@@ -87,9 +87,9 @@ void D3D9Renderer::Update(float deltaTime)
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
-	IShader* cubeShader = gEngine->GetShaderManager()->CreateShader("simple.fx");
-	SetCurrentShader(cubeShader);
-	m_curShader->SetShaderParam( "g_World", &matWorld);
+	IMaterial* material = gEngine->GetMaterialManager()->CreateMaterial("simple.mat");
+	SetMaterial(material);
+	material->Load();
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
@@ -206,9 +206,9 @@ IRenderDevice* D3D9Renderer::GetIRenderDevice()
 	return m_device;
 }
 
-void D3D9Renderer::SetCurrentShader(IShader* shader)
+void D3D9Renderer::SetMaterial(IMaterial* material)
 {
-	m_curShader = shader;
+	m_curMaterial = material;
 }
 
 void D3D9Renderer::RenderCallBack()

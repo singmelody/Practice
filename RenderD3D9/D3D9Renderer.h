@@ -24,7 +24,7 @@ public:
 	virtual void Render();
 	virtual void RenderCallBack();
 
-	virtual void SetCurrentShader(IShader* shader) ;
+	virtual void SetMaterial(IMaterial* material) ;
 
 	int m_firstVertex;
 	int m_vertexCount;

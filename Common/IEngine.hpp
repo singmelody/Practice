@@ -10,6 +10,7 @@ class IResourceManager;
 class ITextureManager;
 class IRenderDevice;
 class IShaderManager;
+class IMaterialManager;
 
 struct EngineStartupInfo
 {
@@ -35,7 +36,7 @@ public:
 	virtual IResourceManager* GetIResourceManager() = 0;
 	virtual ITextureManager* GetITextureManager() = 0;
 	virtual IRenderer* GetIRenderer() = 0;
-	virtual IShaderManager* GetShaderManager() = 0;
+	virtual IMaterialManager* GetMaterialManager() = 0;
 };
 
 extern IEngine*		gEngine;
