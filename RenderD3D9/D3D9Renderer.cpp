@@ -91,6 +91,7 @@ void D3D9Renderer::Update(float deltaTime)
 	SetMaterial(material);
 	material->Load();
 
+
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vUpVec( 0.0f, 1.0f, 0.0f );
