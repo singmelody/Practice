@@ -25,9 +25,10 @@ struct CUSTOMVERTEX
 D3D9Renderer::D3D9Renderer() : IRenderer()
 	,m_ib(NULL)
 	,m_vb(NULL)
-	,m_curShader(NULL)
+	,m_curMaterial(NULL)
 {
 	m_device = new D3D9RenderDevice();
+	m_globalShader = new GlobalShader();
 }
 
 
@@ -97,7 +98,7 @@ void D3D9Renderer::Update(float deltaTime)
 	D3DXVECTOR3 vUpVec( 0.0f, 1.0f, 0.0f );
 	D3DXMATRIXA16 matView;
 	D3DXMatrixLookAtLH( &matView, &vEyePt, &vLookatPt, &vUpVec );
-	m_curShader->SetShaderParam( "g_View", &matView );
+	m_globalShader->SetShaderParam( , &matView );
 
 	D3DXMATRIXA16 matProj;
 	D3DXMatrixPerspectiveFovLH( &matProj, D3DX_PI / 4, 800.0f/600.0f, 1.0f, 100.0f );

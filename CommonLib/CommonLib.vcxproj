@@ -70,11 +70,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="GlobalShader.h" />
     <ClInclude Include="IO\IStream.hpp" />
     <ClInclude Include="IO\FileStream.h" />
     <ClInclude Include="IO\MemoryStream.h" />
+    <ClInclude Include="Material\GlobalShader.h" />
     <ClInclude Include="Material\MaterialManager.h" />
+    <ClInclude Include="Math\Matrix.h" />
     <ClInclude Include="ResourceItem.h" />
     <ClInclude Include="Resource\IResourceItem.hpp" />
     <ClInclude Include="Resource\FileResourceItem.h" />
@@ -93,10 +94,11 @@
     <ClInclude Include="Util\StringHelper.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GlobalShader.cpp" />
     <ClCompile Include="IO\FileStream.cpp" />
     <ClCompile Include="IO\MemoryStream.cpp" />
+    <ClCompile Include="Material\GlobalShader.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
+    <ClCompile Include="Math\Matrix.cpp" />
     <ClCompile Include="Resource\FileResourceItem.cpp" />
     <ClCompile Include="Resource\ResourceManager.cpp" />
     <ClCompile Include="Serialize\XMLSerialize.cpp" />

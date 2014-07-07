@@ -10,6 +10,7 @@ class D3D9RenderDevice;
 class IVertexBuffer;
 class IIndexBuffer;
 class IShader;
+class GlobalShader;
 
 class D3D9Renderer : public IRenderer
 {
@@ -36,7 +37,7 @@ private:
 	void InitCube();
 
 	IMaterial*		  m_curMaterial;
-	IShader*		  m_globalShader;
+	GlobalShader*	  m_globalShader;
 	D3D9RenderDevice* m_device;
 
 

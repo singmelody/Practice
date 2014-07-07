@@ -98,7 +98,10 @@
     <ClInclude Include="Material\MaterialManager.h">
       <Filter>Material</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalShader.h">
+    <ClInclude Include="Math\Matrix.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Material\GlobalShader.h">
       <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
@@ -127,7 +130,10 @@
     <ClCompile Include="Material\MaterialManager.cpp">
       <Filter>Material</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalShader.cpp">
+    <ClCompile Include="Math\Matrix.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Material\GlobalShader.cpp">
       <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>

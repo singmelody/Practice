@@ -13,4 +13,9 @@ GlobalShader::~GlobalShader(void)
 {
 }
 
+void GlobalShader::SetShaderParam(GMatrixParamIdx idx, const Matrix& mat)
+{
+
+}
+
 }
