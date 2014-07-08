@@ -24,8 +24,12 @@ public:
 
 	void SetShaderParam( GMatrixParamIdx idx, const Matrix& mat);
 
-	GlobalShader(void);
-	virtual ~GlobalShader(void);
+	GlobalShader();
+	virtual ~GlobalShader();
+
+protected:
+	virtual void SetShaderParam(const char* varName, void* data, PARAMTYPE type) {}
+
 };
 
 }

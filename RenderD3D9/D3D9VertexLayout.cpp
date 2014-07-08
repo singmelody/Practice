@@ -3,6 +3,7 @@
 #include "D3D9RenderDevice.h"
 #include "IRenderer.hpp"
 #include "EngineConfig.h"
+DEFINE_RENDER_INTERFACE
 
 namespace Dream{
 

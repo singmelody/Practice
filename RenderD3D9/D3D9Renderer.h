@@ -21,6 +21,8 @@ public:
 	virtual bool Init(const void* wnd, IEngine* engine);
 	virtual void Destroy();
 
+	virtual IRenderDevice* GetIRenderDevice();
+
 	virtual void Update(float deltaTime);
 	virtual void Render();
 	virtual void RenderCallBack();

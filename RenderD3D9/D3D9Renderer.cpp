@@ -5,7 +5,13 @@
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexLayout.h"
+
+// Material Header
 #include "D3D9Shader.h"
+#include "Material/GlobalShader.h"
+#include "Math/Matrix.h"
+#include "IMaterial.hpp"
+
 #include "IEngine.hpp"
 #include "IMaterialManager.hpp"
 #include <assert.h>
@@ -34,7 +40,7 @@ D3D9Renderer::D3D9Renderer() : IRenderer()
 
 D3D9Renderer::~D3D9Renderer()
 {
-	SAFE_DELETE(m_curShader);
+	SAFE_DELETE(m_globalShader);
 	SAFE_DELETE(m_device);
 }
 
@@ -89,20 +95,22 @@ void D3D9Renderer::Update(float deltaTime)
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
 	IMaterial* material = gEngine->GetMaterialManager()->CreateMaterial("simple.mat");
-	SetMaterial(material);
 	material->Load();
+
+	SetMaterial(material);
 
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vUpVec( 0.0f, 1.0f, 0.0f );
-	D3DXMATRIXA16 matView;
-	D3DXMatrixLookAtLH( &matView, &vEyePt, &vLookatPt, &vUpVec );
-	m_globalShader->SetShaderParam( , &matView );
+	Matrix matView;
+	//D3DXMatrixLookAtLH( &matView, &vEyePt, &vLookatPt, &vUpVec );
 
-	D3DXMATRIXA16 matProj;
-	D3DXMatrixPerspectiveFovLH( &matProj, D3DX_PI / 4, 800.0f/600.0f, 1.0f, 100.0f );
-	m_curShader->SetShaderParam( "g_Proj", &matProj );
+	m_globalShader->SetShaderParam( GlobalShader::eMatView, matView);
+
+	Matrix matProj;
+	//D3DXMatrixPerspectiveFovLH( &matProj, D3DX_PI / 4, 800.0f/600.0f, 1.0f, 100.0f );
+	m_globalShader->SetShaderParam( GlobalShader::eMatProj, matProj);
 }
 
 void D3D9Renderer::Render()
@@ -162,7 +170,7 @@ void D3D9Renderer::InitCube()
 	if(!d3d9VB)
 		return;
 
-	d3d9VB->Fill((void*)pVertex);
+	d3d9VB->Fill((void*)pVertex, sizeof(pVertex));
 
 
 	WORD indices[] =

@@ -9,7 +9,7 @@ class IPass;
 class D3D9Technique : public ITechnique
 {
 public:
-	D3D9Technique(D3DXHANDLE handle)
+	D3D9Technique(D3DXHANDLE handle);
 	virtual ~D3D9Technique();
 
 	virtual void Render(const char* techName);

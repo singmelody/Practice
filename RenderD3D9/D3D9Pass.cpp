@@ -37,9 +37,9 @@ void D3D9Pass::Render(void *handle)
 {
 	IRenderer* renderer = gEngine->GetIRenderer();
 
-	D3D9Renderer* renderer = static_cast<D3D9Renderer*>(renderer);
+	D3D9Renderer* d3d9Renderer = static_cast<D3D9Renderer*>(renderer);
 
-	renderer->Render();
+	d3d9Renderer->RenderCallBack();
 }
 
 void D3D9Pass::EndRender(void *handle)

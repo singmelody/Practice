@@ -10,6 +10,8 @@ namespace Dream
 		IMaterial(){}
 		virtual ~IMaterial(){}
 
+		virtual bool Load() = 0 ;
+
 	protected:
 		IShader*	m_shader;
 	};

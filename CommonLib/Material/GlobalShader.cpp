@@ -4,12 +4,12 @@
 namespace Dream
 {
 
-GlobalShader::GlobalShader(void)
+GlobalShader::GlobalShader()
 {
 }
 
 
-GlobalShader::~GlobalShader(void)
+GlobalShader::~GlobalShader()
 {
 }
 
