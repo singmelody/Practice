@@ -46,7 +46,7 @@ D3D9Renderer::~D3D9Renderer()
 
 bool D3D9Renderer::Init(const void* wnd, IEngine* engine)
 {
-	HWND* hwnd = (HWND*)wnd;
+	HWND hwnd = (HWND)wnd;
 	if(!hwnd)
 		return false;
 

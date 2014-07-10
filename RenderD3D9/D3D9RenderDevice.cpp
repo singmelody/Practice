@@ -13,6 +13,7 @@ namespace Dream
 	#define CONST_CAST(type, ptr)  static_cast<const type*>(ptr); 
 
 	D3D9RenderDevice::D3D9RenderDevice() : IRenderDevice()
+		,m_hwnd(NULL)
 		,m_devBehaviorFlags(0)
 	{
 
@@ -82,15 +83,14 @@ namespace Dream
 			return false;
 
 		// If pure device and HW T&L supported
-		DWORD devBehaviorFlags = 0;
 		if( caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT )
-			devBehaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
+			m_devBehaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		else
-			devBehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+			m_devBehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
 		if( caps.DevCaps & D3DDEVCAPS_PUREDEVICE &&
-			devBehaviorFlags & D3DCREATE_HARDWARE_VERTEXPROCESSING)
-			devBehaviorFlags |= D3DCREATE_PUREDEVICE;
+			m_devBehaviorFlags & D3DCREATE_HARDWARE_VERTEXPROCESSING)
+			m_devBehaviorFlags |= D3DCREATE_PUREDEVICE;
 
 		return true;
 	}
@@ -109,11 +109,11 @@ namespace Dream
 
 	bool D3D9RenderDevice::Init(const void* wnd)
 	{
-		HWND* hwnd = (HWND*)wnd;
+		HWND hwnd = (HWND)wnd;
 		if(!hwnd)
 			return false;
 		
-		m_hwnd = *hwnd;
+		m_hwnd = hwnd;
 
 		m_d3d9Object = Direct3DCreate9(D3D_SDK_VERSION);
 		if(!m_d3d9Object)

@@ -12,14 +12,47 @@ public:
 	{
 		// comment use, Global var begin
 		eMatBegin = 0,
-		eMatView  = eMatBegin,	//	g_View
-		eMatProj,				//  g_LightView
-		eMatEnd,
+	
+		eMatCommonBegin = eMatBegin,
+		eMatView  = eMatCommonBegin,	//	g_View
+		eMatProj,	//  g_LightView
+		eMatCommonEnd,
 
 		// comment use, Local var begin
-		eMatLocalBegin = eMatEnd,
+		eMatCustomBegin = eMatCommonEnd,
+		eMatLocal =  eMatCustomBegin,
+		eMatCustomEnd,
 
-		eMatLocalEnd,
+		eMatEnd = eMatCustomEnd
+	};
+
+	enum GVecParamIdx
+	{
+		eVecBegin = eMatEnd,
+
+		eVecCommonBegin = eVecBegin,
+		eVecAmbient = eVecCommonBegin,
+		eVecCommonEnd,
+
+		eVecCustomBeign = eVecCommonEnd,
+		eVecCustomEnd,
+
+		eVecEnd = eVecCustomEnd,
+	};
+
+	enum GTexParamIdx
+	{
+		eTexBegin = eVecEnd,
+
+		eTexCommonBegin = eTexBegin,
+
+		eTexCommonEnd,
+
+		eTexCustomBegin = eTexCommonEnd,
+
+		eTexCustomEnd,
+
+		eTexEnd = eTexCustomEnd
 	};
 
 	void SetShaderParam( GMatrixParamIdx idx, const Matrix& mat);
