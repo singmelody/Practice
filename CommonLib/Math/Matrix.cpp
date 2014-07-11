@@ -3,9 +3,7 @@
 
 namespace Dream{
 
-Matrix::Matrix()
-{
-}
+
 
 
 Matrix::~Matrix()
