@@ -76,6 +76,8 @@
     <ClInclude Include="Material\GlobalShader.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Math\Matrix.h" />
+    <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="Math\Vector.h" />
     <ClInclude Include="ResourceItem.h" />
     <ClInclude Include="Resource\IResourceItem.hpp" />
     <ClInclude Include="Resource\FileResourceItem.h" />
@@ -99,6 +101,8 @@
     <ClCompile Include="Material\GlobalShader.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Math\Matrix.cpp" />
+    <ClCompile Include="Math\Quaternion.cpp" />
+    <ClCompile Include="Math\Vector.cpp" />
     <ClCompile Include="Resource\FileResourceItem.cpp" />
     <ClCompile Include="Resource\ResourceManager.cpp" />
     <ClCompile Include="Serialize\XMLSerialize.cpp" />

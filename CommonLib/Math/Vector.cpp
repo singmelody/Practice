@@ -4,10 +4,4 @@
 namespace Dream{
 
 
-
-
-Vector::~Vector()
-{
-}
-
 }
