@@ -43,7 +43,7 @@ namespace Dream
 			return false;
 
 		func(&gRenderer);
-
+		
 		bool result = gRenderer->Init(mainWnd, this);
 		if(!result)
 			return false;

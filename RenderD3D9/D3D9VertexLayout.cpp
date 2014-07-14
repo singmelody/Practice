@@ -79,7 +79,7 @@ BYTE D3D9VertexLayout::ConvertVertexUsage(VERTEXUSAGE usage)
 	return D3DDECLUSAGE_POSITION;
 }
 
-void D3D9VertexLayout::Build()
+void D3D9VertexLayout::Build(IRenderDevice* device)
 {
 	int count = m_elements.size();
 	D3DVERTEXELEMENT9*	elements = new D3DVERTEXELEMENT9[count];
@@ -87,7 +87,7 @@ void D3D9VertexLayout::Build()
 	for (int i = 0; i < count; ++i)
 		elements[i] = m_elements[i];
 
-	D3D9RenderDevice* d3d9Device = static_cast<D3D9RenderDevice*>(gRenderer->GetIRenderDevice());
+	D3D9RenderDevice* d3d9Device = static_cast<D3D9RenderDevice*>(device);
 	d3d9Device->CreateVertexDeclaration( elements, &m_decl);
 
 	delete[] elements;

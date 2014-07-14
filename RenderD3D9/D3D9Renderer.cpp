@@ -94,10 +94,10 @@ void D3D9Renderer::Update(float deltaTime)
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
-	IMaterial* material = gEngine->GetMaterialManager()->CreateMaterial("simple.mat");
-	material->Load();
-
-	SetMaterial(material);
+// 	IMaterial* material = gEngine->GetMaterialManager()->CreateMaterial("simple.mat");
+// 	material->Load();
+// 
+// 	SetMaterial(material);
 
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );
@@ -156,9 +156,7 @@ void D3D9Renderer::InitCube()
 	IVertexLayout* layout = new D3D9VertexLayout();
 	layout->AddSignature( 0, 0, IVertexLayout::FLOAT3, IVertexLayout::DEFAULT, IVertexLayout::POSITION, 0);
 	layout->AddSignature( 0, 12, IVertexLayout::DWORD, IVertexLayout::DEFAULT, IVertexLayout::COLOR, 0);
-	layout->Build();
-
-	m_vb->SetIVertexLayout(layout);
+	layout->Build(m_device);
 
 	IDirect3DVertexBuffer9* vb;
 	if( FAILED(m_device->CreateVertexBuffer( sizeof( pVertex ),
@@ -166,11 +164,14 @@ void D3D9Renderer::InitCube()
 		D3DPOOL_DEFAULT, &vb, NULL )) )
 		return;
 
-	IVertexBuffer* d3d9VB = new D3D9VertexBuffer(vb);
-	if(!d3d9VB)
+
+	m_vb = new D3D9VertexBuffer(vb);
+	if(!m_vb)
 		return;
 
-	d3d9VB->Fill((void*)pVertex, sizeof(pVertex));
+	m_vb->SetIVertexLayout(layout);
+
+	m_vb->Fill((void*)pVertex, sizeof(pVertex));
 
 
 	WORD indices[] =
@@ -201,12 +202,12 @@ void D3D9Renderer::InitCube()
 	if(!result)
 		return;
 
-	IIndexBuffer* d3d9IB = new D3D9IndexBuffer(ib);
-	if(!d3d9IB)
+	m_ib = new D3D9IndexBuffer(ib);
+	if(!m_ib)
 		return;
 
 	
-	d3d9IB->Fill(indices, sizeof(indices));
+	m_ib->Fill(indices, sizeof(indices));
 
 	return;
 }

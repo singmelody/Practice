@@ -6,6 +6,7 @@ namespace Dream
 class Matrix
 {
 public:
+	Matrix(){}
 	Matrix(	
 		float _m00, float _m01, float _m02, float _m03,
 		float _m10, float _m11, float _m12, float _m13,

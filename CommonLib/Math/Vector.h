@@ -6,6 +6,7 @@ namespace Dream
 
 class Vector3
 {
+public:
 	Vector3(	
 		float _x, float _y, float _z)
 	{
@@ -19,9 +20,15 @@ class Vector3
 
 	void Normalize()
 	{
-		float len = sqrt(x * x + y * y + z * z);
+		float len = Length();
 		float factor = 1.0f / len;
 		x *= factor; y *= factor; z *= factor;
+	}
+
+	float Length()
+	{
+		float len = sqrt(x * x + y * y + z * z);
+		return len;
 	}
 };
 
@@ -39,9 +46,15 @@ public:
 
 	void Normalize()
 	{
-		float len = sqrt(x * x + y * y + z * z + w * w);
+		float len = Length();
 		float factor = 1.0f / len;
 		x *= factor; y *= factor; z *= factor; w *= factor;
+	}
+
+	float Length()
+	{
+		float len = sqrt(x * x + y * y + z * z + w * w);
+		return len;
 	}
 };
 

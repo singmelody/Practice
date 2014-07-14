@@ -13,7 +13,7 @@ public:
 	virtual ~D3D9VertexLayout();
 
 	virtual void AddSignature(WORD streamIdx, WORD Offset, DATATYPE type, METHOD method, VERTEXUSAGE usage, BYTE usageIdx);
-	virtual void Build();
+	virtual void Build(IRenderDevice* device);
 
 	IDirect3DVertexDeclaration9* GetD3D9VertexDeclaration() const { return m_decl; }
 protected:

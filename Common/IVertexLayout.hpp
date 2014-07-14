@@ -6,6 +6,8 @@ namespace Dream
 	typedef unsigned long	DWORD;
 	typedef unsigned char	BYTE;
 
+	class IRenderDevice;
+
 	class IVertexLayout
 	{
 	public:
@@ -37,7 +39,7 @@ namespace Dream
 
 		virtual void AddSignature(WORD streamIdx, WORD Offset, DATATYPE type, METHOD method, VERTEXUSAGE usage, BYTE usageIdx) = 0;
 
-		virtual void Build() = 0;
+		virtual void Build(IRenderDevice* device) = 0;
 
 		virtual int GetVertexSize() const { return m_vertexByteSize; }
 
