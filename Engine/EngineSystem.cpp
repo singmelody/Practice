@@ -71,6 +71,10 @@ namespace Dream
 		gTextureManager = new TextureManager();
 		gTextureManager->Init(this);
 
+		// Create material manager
+		gMaterialManager = new MaterialManager();
+		gMaterialManager->Init(this);
+
 		return true;
 	}
 

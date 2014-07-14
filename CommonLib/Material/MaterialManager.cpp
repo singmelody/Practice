@@ -3,7 +3,6 @@
 #include "IRenderer.hpp"
 #include "IRenderDevice.hpp"
 #include <IEngine.hpp>
-DEFINE_ENGINE_INTERFACE
 
 namespace Dream
 {

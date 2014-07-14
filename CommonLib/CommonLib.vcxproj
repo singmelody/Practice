@@ -73,11 +73,13 @@
     <ClInclude Include="IO\IStream.hpp" />
     <ClInclude Include="IO\FileStream.h" />
     <ClInclude Include="IO\MemoryStream.h" />
+    <ClInclude Include="MaterialInstance.h" />
     <ClInclude Include="Material\GlobalShader.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Math\Matrix.h" />
     <ClInclude Include="Math\Quaternion.h" />
     <ClInclude Include="Math\Vector.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceItem.h" />
     <ClInclude Include="Resource\IResourceItem.hpp" />
     <ClInclude Include="Resource\FileResourceItem.h" />
@@ -98,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="IO\FileStream.cpp" />
     <ClCompile Include="IO\MemoryStream.cpp" />
+    <ClCompile Include="MaterialInstance.cpp" />
     <ClCompile Include="Material\GlobalShader.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Math\Matrix.cpp" />

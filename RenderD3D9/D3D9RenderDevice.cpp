@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "D3D9RenderDevice.h"
+#include "MaterialInstance.h"
 #include "D3D9Texture.h"
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexBuffer.h"
@@ -94,6 +95,21 @@ namespace Dream
 
 		return true;
 	}
+
+	IShader* D3D9RenderDevice::CreateShader(const char* name)
+	{
+		return NULL;
+	}
+
+	IMaterial* D3D9RenderDevice::CreateMaterial(const char* name)
+	{
+		IMaterial* mat = new MaterialInstance();
+		if(!mat)
+			return NULL;
+
+		return mat;
+	}
+
 
 	ITexture* D3D9RenderDevice::CreateTexture(const char* path)
 	{
@@ -236,6 +252,5 @@ namespace Dream
 	{
 		m_d3d9Device->SetRenderState( renderStateType, value);
 	}
-
 
 }

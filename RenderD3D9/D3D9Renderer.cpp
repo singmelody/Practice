@@ -94,10 +94,10 @@ void D3D9Renderer::Update(float deltaTime)
 	FLOAT fAngle = iTime * ( 2.0f * D3DX_PI ) / 1000.0f;
 	D3DXMatrixRotationY( &matWorld, fAngle );
 
-// 	IMaterial* material = gEngine->GetMaterialManager()->CreateMaterial("simple.mat");
-// 	material->Load();
-// 
-// 	SetMaterial(material);
+ 	IMaterial* material = gEngine->GetMaterialManager()->CreateMaterial("simple.mat");
+ 	material->Load();
+ 
+ 	SetMaterial(material);
 
 
 	D3DXVECTOR3 vEyePt( 0.0f, 3.0f,-5.0f );

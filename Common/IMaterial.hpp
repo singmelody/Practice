@@ -7,7 +7,7 @@ namespace Dream
 	class IMaterial
 	{
 	public:
-		IMaterial(){}
+		IMaterial() : m_shader(0){}
 		virtual ~IMaterial(){}
 
 		virtual bool Load() = 0 ;

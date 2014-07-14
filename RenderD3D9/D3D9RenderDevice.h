@@ -28,8 +28,8 @@ namespace Dream
 		virtual void SetIndexBuffer(const IIndexBuffer* ib);
 		virtual void SetVertexLayout(const IVertexLayout* layout);
 
-		virtual IShader*  CreateShader(const char* name) { return NULL; }
-		virtual IMaterial*  CreateMaterial(const char* name) { return NULL; }
+		virtual IShader*  CreateShader(const char* name);
+		virtual IMaterial*  CreateMaterial(const char* name);
 		virtual ITexture* CreateTexture(const char* path);
 
 		// D3D9 section
