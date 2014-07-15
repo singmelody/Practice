@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "D3D9RenderDevice.h"
-#include "MaterialInstance.h"
+#include "Material/MaterialInstance.h"
 #include "D3D9Texture.h"
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexBuffer.h"

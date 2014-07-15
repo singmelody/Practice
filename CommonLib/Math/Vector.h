@@ -30,6 +30,29 @@ public:
 		float len = sqrt(x * x + y * y + z * z);
 		return len;
 	}
+
+	float Dot(const Vector3& vec)
+	{
+		float value = vec.x * x + vec.y * y + vec.z * z;
+		return value;
+	}
+
+	Vector3 Mid(const Vector3& vec)
+	{
+		return Vector3(
+				(x + vec.x) * 0.5f,
+				(y + vec.y) * 0.5f,
+				(z + vec.z) * 0.5f);
+	}
+
+	Vector3 Cross(const Vector3& vec)
+	{
+		return Vector3(
+				y * vec.z - z * vec.y,
+				z * vec.x - x * vec.z,
+				x * vec.y - y * vec.x
+			);
+	}
 };
 
 class Vector4
@@ -56,6 +79,14 @@ public:
 		float len = sqrt(x * x + y * y + z * z + w * w);
 		return len;
 	}
+
+	float Dot(const Vector4& vec)
+	{
+		float value = vec.x * x + vec.y * y + vec.z * z + vec.w * w;
+		return value;
+	}
+
+
 };
 
 }

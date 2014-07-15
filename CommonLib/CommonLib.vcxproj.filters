@@ -113,7 +113,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MaterialInstance.h">
+    <ClInclude Include="Material\MaterialInstance.h">
       <Filter>Material</Filter>
     </ClInclude>
   </ItemGroup>
@@ -154,7 +154,7 @@
     <ClCompile Include="Math\Vector.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialInstance.cpp">
+    <ClCompile Include="Material\MaterialInstance.cpp">
       <Filter>Material</Filter>
     </ClCompile>
   </ItemGroup>
