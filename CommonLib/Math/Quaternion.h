@@ -24,6 +24,11 @@ public:
 		z *= factor;
 		w *= factor;
 	}
+
+	Quaternion Multiply(const Quaternion& q)
+	{
+		return Quaternion( q.x * x, q.y * y, q.z * z, q.w * w);
+	}
 };
 
 }

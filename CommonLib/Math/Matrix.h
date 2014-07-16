@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector.h"
 
 namespace Dream
 {
@@ -6,6 +7,8 @@ namespace Dream
 class Matrix
 {
 public:
+
+
 	Matrix(){}
 	Matrix(	
 		float _m00, float _m01, float _m02, float _m03,
@@ -33,6 +36,23 @@ public:
 	{
 		*this = Transposed();
 	}
+
+	Vector4 GetRow(int i)
+	{
+		return Vector4(m[i][0],m[i][1],m[i][2],m[i][3]);
+	}
+
+	Vector4 GetCol(int i)
+	{
+		return Vector4(m[0][i],m[1][i],m[2][i],m[3][i]);
+	}
+
+	Vector4 GetPosition() const
+	{
+		return GetRow(3);
+	}
+
+
 };
 
 }
