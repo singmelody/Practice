@@ -52,7 +52,14 @@ public:
 		return GetRow(3);
 	}
 
+	void SetScale(const Vector3& vec)
+	{
+		v[0][0] = v.x;
+		v[1][1] = v.y;
+		v[2][2] = v.z;
+	}
 
+	
 };
 
 }

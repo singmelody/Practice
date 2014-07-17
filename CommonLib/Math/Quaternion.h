@@ -29,6 +29,11 @@ public:
 	{
 		return Quaternion( q.x * x, q.y * y, q.z * z, q.w * w);
 	}
+
+// 	Quaternion Slerp( const Quaternion& q, float t)
+// 	{
+// 		return ;
+// 	}
 };
 
 }
