@@ -16,9 +16,10 @@ public:
 		float _m20, float _m21, float _m22, float _m23,
 		float _m30, float _m31, float _m32, float _m33)
 	{
-		m[0][0] = _m11; m[0][1] = _m12; m[0][2] = _m13;
-		m[1][0] = _m21; m[1][1] = _m22; m[1][2] = _m23;
-		m[2][0] = _m31; m[2][1] = _m32; m[2][2] = _m33;
+		m[0][0] = _m00; m[0][1] = _m01; m[0][2] = _m02; m[0][3] = _m03;
+		m[1][0] = _m10; m[1][1] = _m11; m[1][2] = _m12; m[1][3] = _m13;
+		m[2][0] = _m20; m[2][1] = _m21; m[2][2] = _m22; m[2][3] = _m23;
+		m[3][0] = _m30; m[3][1] = _m31; m[3][2] = _m32; m[3][3] = _m33;
 	};
 	~Matrix();
 
@@ -47,19 +48,31 @@ public:
 		return Vector4(m[0][i],m[1][i],m[2][i],m[3][i]);
 	}
 
-	Vector4 GetPosition() const
+	Vector4 GetPosition()
 	{
 		return GetRow(3);
 	}
 
 	void SetScale(const Vector3& vec)
 	{
-		v[0][0] = v.x;
-		v[1][1] = v.y;
-		v[2][2] = v.z;
+		m[0][0] = vec.x;
+		m[1][1] = vec.y;
+		m[2][2] = vec.z;
 	}
 
-	
+	void Identity()
+	{
+		m[0][0] = 1.0f; m[0][1] = 0; m[0][2] = 0; m[0][3] = 0;
+		m[1][0] = 0; m[1][1] = 1.0f; m[1][2] = 0; m[1][3] = 0;
+		m[2][0] = 0; m[2][1] = 0; m[2][2] = 1.0f; m[2][3] = 0;
+		m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1.0f;
+
+	}
+
+	void translation(const Vector3& vec)
+	{
+		m[3][0] = vec.x; m[3][1] = vec.y; m[3][2] = vec.z; 
+	}
 };
 
 }
