@@ -69,6 +69,7 @@ public:
 
 	}
 
+
 	void translation(const Vector3& vec)
 	{
 		m[3][0] = vec.x; m[3][1] = vec.y; m[3][2] = vec.z; 
