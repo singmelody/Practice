@@ -133,6 +133,12 @@ TEST( MATH_TEST, MATH_MATRIX_TEST)
 
 	ASSERT_TRUE( mtx.m[3][0] == 1.0f && mtx.m[3][1] == 2.0f 
 		&& mtx.m[3][2] == 3.0f && mtx.m[3][3] == 1.0f );
+}
+
+//--------------------Math Lib Test Begin---------------------
+TEST( MATH_TEST, MATH_VEC_TEST)
+{
+	Vector3 vec( 1.0f, 2.0f, 3.0f);
 
 	float value = vec.Dot(Vector3( 3.0f, 2.0f, 1.0f));
 	ASSERT_TRUE( value == 10.0f);
@@ -140,6 +146,11 @@ TEST( MATH_TEST, MATH_MATRIX_TEST)
 	float length = vec.Length();
 	ASSERT_TRUE( length == sqrt( 1.0f + 4.0f + 9.0f ));
 
+	Vector3 mid = vec.Mid(vec);
+	ASSERT_TRUE( vec == mid );
+
+	vec.Normalize();
+	ASSERT_FLOAT_EQ( vec.Length(), 1.0f );
 }
 //--------------------TexMgr Test End---------------------
 

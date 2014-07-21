@@ -53,6 +53,15 @@ public:
 				x * vec.y - y * vec.x
 			);
 	}
+
+	bool operator==(const Vector3& vec)
+	{
+		if( vec.x == x && vec.y == y && vec.z == z)
+			return true;
+
+		return false;
+	}
+
 };
 
 class Vector4
