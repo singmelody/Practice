@@ -17,7 +17,7 @@ public:
 
 	void Normalize()
 	{
-		float len = sqrt(x * x + y * y + z * z + w * w);
+		float len = Length();
 		float factor = 1.0f / len;
 		x *= factor;
 		y *= factor;
@@ -25,13 +25,22 @@ public:
 		w *= factor;
 	}
 
-	Quaternion Multiply(const Quaternion& q)
+	float Length()
 	{
-		x = w * q.x + x * q.w + y * q.z - z * q.y;
-		y = w * q.y + y * q.w + z * q.x - x * q.z;
-		z = w * q.z + z * q.w + x * q.y - y * q.x;
-		w = w * q.w - x * q.x - y * q.y - z * q.z;
+		 float len = sqrt(x * x + y * y + z * z + w * w);
+		 return len;
 	}
+
+// algorithm is error on 3D Math book P147 the result is not the same with d3d
+// 	Quaternion Multiply(const Quaternion& q)
+// 	{
+// 		float resultX = w * q.x + x * q.w + y * q.z - z * q.y;
+// 		float resultY = w * q.y + y * q.w + z * q.x - x * q.z;
+// 		float resultZ = w * q.z + z * q.w + x * q.y - y * q.x;
+// 		float resultW = w * q.w - x * q.x - y * q.y - z * q.z;
+// 
+// 		return Quaternion( resultX, resultY, resultZ, resultW);
+// 	}
 
 	Quaternion Quaternion::operator+ (const Quaternion& rkQ) const
 	{
@@ -59,6 +68,15 @@ public:
 			,
 			w * q.w - x * q.x - y * q.y - z * q.z
 			);
+	}
+
+	bool operator==(const Quaternion& q)
+	{
+		 if (q.x/q.w == x/w && q.y/q.w == y/w 
+			 && q.z / q.w == z/w)
+			 return true;
+
+		 return false;
 	}
 };
 

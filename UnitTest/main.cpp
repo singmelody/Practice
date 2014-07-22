@@ -1,6 +1,7 @@
 #include "gtest.h"
 #include "Demo.hpp"
 #include "Math/Matrix.h"
+#include "Math/Quaternion.h"
 
 using namespace std;
 using namespace Dream;
@@ -135,7 +136,6 @@ TEST( MATH_TEST, MATH_MATRIX_TEST)
 		&& mtx.m[3][2] == 3.0f && mtx.m[3][3] == 1.0f );
 }
 
-//--------------------Math Lib Test Begin---------------------
 TEST( MATH_TEST, MATH_VEC_TEST)
 {
 	Vector3 vec( 1.0f, 2.0f, 3.0f);
@@ -151,6 +151,24 @@ TEST( MATH_TEST, MATH_VEC_TEST)
 
 	vec.Normalize();
 	ASSERT_FLOAT_EQ( vec.Length(), 1.0f );
+}
+
+TEST( MATH_TEST, MATH_QUA_TEST)
+{
+	Quaternion qua( 1.0f, 2.0f, 3.0f, 1.0f);
+	Quaternion qua2( 3.0f, 2.0f, 1.0f, 1.0f);
+
+// 
+// 	Quaternion q = qua.Multiply(qua2);
+// 	Quaternion result( 2.0f, 11.0f, -3.0f, -9.0f);
+
+	qua.Normalize();
+
+	ASSERT_FLOAT_EQ( qua.Length() , 1.0f );
+
+
+
+	ASSERT_TRUE(q == result);
 }
 //--------------------TexMgr Test End---------------------
 

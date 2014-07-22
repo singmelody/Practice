@@ -61,6 +61,12 @@ namespace Dream
 		if(FAILED(hr))
 			return false;
 
+		D3DXQUATERNION q1( 1.0f, 2.0f, 3.0f, 1.0f);
+		D3DXQUATERNION q2( 3.0f, 2.0f, 1.0f, 1.0f);
+		
+		D3DXQUATERNION qResult;
+		D3DXQuaternionMultiply( &qResult, &q1, &q2);
+
 		return true;
 	}
 
