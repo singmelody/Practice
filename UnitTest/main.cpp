@@ -166,7 +166,7 @@ TEST( MATH_TEST, MATH_QUA_TEST)
 
 	ASSERT_FLOAT_EQ( qua.Length() , 1.0f );
 
-
+	
 
 	ASSERT_TRUE(q == result);
 }
