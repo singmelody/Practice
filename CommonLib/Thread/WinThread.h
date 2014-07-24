@@ -1,15 +1,18 @@
 #pragma once
 
 #include "IThread.hpp"
-
+#include <vector.h>
 namespace Dream
 {
 
-class WinThread : public IThread
+class ThreadPool
 {
 public:
-	WinThread(void);
-	~WinThread(void);
+	ThreadPool(void);
+	~ThreadPool(void);
+
+private:
+	std::vector<IThread> m_threads;
 };
 
 }

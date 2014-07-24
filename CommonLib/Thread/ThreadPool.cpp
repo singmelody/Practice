@@ -2,12 +2,12 @@
 #include "WinThread.h"
 
 namespace Dream{
-ThreadPool::ThreadPool()
+WinThread::WinThread(void)
 {
 }
 
 
-ThreadPool::~ThreadPool()
+WinThread::~WinThread(void)
 {
 }
 
