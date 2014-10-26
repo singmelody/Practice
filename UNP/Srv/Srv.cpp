@@ -11,6 +11,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	char buff[MAXLINE];
 	time_t ticks;
 
+#ifdef WIN32
+	InitWinSocket();
+#endif
+
 	listenfd = Socket(AF_INET, SOCK_STREAM, 0);
 
 	memset( &servaddr, 0, sizeof(servaddr));
