@@ -87,6 +87,11 @@ static void err_doit(int erronoflag, int level, const char* fmt, va_list ap)
 
 }
 
+void err_quit(const char *, ...)
+{
+
+}
+
 #ifdef WIN32
 void InitWinSocket()
 {
@@ -99,4 +104,58 @@ void InitWinSocket()
 		exit(1);
 	}
 }
+
 #endif
+
+void Inet_pton(int family, const char *strptr, void *addrptr)
+{
+	int n;
+
+	if(( n = inet_pton( family, strptr, addrptr)) < 0)
+		err_sys("inet_pton error for %s", strptr);
+	else if( n == 0)
+		err_quit("inet_pton error for %s", strptr);
+
+	return;
+}
+
+void Connect(int fd,const SA* sa, socklen_t salenptr)
+{
+	if(connect( fd, sa, salenptr) < 0)
+		err_sys("connect error");
+}
+
+void str_cli(FILE * fp, int sockfd)
+{
+	char sendLine[MAXLINE], recvLine[MAXLINE];
+	while( Fgets( sendLine, MAXLINE, fp) != NULL)
+	{
+		Writen( sockfd, sendline, strlen(sendline));
+
+		if(Readline(sockfd, recvline, MAXLINE) == 0)
+			err_quit("str_cli : server terminated prematurely");
+
+		Fputs( recvline, stdout);
+	}
+}
+
+void Writen(int fd, void* ptr, size_t nbyte)
+{
+	if(writen( fd, ptr, nbbytes) != nbytes)
+		err_sys("writeen error");
+}
+
+char* Fgets(char *, int, FILE *)
+{
+
+}
+
+void Fputs(const char *, FILE *)
+{
+
+}
+
+size_t	Readline(int, void *, size_t)
+{
+
+}
