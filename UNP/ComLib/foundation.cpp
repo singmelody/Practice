@@ -127,21 +127,22 @@ void Connect(int fd,const SA* sa, socklen_t salenptr)
 
 void str_cli(FILE * fp, int sockfd)
 {
-	char sendLine[MAXLINE], recvLine[MAXLINE];
+	char sendLine[MAXLINE];
+	char recvLine[MAXLINE];
 	while( Fgets( sendLine, MAXLINE, fp) != NULL)
 	{
-		Writen( sockfd, sendline, strlen(sendline));
+		Writen( sockfd, sendLine, strlen(sendLine));
 
-		if(Readline(sockfd, recvline, MAXLINE) == 0)
+		if(Readline(sockfd, recvLine, MAXLINE) == 0)
 			err_quit("str_cli : server terminated prematurely");
 
-		Fputs( recvline, stdout);
+		Fputs( recvLine, stdout);
 	}
 }
 
-void Writen(int fd, void* ptr, size_t nbyte)
+void Writen(int fd, void* ptr, size_t nbytes)
 {
-	if(writen( fd, ptr, nbbytes) != nbytes)
+	if(write( fd, ptr, nbytes) != nbytes)
 		err_sys("writeen error");
 }
 
@@ -158,4 +159,56 @@ void Fputs(const char *, FILE *)
 size_t	Readline(int, void *, size_t)
 {
 
+}
+
+size_t Writen(int fd, const void* vptr, size_t nbytes)
+{
+	size_t nleft;
+	size_t nwritten;
+	const char* ptr;
+
+	ptr = (const char*)vptr;
+	nleft = nbytes;
+
+	while(nleft > 0)
+	{
+		if( (nwritten = write( fd, ptr, nleft)) <= 0)
+		{
+			if(nwritten < 0 && errno == EINTR)
+				nwritten = 0;
+			else
+				return -1;
+		}
+
+		nleft -= nwritten;
+		ptr += nwritten;
+	}
+}
+
+size_t Readn(int fd, void* buff, size_t nbyte, size_t nbytes)
+{
+	size_t nleft;
+	size_t nread;
+	char* ptr;
+
+	ptr = (char*)buff;
+	nleft = nbytes;
+
+	while(nleft > 0)
+	{
+		if( (nread = read( fd, ptr, nleft)) < 0 )
+		{
+			if( errno == EINTR )
+				nread = 0;
+			else
+				return -1;
+		}
+		else if( nread == 0)
+			break;
+
+		nleft -= nread;
+		ptr   += nread;
+	}
+
+	return (nbytes - nleft);
 }

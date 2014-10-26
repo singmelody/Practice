@@ -49,6 +49,10 @@ char*	Fgets(char *, int, FILE *);
 
 void	Fputs(const char *, FILE *);
 
+size_t Readn(int files, void* buff, size_t nbyte, size_t nbytes);
+
+size_t Writen(int files, const void* buff, size_t nbytes);
+
 size_t	Readline(int, void *, size_t);
 
 enum ERRLEVEL
