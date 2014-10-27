@@ -140,10 +140,30 @@ void str_cli(FILE * fp, int sockfd)
 	}
 }
 
-void Writen(int fd, void* ptr, size_t nbytes)
+void str_echo(int sockfd)
 {
-	if(write( fd, ptr, nbytes) != nbytes)
+	size_t n;
+	char buff[MAXLINE];
+
+again:
+	while( ( n = recv( sockfd, buff, MAXLINE, 0)) > 0)
+	{
+		Writen( sockfd, buff, n);
+	}
+
+	if( n < 0 && errno == EINTR)
+		goto again;
+	else if( n < 0 )
+		err_sys("str_echo : read error");
+}
+
+size_t Writen(int fd, void* ptr, size_t nbytes)
+{
+	int n ;
+	if(( n = write( fd, ptr, nbytes)) != nbytes)
 		err_sys("writeen error");
+
+	return n;
 }
 
 char* Fgets(char *, int, FILE *)
@@ -156,12 +176,12 @@ void Fputs(const char *, FILE *)
 
 }
 
-size_t	Readline(int, void *, size_t)
+size_t	Readline(int fd, void *vptr, size_t maxlen) 
 {
 	size_t n, rc;
 	char c, *ptr;
 
-	ptr = vptr;
+	ptr = (char*)vptr;
 
 	for(n = 1; n < maxlen; n++)
 	{
@@ -241,4 +261,15 @@ size_t Readn(int fd, void* buff, size_t nbyte, size_t nbytes)
 	}
 
 	return (nbytes - nleft);
+}
+
+int sockfd_to_family(int sockfd)
+{
+	struct sockaddr_storage ss;
+	socklen_t len;
+	len = sizeof(ss);
+	if(getsockname( sockfd, (SA*)&ss, &len) < 0)
+		return -1;
+
+	return ss.ss_family;
 }

@@ -35,6 +35,8 @@ void Inet_pton(int, const char *, void *);
 
 void str_cli(FILE *, int);
 
+void str_echo(int sockfd);
+
 int snprintf(char *, size_t, const char *, ...);
 
 void err_sys(const char *, ...);
@@ -54,6 +56,8 @@ size_t Readn(int files, void* buff, size_t nbyte, size_t nbytes);
 size_t Writen(int files, const void* buff, size_t nbytes);
 
 size_t	Readline(int, void *, size_t);
+
+int sockfd_to_family(int sockfd);
 
 enum ERRLEVEL
 {
