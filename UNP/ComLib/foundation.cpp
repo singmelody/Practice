@@ -62,10 +62,20 @@ int Accept(int fd, SA* sa, socklen_t* salenptr)
 	return n;
 }
 
-int snprintf(char *str, size_t, const char *, ...)
+int snprintf(char * buff, size_t len, const char *fmt, ...)
 {
-	printf("%s\n",str);
-	return 0;
+	int n;
+	va_list ap;
+	
+	va_start( ap, fmt);
+	vsprintf( buff, fmt, ap);
+	n = strlen(buff);
+	va_end(ap);
+	
+	if( n >= len)
+		err_quit("snprintf : %s overflowed array", fmt);
+
+	return n;
 }
 
 void err_sys(const char * fmt, ...)
@@ -73,7 +83,9 @@ void err_sys(const char * fmt, ...)
 	// temp imp
 	printf("%s\n", fmt);
 
+#ifdef WIN32
 	WSACleanup( );
+#endif
 
 	va_list ap;
 
@@ -81,21 +93,39 @@ void err_sys(const char * fmt, ...)
 	err_doit( 1, LOG_ERR, fmt, ap);
 	va_end(ap);
 
-
 	exit(1);
 }
 
 /* Print message and return to caller
  * Caller specifies "errnoflag" and "level" */
 
-static void err_doit(int erronoflag, int level, const char* fmt, va_list ap)
+static void 
+	err_doit(int errnoflag, int level, const char* fmt, va_list ap)
 {
+	int errno_save;
+	char buf[MAXLINE + 1];
 
+	errno_save = errno;
+
+	vsprintf( buf, fmt, ap);
+	if(errnoflag)
+		sprintf( buf + strlen(buf), ": %s", strerror(errno_save));
+
+	strcat( buf, "\n");
+
+
+	fflush( stdout);		/* in case stdout and stderr are the same */
+	fputs( buf, stderr);
+	fflush(stderr);
 }
 
-void err_quit(const char * ptr, ...)
+void err_quit(const char * fmt, ...)
 {
-	printf("err_quit : %s\n", ptr);
+	va_list	ap;
+
+	va_start( ap, fmt);
+	err_doit( 0, LOG_ERR, fmt, ap);
+	va_end(ap);
 	exit(1);
 }
 
@@ -140,8 +170,8 @@ void str_cli(FILE * fp, int sockfd)
 	{
 		Writen( sockfd, sendLine, strlen(sendLine));
 
-// 		if(Readline(sockfd, recvLine, MAXLINE) == 0)
-// 			err_quit("str_cli : server terminated prematurely");
+		if(Readline(sockfd, recvLine, MAXLINE) == 0)
+			err_quit("str_cli : server terminated prematurely");
 
 		fputs( recvLine, stdout);
 	}
@@ -164,15 +194,6 @@ again:
 		err_sys("str_echo : read error");
 }
 
-size_t Writen(int fd, void* ptr, size_t nbytes)
-{
-	int n ;
-	if(( n = send( fd, (const char*)ptr, nbytes, 0)) != nbytes)
-		err_sys("writeen error");
-
-	return n;
-}
-
 char* Fgets(char *, int, FILE *)
 {
 	return NULL;
@@ -183,14 +204,15 @@ void Fputs(const char *, FILE *)
 
 }
 
-size_t	Readline(int fd, void *vptr, size_t maxlen) 
+
+size_t readline(int fd, void* str, size_t len)
 {
-	size_t n, rc;
+	size_t n, rc = 0;
 	char c, *ptr;
 
-	ptr = (char*)vptr;
+	ptr = (char*)str;
 
-	for(n = 1; n < maxlen; n++)
+	for(n = 1; n < len; n++)
 	{
 again:
 		if( ( rc == recv( fd, &c, 1, 0)) == 1)
@@ -218,14 +240,24 @@ again:
 	return n;
 }
 
-size_t Writen(int fd, const void* vptr, size_t nbytes)
+
+size_t	Readline(int fd, void *vptr, size_t maxlen) 
+{
+	size_t n;
+	if( ( n = readline( fd, vptr, maxlen)) < 0)
+		err_sys("");
+
+	return n;
+}
+
+size_t writen(int fd, const void* str, size_t len)
 {
 	size_t nleft;
 	size_t nwritten;
 	const char* ptr;
 
-	ptr = (const char*)vptr;
-	nleft = nbytes;
+	ptr = (const char*)str;
+	nleft = len;
 
 	while(nleft > 0)
 	{
@@ -240,6 +272,14 @@ size_t Writen(int fd, const void* vptr, size_t nbytes)
 		nleft -= nwritten;
 		ptr += nwritten;
 	}
+
+	return len;
+}
+
+void Writen(int fd, void* vptr, size_t nbytes)
+{
+	if(writen( fd, vptr, nbytes) != nbytes)
+		err_sys("writen error");
 }
 
 size_t Readn(int fd, void* buff, size_t nbyte, size_t nbytes)

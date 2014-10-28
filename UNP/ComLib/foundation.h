@@ -21,9 +21,13 @@ void Bind(int , SA*, int);
 
 void Listen( int, int);
 
-void Write( int, char*, int );
+size_t writen(int fd, const void* str, size_t len);
 
-size_t Writen(int fd, void* ptr, size_t nbytes);
+void Writen(int fd, void* ptr, size_t nbytes);
+
+size_t readline(int fd, const void* str, size_t len);
+
+size_t Readline(int, void *, size_t);
 
 void Close( int );
 
@@ -43,7 +47,7 @@ void err_sys(const char *, ...);
 
 void err_quit(const char *, ...);
 
-void err_doit(int ,int , const char* , va_list);
+void err_doit(int errnoflag, int level, const char* fmt, va_list ap);
 
 void InitWinSocket();
 
@@ -54,8 +58,6 @@ void	Fputs(const char *, FILE *);
 size_t Readn(int files, void* buff, size_t nbyte, size_t nbytes);
 
 size_t Writen(int files, const void* buff, size_t nbytes);
-
-size_t	Readline(int, void *, size_t);
 
 int sockfd_to_family(int sockfd);
 
