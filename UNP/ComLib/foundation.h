@@ -30,7 +30,9 @@ void Connect(int,const SA*, socklen_t);
 
 size_t writen(int fd, const void* str, size_t len);
 
-void Writen(int fd, void* ptr, size_t nbytes);
+void Writen(int fd, void* ptr, size_t nbytes);	// write localbuffer 2 socketbuffer
+
+void Write(int, void *, size_t); // write  localbuffer 2 socketbuffer
 
 size_t Readn(int files, void* buff, size_t nbyte, size_t nbytes);
 

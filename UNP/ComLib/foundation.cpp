@@ -29,15 +29,6 @@ void Listen(int fd, int backLog)
 
 }
 
-void Write(int fd, char* ptr, int nBytes)
-{
-#if WIN32
-	if(recv( fd, ptr, nBytes, 0) != nBytes)
-#else
-	if(write( fd, ptr, nBytes) != nBytes)
-#endif
-		err_sys("write error");
-}
 
 void Close(int fd)
 {
@@ -167,17 +158,17 @@ void Connect(int fd,const SA* sa, socklen_t salenptr)
 
 void str_cli(FILE * fp, int sockfd)
 {
-	char sendLine[MAXLINE];
-	char recvLine[MAXLINE];
-	while( Fgets( sendLine, MAXLINE, fp) != NULL)
-	{
-		Writen( sockfd, sendLine, strlen(sendLine));
+	char sendLine[MAXLINE] = {0};
+	char recvLine[MAXLINE] = {0};
+// 	while( Fgets( sendLine, MAXLINE, fp) != NULL)
+// 	{
+		Writen( sockfd, "world\n", strlen(sendLine));
 
 		if(Readline(sockfd, recvLine, MAXLINE) == 0)
 			err_quit("str_cli : server terminated prematurely");
 
 		Fputs( recvLine, stdout);
-	}
+//	}
 }
 
 void str_echo(int sockfd)
@@ -265,7 +256,7 @@ again:
 
 size_t readline(int fd, void* str, size_t len)
 {
-	size_t n, rc = -1;
+	size_t n, rc = 0;
 	char c, *ptr;
 
 	ptr = (char*)str;
@@ -273,7 +264,7 @@ size_t readline(int fd, void* str, size_t len)
 	for(n = 1; n < len; n++)
 	{
 again:
-		if( ( rc == my_read( fd, &c)) == 1)
+		if( ( rc = my_read( fd, &c)) == 1)
 		{
 			*ptr++ = c;
 			if( c == '\n' )
@@ -303,7 +294,7 @@ size_t	Readline(int fd, void *vptr, size_t maxlen)
 {
 	size_t n;
 	if( ( n = readline( fd, vptr, maxlen)) < 0)
-		err_sys("");
+		err_sys("readline error");
 
 	return n;
 }
@@ -338,6 +329,16 @@ void Writen(int fd, void* vptr, size_t nbytes)
 {
 	if(writen( fd, vptr, nbytes) != nbytes)
 		err_sys("writen error");
+}
+
+void Write(int fd, void* ptr, size_t nBytes)
+{
+#if WIN32
+	if(send( fd, (const char*)ptr, nBytes, 0) != nBytes)
+#else
+	if(write( fd, ptr, nBytes) != nBytes)
+#endif
+		err_sys("write error");
 }
 
 size_t Readn(int fd, void* buff, size_t nbyte, size_t nbytes)

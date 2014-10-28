@@ -25,5 +25,5 @@ int main(int argc, char ** argv)
 
 	str_cli( stdin , sockfd);
 
-	exit(1);
+	return 0;
 }

@@ -36,7 +36,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		ticks = time(NULL);
 		snprintf( buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
 
-		Writen( connfd, buff, strlen(buff));
+		Write( connfd, buff, strlen(buff));
 		
 		Close( connfd );
 	}
