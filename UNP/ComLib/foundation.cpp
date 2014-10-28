@@ -113,7 +113,6 @@ static void
 
 	strcat( buf, "\n");
 
-
 	fflush( stdout);		/* in case stdout and stderr are the same */
 	fputs( buf, stderr);
 	fflush(stderr);
@@ -122,6 +121,10 @@ static void
 void err_quit(const char * fmt, ...)
 {
 	va_list	ap;
+
+#ifdef WIN32
+	WSACleanup( );
+#endif
 
 	va_start( ap, fmt);
 	err_doit( 0, LOG_ERR, fmt, ap);
@@ -166,14 +169,14 @@ void str_cli(FILE * fp, int sockfd)
 {
 	char sendLine[MAXLINE];
 	char recvLine[MAXLINE];
-	while( fgets( sendLine, MAXLINE, fp) != NULL)
+	while( Fgets( sendLine, MAXLINE, fp) != NULL)
 	{
 		Writen( sockfd, sendLine, strlen(sendLine));
 
 		if(Readline(sockfd, recvLine, MAXLINE) == 0)
 			err_quit("str_cli : server terminated prematurely");
 
-		fputs( recvLine, stdout);
+		Fputs( recvLine, stdout);
 	}
 }
 
@@ -194,20 +197,75 @@ again:
 		err_sys("str_echo : read error");
 }
 
-char* Fgets(char *, int, FILE *)
+char* Fgets(char *ptr, int n, FILE *stream)
 {
-	return NULL;
+	char	*rptr;
+
+	if ( (rptr = fgets(ptr, n, stream)) == NULL && ferror(stream))
+		err_sys("fgets error");
+
+	return (rptr);
 }
 
-void Fputs(const char *, FILE *)
-{
 
+FILE *
+	Fdopen(int fd, const char *type)
+{
+	FILE	*fp;
+
+	if ( (fp = fdopen(fd, type)) == NULL)
+		err_sys("fdopen error");
+
+	return(fp);
+}
+
+void
+	Fputs(const char *ptr, FILE *stream)
+{
+	if (fputs(ptr, stream) == EOF)
+		err_sys("fputs error");
+}
+
+void
+	Fclose(FILE *fp)
+{
+	if (fclose(fp) != 0)
+		err_sys("fclose error");
+}
+
+static int	read_cnt;
+static char	*read_ptr;
+static char	read_buf[MAXLINE];
+
+static size_t 
+my_read(int fd, char* ptr)
+{
+	if( read_cnt <= 0 )
+	{
+again:
+		if( ( read_cnt = recv( fd, read_buf, sizeof(read_buf), 0)) < 0)
+		{
+			if(errno == EINTR)
+				goto again;
+			return -1;
+		}
+		else if( read_cnt == 0 )
+		{
+			return 0;
+		}
+
+		read_ptr = read_buf;
+	}
+
+	read_cnt--;
+	*ptr = *read_ptr++;
+	return 1;
 }
 
 
 size_t readline(int fd, void* str, size_t len)
 {
-	size_t n, rc = 0;
+	size_t n, rc = -1;
 	char c, *ptr;
 
 	ptr = (char*)str;
@@ -215,7 +273,7 @@ size_t readline(int fd, void* str, size_t len)
 	for(n = 1; n < len; n++)
 	{
 again:
-		if( ( rc == recv( fd, &c, 1, 0)) == 1)
+		if( ( rc == my_read( fd, &c)) == 1)
 		{
 			*ptr++ = c;
 			if( c == '\n' )
@@ -320,3 +378,4 @@ int sockfd_to_family(int sockfd)
 
 	return ss.ss_family;
 }
+

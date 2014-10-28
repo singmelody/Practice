@@ -15,19 +15,12 @@
 
 typedef int socklen_t;
 
+// socket functions
 int Socket(int , int ,int );
 
 void Bind(int , SA*, int);
 
 void Listen( int, int);
-
-size_t writen(int fd, const void* str, size_t len);
-
-void Writen(int fd, void* ptr, size_t nbytes);
-
-size_t readline(int fd, const void* str, size_t len);
-
-size_t Readline(int, void *, size_t);
 
 void Close( int );
 
@@ -35,6 +28,19 @@ int Accept( int , SA*, socklen_t*);
 
 void Connect(int,const SA*, socklen_t);
 
+size_t writen(int fd, const void* str, size_t len);
+
+void Writen(int fd, void* ptr, size_t nbytes);
+
+size_t Readn(int files, void* buff, size_t nbyte, size_t nbytes);
+
+size_t my_read(int fd, char* ptr);
+
+size_t readline(int fd, const void* str, size_t len);
+
+size_t Readline(int, void *, size_t);
+
+// transform functions
 void Inet_pton(int, const char *, void *);
 
 void str_cli(FILE *, int);
@@ -43,6 +49,7 @@ void str_echo(int sockfd);
 
 int snprintf(char *, size_t, const char *, ...);
 
+// error functions
 void err_sys(const char *, ...);
 
 void err_quit(const char *, ...);
@@ -51,13 +58,14 @@ void err_doit(int errnoflag, int level, const char* fmt, va_list ap);
 
 void InitWinSocket();
 
-char*	Fgets(char *, int, FILE *);
+// io functions
+void	 Fclose(FILE *);
+FILE	*Fdopen(int, const char *);
+char	*Fgets(char *, int, FILE *);
+FILE	*Fopen(const char *, const char *);
+void	 Fputs(const char *, FILE *);
 
-void	Fputs(const char *, FILE *);
 
-size_t Readn(int files, void* buff, size_t nbyte, size_t nbytes);
-
-size_t Writen(int files, const void* buff, size_t nbytes);
 
 int sockfd_to_family(int sockfd);
 
