@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="daytimeclt.cpp">
+    <ClCompile Include="simple.cpp">
       <Filter>资源文件</Filter>
     </ClCompile>
   </ItemGroup>
