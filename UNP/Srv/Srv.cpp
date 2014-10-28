@@ -34,7 +34,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		printf("connection from %s, port %d\n", inet_ntop( AF_INET, &cliaddr.sin_addr, buff, sizeof(buff)), ntohs(cliaddr.sin_port));
 
 		ticks = time(NULL);
-		snprintf( buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
+		printf( buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
 
 		Write( connfd, buff, strlen(buff));
 		

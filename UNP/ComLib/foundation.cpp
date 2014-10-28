@@ -57,16 +57,22 @@ int Accept(int fd, SA* sa, socklen_t* salenptr)
 		err_sys("accept error");
 	}
 
+	printf("Accept Success\n");
+
 	return n;
 }
 
-int snprintf(char *, size_t, const char *, ...)
+int snprintf(char *str, size_t, const char *, ...)
 {
+	printf("%s\n",str);
 	return 0;
 }
 
 void err_sys(const char * fmt, ...)
 {
+	// temp imp
+	printf("%s\n", fmt);
+
 	WSACleanup( );
 
 	va_list ap;
@@ -87,9 +93,10 @@ static void err_doit(int erronoflag, int level, const char* fmt, va_list ap)
 
 }
 
-void err_quit(const char *, ...)
+void err_quit(const char * ptr, ...)
 {
-
+	printf("err_quit : %s\n", ptr);
+	exit(1);
 }
 
 #ifdef WIN32
@@ -129,14 +136,14 @@ void str_cli(FILE * fp, int sockfd)
 {
 	char sendLine[MAXLINE];
 	char recvLine[MAXLINE];
-	while( Fgets( sendLine, MAXLINE, fp) != NULL)
+	while( fgets( sendLine, MAXLINE, fp) != NULL)
 	{
 		Writen( sockfd, sendLine, strlen(sendLine));
 
-		if(Readline(sockfd, recvLine, MAXLINE) == 0)
-			err_quit("str_cli : server terminated prematurely");
+// 		if(Readline(sockfd, recvLine, MAXLINE) == 0)
+// 			err_quit("str_cli : server terminated prematurely");
 
-		Fputs( recvLine, stdout);
+		fputs( recvLine, stdout);
 	}
 }
 
@@ -160,7 +167,7 @@ again:
 size_t Writen(int fd, void* ptr, size_t nbytes)
 {
 	int n ;
-	if(( n = write( fd, ptr, nbytes)) != nbytes)
+	if(( n = send( fd, (const char*)ptr, nbytes, 0)) != nbytes)
 		err_sys("writeen error");
 
 	return n;
@@ -168,7 +175,7 @@ size_t Writen(int fd, void* ptr, size_t nbytes)
 
 char* Fgets(char *, int, FILE *)
 {
-
+	return NULL;
 }
 
 void Fputs(const char *, FILE *)
@@ -186,7 +193,7 @@ size_t	Readline(int fd, void *vptr, size_t maxlen)
 	for(n = 1; n < maxlen; n++)
 	{
 again:
-		if( ( rc == read( fd, &c, 1)) == 1)
+		if( ( rc == recv( fd, &c, 1, 0)) == 1)
 		{
 			*ptr++ = c;
 			if( c == '\n' )
@@ -222,7 +229,7 @@ size_t Writen(int fd, const void* vptr, size_t nbytes)
 
 	while(nleft > 0)
 	{
-		if( (nwritten = write( fd, ptr, nleft)) <= 0)
+		if( (nwritten = send( fd, ptr, nleft, 0)) <= 0)
 		{
 			if(nwritten < 0 && errno == EINTR)
 				nwritten = 0;
@@ -246,7 +253,7 @@ size_t Readn(int fd, void* buff, size_t nbyte, size_t nbytes)
 
 	while(nleft > 0)
 	{
-		if( (nread = read( fd, ptr, nleft)) < 0 )
+		if( (nread = recv( fd, ptr, nleft, 0)) < 0 )
 		{
 			if( errno == EINTR )
 				nread = 0;

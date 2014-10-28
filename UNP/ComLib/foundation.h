@@ -11,7 +11,7 @@
    kernels still #define it as 5, while actually supporting many more */
 #define	LISTENQ		1024
 #define	SA	struct sockaddr
-#define	SERV_PORT		 9877
+#define	SERV_PORT		 13
 
 typedef int socklen_t;
 
@@ -23,7 +23,7 @@ void Listen( int, int);
 
 void Write( int, char*, int );
 
-void Writen( int, void*, size_t);
+size_t Writen(int fd, void* ptr, size_t nbytes);
 
 void Close( int );
 

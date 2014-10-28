@@ -1,0 +1,1 @@
+start .\Debug\Srv.exe

@@ -8,6 +8,10 @@ int main(int argc, char ** argv)
 	if(argc != 2)
 		err_quit("uage : tcpcli <IPaddress>");
 
+#ifdef WIN32
+	InitWinSocket();
+#endif
+
 	sockfd = Socket( AF_INET, SOCK_STREAM, 0);
 
 	memset( &servaddr, 0, sizeof(servaddr));
@@ -17,7 +21,7 @@ int main(int argc, char ** argv)
 	
 	Inet_pton( AF_INET, argv[1], &servaddr.sin_addr);
 
-	Connect( sockfd, (SA*) servaddr.sin_family, sizeof(servaddr));
+	Connect( sockfd, (SA*) &servaddr, sizeof(servaddr));
 
 	str_cli( stdin , sockfd);
 
